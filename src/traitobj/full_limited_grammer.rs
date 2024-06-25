@@ -1,8 +1,8 @@
-trait Pilot {
+pub trait Pilot {
     fn fly(&self) -> String;
 }
 
-trait Wizard {
+pub trait Wizard {
     fn fly(&self) -> String;
 }
 

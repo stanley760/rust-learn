@@ -1,4 +1,4 @@
-fn borrow_element_same_time() {
+pub fn invoke() {
     let mut v = vec![1, 2, 3];
     for i in &v {
         println!("{}", i)

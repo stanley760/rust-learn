@@ -14,3 +14,10 @@ impl MyTrait for String {
 fn my_function(x: impl MyTrait)  -> impl MyTrait {
     x.f()
 }
+
+pub fn invoke() {
+    let x = my_function(42);
+    // println!("{:?}", x);
+    let y = my_function("hello".to_string());
+    println!()
+}

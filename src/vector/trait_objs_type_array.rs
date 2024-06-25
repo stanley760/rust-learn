@@ -18,7 +18,7 @@ impl IpAddr for V6 {
     }
 }
 
-pub fn main() {
+pub fn invoke() {
     let v: Vec<Box<dyn IpAddr>> = vec![                // 需要定义手动地指定类型
         Box::new(V4("127.0.0.1".to_string())),
         Box::new(V6("::1".to_string())),

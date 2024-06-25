@@ -1,13 +1,16 @@
+use crate::traitobj::full_limited_grammer::Pilot;
+use crate::traitobj::full_limited_grammer::Wizard;
+
 struct Human;
 impl Pilot for Human {
-    fn fly(&self) {
-        println!("This is your captain speaking.")
+    fn fly(&self) -> String {
+        String::from("This is your captain speaking.")
     }
 }
 
 impl Wizard for Human {
-    fn fly(&self) {
-        println!("Up!")
+    fn fly(&self) -> String{
+        String::from("Up!")
     }
 }
 

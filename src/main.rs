@@ -1,8 +1,10 @@
+use rust_learn::circle::diff_circle;
+use rust_learn::table:: map_lifetime;
+use rust_learn::traitobj::*;
 
 fn main() {
-    println!("{:?}", display(1,2))
-}
-
-fn display(x: i32, y : i32) -> (i32, i32) {
-    (x, y)
+    diff_circle::invoke();
+    map_lifetime::invoke();
+    advance_trait_generic_params::invoke();
+    advance_limited_grammer::invoke();
 }

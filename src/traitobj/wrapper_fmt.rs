@@ -8,3 +8,8 @@ impl fmt::Display for Wrapper {
         write!(f, "[{}]", self.0.join(", "))
     }
 }
+
+pub fn invoke() {
+    let w = Wrapper(vec!["hello", "world"]);
+    println!("w = {}", w);
+}
