@@ -35,3 +35,8 @@ pub mod vector {
     pub mod vec_method;
     pub mod vec_sort;
 }
+
+pub mod types {
+    pub mod express;
+    pub mod num;
+}

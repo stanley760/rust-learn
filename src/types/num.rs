@@ -1,6 +1,6 @@
 use num::Complex;
 
-fn type_num() {
+pub fn invoke() {
     println!("===================complex==================>");
     numb_complex();
     println!("=====================range==================>");
@@ -86,15 +86,15 @@ fn float_diff_eq() {
 
     println!("abc (f32)");
     println!("   0.1 + 0.2: {:x}", (abc.0 + abc.1).to_bits());
-    println!("         0.3: {:x}", (abc.2).to_bits());
+    println!("         0.3: {:x}", abc.2.to_bits());
     println!();
 
     println!("xyz (f64)");
     println!("   0.1 + 0.2: {:x}", (xyz.0 + xyz.1).to_bits());
-    println!("         0.3: {:x}", (xyz.2).to_bits());
+    println!("         0.3: {:x}", xyz.2.to_bits());
     println!();
 
-    assert!(abc.0 + abc.1 == abc.2);
+    assert_eq!(abc.0 + abc.1, abc.2);
     //assert!(xyz.0 + xyz.1 == xyz.2); err
 }
 

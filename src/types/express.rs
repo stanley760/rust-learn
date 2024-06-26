@@ -30,3 +30,14 @@ fn plus_or_minus(x:i32) -> i32 {
 
     x + 5
 }
+
+pub fn invoke() {
+    let x = 5;
+    let y = 10.0;
+    another_function(x, y);
+    println!("The value of x is: {}", x);
+    println!("The value of y is: {}", y);
+    println!("The value of the method with plus_or_minus is: {}", plus_or_minus(x));
+    println!("The value of the method with add_with_extra is: {}", add_with_extra(x, x));
+    ret_unit_type();
+}

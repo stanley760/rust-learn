@@ -20,7 +20,11 @@ trait CompSciStudent: Programmer + Student {
 
 fn comp_sci_student_greeting(student: &dyn CompSciStudent) -> String {
     format!(
-        "My name is {} and I attend {}. My favorite language is {}. My Git username is {}",
+        "/*********************************\n\
+        My name is {} and I attend {}. \n\
+        My favorite language is {}. \n\
+        My Git username is {}\n\
+        /*********************************",
         student.name(),
         student.university(),
         student.fav_language(),
