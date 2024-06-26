@@ -30,7 +30,6 @@ pub mod vector {
     pub mod exercise_3;
     pub mod exercise_4;
     pub mod exercise_7;
-    pub mod exercise_8;
     pub mod trait_objs_type_array;
     pub mod vec_method;
     pub mod vec_sort;
@@ -39,4 +38,8 @@ pub mod vector {
 pub mod types {
     pub mod express;
     pub mod num;
+}
+
+pub mod characters {
+    pub mod strings;
 }

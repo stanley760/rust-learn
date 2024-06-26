@@ -1,3 +1,4 @@
+use rust_learn::characters::strings;
 use rust_learn::circle::diff_circle;
 use rust_learn::table::map_lifetime;
 use rust_learn::traitobj::*;
@@ -27,8 +28,9 @@ fn main() {
     exercise_3::invoke();
     exercise_4::invoke();
     exercise_7::invoke();
-    exercise_8::invoke();
     trait_objs_type_array::invoke();
     vec_method::invoke();
     vec_sort::invoke();
+    
+    strings::push_str();
 }

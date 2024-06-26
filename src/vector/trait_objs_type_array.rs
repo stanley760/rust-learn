@@ -1,4 +1,4 @@
-trait IpAddr {
+pub trait IpAddr {
     fn display(&self);
 }
 
