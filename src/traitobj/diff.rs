@@ -1,4 +1,4 @@
-
+use rand::Rng;
 struct Sheep {}
 struct Cow {}
 
@@ -26,4 +26,12 @@ fn random_animal(random_number: f64) -> Box<dyn Animal> {
     } else {
         Box::new(Cow {})
     }
+}
+
+pub fn invoke() {
+    let mut rng = rand::thread_rng();
+    
+    let random_number = rng.gen();
+    let animal = random_animal(random_number);
+    println!("animal make a noise :{}", animal.noise())
 }

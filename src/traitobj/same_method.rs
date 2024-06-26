@@ -19,3 +19,10 @@ impl Human {
         println!("*waving arms furiously*");
     }
 }
+
+pub fn invoke() {
+    let person = Human;
+    println!("Pilot: {}", Pilot::fly(&person));
+    println!("Wizard:{}", Wizard::fly(&person));
+    person.fly();
+}

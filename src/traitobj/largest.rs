@@ -31,3 +31,15 @@ fn largetst<T:PartialOrd> (list: &[T]) -> &T {
 
     largest
 }
+
+pub fn invoke() {
+    let number_list = vec![34, 50, 25, 100, 65];
+
+    let result = largestst(&number_list);
+    println!("largestst :{}", result);
+    let char_list = vec!['y', 'm', 'a', 'q'];
+    let result = largetst(&char_list);
+    println!("largestst :{}", result);
+    let result = largest(&number_list);
+    println!("largest :{}", result);
+}

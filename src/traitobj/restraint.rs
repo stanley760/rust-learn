@@ -9,3 +9,8 @@ fn sum1<T>(x: T, y: T) -> T
     where T: Add<Output=T> {
     x + y
 }
+
+pub fn invoke() {
+    println!("sum:{}",sum(1,2));
+    println!("sum1:{}",sum1(1,2));
+}

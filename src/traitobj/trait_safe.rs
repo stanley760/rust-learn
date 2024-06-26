@@ -16,8 +16,8 @@ fn my_function(x: impl MyTrait)  -> impl MyTrait {
 }
 
 pub fn invoke() {
-    let x = my_function(42);
+    let _x = my_function(42);
     // println!("{:?}", x);
-    let y = my_function("hello".to_string());
-    println!()
+    let _y = my_function("hello".to_string());
+    println!("my trait")
 }
