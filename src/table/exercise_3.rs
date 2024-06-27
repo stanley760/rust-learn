@@ -4,10 +4,10 @@ pub fn invoke() {
     let mut map = HashMap::new();
     let value = "hoho";
 
-    map. entry("poneyland").or_insert_with(|| value);
+    map.entry("poneyland").or_insert_with(|| value);
 
     assert_eq!(map["poneyland"], "hoho");
-    
+
     // 编译器可以根据后续的使用情况帮我自动推断出 HashMap 的类型，当然你也可以显式地标注类型：HashMap<&str, u8>
     let mut player_stats = HashMap::new();
 
@@ -17,7 +17,9 @@ pub fn invoke() {
     assert_eq!(player_stats["health"], 100);
 
     // 通过函数来返回新的值
-    player_stats.entry("health").or_insert_with(random_stat_buff);
+    player_stats
+        .entry("health")
+        .or_insert_with(random_stat_buff);
     assert_eq!(player_stats["health"], 100);
 
     let health = player_stats.entry("health").or_insert(50);

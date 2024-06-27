@@ -12,7 +12,6 @@ pub fn invoke() {
     // 使用两种方法来解决错误
     let s: String = 'a'.into();
 
-    
     println!("s:{}; i3:{}", s, i3);
     println!("Success!")
 }

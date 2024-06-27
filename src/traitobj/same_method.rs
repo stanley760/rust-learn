@@ -9,7 +9,7 @@ impl Pilot for Human {
 }
 
 impl Wizard for Human {
-    fn fly(&self) -> String{
+    fn fly(&self) -> String {
         String::from("Up!")
     }
 }

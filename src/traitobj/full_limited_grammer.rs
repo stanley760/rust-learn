@@ -29,7 +29,10 @@ impl Human {
 pub fn invoke() {
     let person = Human;
 
-    assert_eq!(Pilot::fly(&person), String::from("This is your captain speaking."));
+    assert_eq!(
+        Pilot::fly(&person),
+        String::from("This is your captain speaking.")
+    );
     assert_eq!(Wizard::fly(&person), String::from("Up!"));
     assert_eq!(person.fly(), String::from("*waving arms furiously*"));
 

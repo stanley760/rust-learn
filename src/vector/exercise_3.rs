@@ -8,7 +8,6 @@ pub fn invoke() {
 
     assert_eq!(v1, v2);
 
-
     // String -> Vec
     // impl From<String> for Vec
     let s = "hello".to_string();
@@ -20,7 +19,7 @@ pub fn invoke() {
 
     // impl<'_> From<&'_ str> for Vec
     let s = "hello";
-    let v3 : Vec<u8> = Vec::from(s);
+    let v3: Vec<u8> = Vec::from(s);
     assert_eq!(v2, v3);
 
     // 迭代器 Iterators 可以通过 collect 变成 Vec

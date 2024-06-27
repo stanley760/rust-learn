@@ -1,4 +1,3 @@
-
 #[allow(overflowing_literals)]
 pub fn invoke() {
     let decimal = 97.123_f32;
@@ -17,7 +16,7 @@ pub fn invoke() {
     // 因此以下代码会报溢出的错误： literal out of range for `u8`.
     // **请仔细查看相应的编译错误，从中寻找到解决的办法**
     // **不要修改 main 中的任何代码**
-    
+
     let _v = 1000 as u8;
 
     println!("Success!")

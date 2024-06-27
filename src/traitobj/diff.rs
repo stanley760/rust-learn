@@ -30,7 +30,7 @@ fn random_animal(random_number: f64) -> Box<dyn Animal> {
 
 pub fn invoke() {
     let mut rng = rand::thread_rng();
-    
+
     let random_number = rng.gen();
     let animal = random_animal(random_number);
     println!("animal make a noise :{}", animal.noise())

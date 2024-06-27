@@ -1,12 +1,12 @@
 pub fn invoke() {
     let mut v = Vec::from([1, 2, 3]);
     for i in v.iter() {
-        println!("{:?}", v[*i -1])
+        println!("{:?}", v[*i - 1])
     }
 
     for i in 0..5 {
         match v.get(i) {
-            Some(x) => v[i] = x +1,
+            Some(x) => v[i] = x + 1,
             None => v.push(i + 2),
         }
     }

@@ -3,7 +3,6 @@ struct ImportantExcerpt<'a> {
     part: &'a str,
 }
 
-
 pub fn invoke() {
     let novel = String::from("Call me Ishmael. Some years ago...");
     let first_sentence = novel.split('.').next().expect("Could not find a '.'");
@@ -14,7 +13,7 @@ pub fn invoke() {
 
     let mut table = HashMap::new();
     table.insert("one", 1);
-    
+
     let mut table1 = HashMap::new();
     table1.insert("two", 2);
     table1.insert("three", 3);
@@ -35,7 +34,6 @@ pub fn invoke() {
     let x1: HashMap<String, i32> = teams.into_iter().collect();
     println!("{:?}", x1);
 
-
     let x = 5;
     let r = &x;
 
@@ -47,7 +45,6 @@ pub fn invoke() {
     let result = longest(string1.as_str(), string2);
     println!("The longest string is {}", result);
 }
-
 
 fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
     if x.len() > y.len() {

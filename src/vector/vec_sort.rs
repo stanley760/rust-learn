@@ -21,7 +21,6 @@ pub fn invoke() {
     println!("{:?}", vec2);
 }
 
-
 #[derive(Debug, Ord, Eq, PartialEq, PartialOrd)]
 struct Person {
     name: String,

@@ -1,6 +1,6 @@
 pub fn invoke() {
     // 填空
-    let v : Vec<IpAddr> = vec![
+    let v: Vec<IpAddr> = vec![
         IpAddr::V4("127.0.0.1".to_string()),
         IpAddr::V6("::1".to_string()),
     ];
@@ -17,4 +17,3 @@ enum IpAddr {
     V4(String),
     V6(String),
 }
-

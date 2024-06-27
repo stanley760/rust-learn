@@ -1,4 +1,4 @@
-fn largest<T:PartialOrd + Clone> (list: &[T]) -> T {
+fn largest<T: PartialOrd + Clone>(list: &[T]) -> T {
     let mut largetst = list[0].clone();
     for item in list.iter().clone() {
         if *item > largetst {
@@ -8,7 +8,7 @@ fn largest<T:PartialOrd + Clone> (list: &[T]) -> T {
     largetst
 }
 
-fn largestst<T:PartialOrd + Copy> (list: &[T]) -> T {
+fn largestst<T: PartialOrd + Copy>(list: &[T]) -> T {
     let mut largest = list[0];
 
     for &item in list.iter() {
@@ -20,7 +20,7 @@ fn largestst<T:PartialOrd + Copy> (list: &[T]) -> T {
     largest
 }
 
-fn largetst<T:PartialOrd> (list: &[T]) -> &T {
+fn largetst<T: PartialOrd>(list: &[T]) -> &T {
     let mut largest = &list[0];
 
     for item in list.iter() {

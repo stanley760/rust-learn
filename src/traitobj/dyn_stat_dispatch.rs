@@ -3,21 +3,25 @@ trait Foo {
 }
 
 impl Foo for u8 {
-    fn method(&self) -> String { format!("u8: {}", *self) }
+    fn method(&self) -> String {
+        format!("u8: {}", *self)
+    }
 }
 
 impl Foo for String {
-    fn method(&self) -> String { format!("string: {}", *self) }
+    fn method(&self) -> String {
+        format!("string: {}", *self)
+    }
 }
 
 // 通过泛型实现以下函数
-fn static_dispatch<T:Foo>(x: T) {
-    println!("generic -> {}",x.method());
+fn static_dispatch<T: Foo>(x: T) {
+    println!("generic -> {}", x.method());
 }
 
 // 通过特征对象实现以下函数
 fn dynamic_dispatch(x: &dyn Foo) {
-    println!("trait object -> {}",x.method())
+    println!("trait object -> {}", x.method())
 }
 
 pub fn invoke() {

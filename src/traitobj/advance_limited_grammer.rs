@@ -24,7 +24,7 @@ impl AgeWidget for Form {
 }
 
 pub fn invoke() {
-    let form = Form{
+    let form = Form {
         username: "rustacean".to_owned(),
         age: 28,
     };

@@ -1,15 +1,14 @@
 use rust_learn::characters::strings;
 use rust_learn::circle::diff_circle;
+use rust_learn::convert;
+use rust_learn::from_into;
+use rust_learn::oth_convert;
 use rust_learn::table;
 use rust_learn::traitobj::*;
 use rust_learn::types;
 use rust_learn::vector;
-use rust_learn::convert;
-use rust_learn::from_into;
-use rust_learn::oth_convert;
 
 fn main() {
-    
     diff_circle::invoke();
     table::map_lifetime::invoke();
     table::exercise_1::invoke();
@@ -44,7 +43,7 @@ fn main() {
     vector::vec_sort::invoke();
 
     strings::push_str();
-    
+
     convert::type_as::invoke();
     convert::exercise_3::invoke();
     convert::exercise_4::invoke();

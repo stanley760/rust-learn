@@ -10,7 +10,6 @@ impl Display for Point {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "The point is ({}, {})", self.x, self.y)
     }
-
 }
 
 pub fn invoke() {

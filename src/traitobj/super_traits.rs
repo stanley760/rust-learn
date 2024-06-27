@@ -46,7 +46,6 @@ impl Person for CSStudent {
     }
 }
 
-
 impl Student for CSStudent {
     fn university(&self) -> String {
         self.university.to_string()

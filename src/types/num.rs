@@ -24,7 +24,7 @@ pub fn invoke() {
 }
 
 fn numb_complex() {
-    let b = Complex {re: 1.0, im: -2.0};
+    let b = Complex { re: 1.0, im: -2.0 };
     let a = Complex::new(11.1, 22.2);
     let res = a + b;
     println!("({}) + ({}) = ({})", a, b, res);
@@ -32,7 +32,7 @@ fn numb_complex() {
 
 fn fun_range() {
     for i in 'a'..='z' {
-        print!("{} ",i);
+        print!("{} ", i);
     }
     println!();
 }
@@ -48,7 +48,7 @@ fn operation_bit() {
     println!("!b : {}", !b); // 100
     println!("a << b : {}", a << b);
     println!("a >> b : {}", a >> b);
-    let mut a = a; 
+    let mut a = a;
     a <<= b;
     println!("a <<= b : {}", a);
 }

@@ -1,4 +1,3 @@
-
 struct Container(i32, i32);
 
 trait Contains {
@@ -16,10 +15,14 @@ impl Contains for Container {
         (&self.0 == number_1) && (&self.1 == number_2)
     }
     // Grab the first number.
-    fn first(&self) -> i32 { self.0 }
+    fn first(&self) -> i32 {
+        self.0
+    }
 
     // Grab the last number.
-    fn last(&self) -> i32 { self.1 }
+    fn last(&self) -> i32 {
+        self.1
+    }
 }
 
 fn difference<C: Contains>(container: &C) -> i32 {
@@ -32,9 +35,12 @@ pub fn invoke() {
 
     let container = Container(number_1, number_2);
 
-    println!("Does container contain {} and {}: {}",
-             &number_1, &number_2,
-             container.contains(&number_1, &number_2));
+    println!(
+        "Does container contain {} and {}: {}",
+        &number_1,
+        &number_2,
+        container.contains(&number_1, &number_2)
+    );
     println!("First number: {}", container.first());
     println!("Last number: {}", container.last());
 
