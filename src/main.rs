@@ -56,4 +56,5 @@ fn main() {
     from_into::exercise_5::invoke();
     oth_convert::exercise_1::invoke();
     oth_convert::exercise_2::invoke();
+    oth_convert::exercise_3::invoke();
 }
