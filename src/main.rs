@@ -5,6 +5,7 @@ use rust_learn::traitobj::*;
 use rust_learn::types;
 use rust_learn::vector;
 use rust_learn::convert;
+use rust_learn::from_into;
 
 fn main() {
     
@@ -47,4 +48,9 @@ fn main() {
     convert::exercise_3::invoke();
     convert::exercise_4::invoke();
     convert::exercise_5::invoke();
+    from_into::exercise_1::invoke();
+    from_into::exercise_2::invoke();
+    from_into::exercise_3::invoke();
+    from_into::exercise_4::invoke();
+    from_into::exercise_5::invoke();
 }

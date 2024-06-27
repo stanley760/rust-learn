@@ -67,3 +67,14 @@ pub mod types {
 pub mod characters {
     pub mod strings;
 }
+
+pub mod from_into {
+    pub mod exercise_1;
+    
+    pub mod exercise_2;
+    
+    pub mod exercise_3;
+    
+    pub mod exercise_4;
+    pub mod exercise_5;
+}
