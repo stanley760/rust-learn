@@ -8,3 +8,4 @@ lib = { path = "/src" }
 [dependencies]
 rand = "0.8.5"
 num = "0.4.0"
+twox-hash = "1.6.3"

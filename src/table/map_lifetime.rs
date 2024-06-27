@@ -14,8 +14,11 @@ pub fn invoke() {
 
     let mut table = HashMap::new();
     table.insert("one", 1);
-    table.insert("two", 2);
-    table.insert("three", 3);
+    
+    let mut table1 = HashMap::new();
+    table1.insert("two", 2);
+    table1.insert("three", 3);
+    table.extend(table1);
     for (key, value) in &table {
         println!("{}: {}", key, value);
     }

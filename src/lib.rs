@@ -4,6 +4,30 @@ pub mod circle {
 
 pub mod table { 
     pub mod map_lifetime; 
+    
+    pub mod exercise_1;
+    
+    pub mod exercise_2;
+    
+    pub mod exercise_3;
+    
+    pub mod exercise_4;
+    
+    pub mod exercise_count_word;
+    
+    pub mod exercise_5;
+    
+    pub mod exercise_6;
+}
+
+pub mod convert {
+    pub mod type_as;
+    
+    pub mod exercise_3;
+    
+    pub mod exercise_4;
+    
+    pub mod exercise_5;
 }
 
 pub mod traitobj {
