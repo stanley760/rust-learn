@@ -28,6 +28,15 @@ pub mod convert {
     pub mod exercise_4;
     
     pub mod exercise_5;
+    
+    
+}
+
+pub mod oth_convert {
+    
+    pub mod exercise_1;
+    
+    pub mod exercise_2;
 }
 
 pub mod traitobj {

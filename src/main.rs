@@ -6,6 +6,7 @@ use rust_learn::types;
 use rust_learn::vector;
 use rust_learn::convert;
 use rust_learn::from_into;
+use rust_learn::oth_convert;
 
 fn main() {
     
@@ -53,4 +54,6 @@ fn main() {
     from_into::exercise_3::invoke();
     from_into::exercise_4::invoke();
     from_into::exercise_5::invoke();
+    oth_convert::exercise_1::invoke();
+    oth_convert::exercise_2::invoke();
 }
