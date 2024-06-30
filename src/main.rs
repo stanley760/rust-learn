@@ -7,6 +7,7 @@ use rust_learn::table;
 use rust_learn::traitobj::*;
 use rust_learn::types;
 use rust_learn::vector;
+use rust_learn::errors;
 
 fn main() {
     diff_circle::invoke();
@@ -20,27 +21,31 @@ fn main() {
     table::exercise_count_word::invoke();
     advance_trait_generic_params::invoke();
     advance_limited_grammer::invoke();
-    restraint::invoke();
+
+    
     diff::invoke();
-    dyn_stat_dispatch::invoke();
     largest::invoke();
-    same_method::invoke();
-    super_traits::invoke();
-    trait_safe::invoke();
-    wrapper_fmt::invoke();
-
-    types::express::invoke();
+    restraint::invoke();
     types::num::invoke();
+    trait_safe::invoke();
+    same_method::invoke();
+    wrapper_fmt::invoke();
+    super_traits::invoke();
+    types::express::invoke();
+    dyn_stat_dispatch::invoke();
 
-    vector::dynamic_array::invoke();
+
+    vector::vec_sort::invoke();
     vector::exercise_1::invoke();
     vector::exercise_2::invoke();
     vector::exercise_3::invoke();
     vector::exercise_4::invoke();
     vector::exercise_7::invoke();
-    vector::trait_objs_type_array::invoke();
     vector::vec_method::invoke();
-    vector::vec_sort::invoke();
+    vector::dynamic_array::invoke();
+    vector::trait_objs_type_array::invoke();
+    
+
 
     strings::push_str();
 
@@ -56,4 +61,12 @@ fn main() {
     oth_convert::exercise_1::invoke();
     oth_convert::exercise_2::invoke();
     oth_convert::exercise_3::invoke();
+
+    errors::exercise_2::invoke();
+    errors::exercise_res_1::invoke();
+    errors::exercise_res_2::invoke();
+    errors::exercise_res_3::invoke();
+    errors::exercise_res_4::invoke();
+    errors::exercise_res_5::invoke();
+    
 }

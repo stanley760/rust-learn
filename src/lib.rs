@@ -87,3 +87,15 @@ pub mod from_into {
     pub mod exercise_4;
     pub mod exercise_5;
 }
+
+
+pub mod errors {
+    pub mod exercise_1;
+    pub mod exercise_2;
+
+    pub mod exercise_res_1;   
+    pub mod exercise_res_2;   
+    pub mod exercise_res_3;   
+    pub mod exercise_res_4;   
+    pub mod exercise_res_5;   
+}
