@@ -116,3 +116,7 @@ pub mod lifetime {
     
     pub mod exercise_6;
 }
+
+pub mod closure {
+    pub mod cacher;
+}
