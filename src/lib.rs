@@ -102,3 +102,17 @@ pub mod errors {
     pub mod exercise_res_5;   
     pub mod exercise_res_6;   
 }
+
+pub mod lifetime {
+    pub mod reborrow;
+    
+    pub mod nll;
+    
+    pub mod reborrow_lt;
+    
+    pub mod exercise_2;
+    
+    pub mod exercise_5;
+    
+    pub mod exercise_6;
+}

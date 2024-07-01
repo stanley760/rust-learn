@@ -8,6 +8,7 @@ use rust_learn::traitobj::*;
 use rust_learn::types;
 use rust_learn::vector;
 use rust_learn::errors;
+use rust_learn::lifetime;
 
 fn main() {
     diff_circle::invoke();
@@ -70,4 +71,9 @@ fn main() {
     errors::exercise_res_4::invoke();
     errors::exercise_res_5::invoke();
     errors::exercise_res_6::invoke();
+    
+    lifetime::reborrow::invoke();
+    lifetime::reborrow_lt::invoke();
+    lifetime::exercise_5::invoke();
+    lifetime::exercise_6::invoke();
 }
