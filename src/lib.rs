@@ -28,6 +28,8 @@ pub mod convert {
     pub mod exercise_4;
 
     pub mod exercise_5;
+    
+    pub mod transmute;
 }
 
 pub mod oth_convert {
@@ -98,4 +100,5 @@ pub mod errors {
     pub mod exercise_res_3;   
     pub mod exercise_res_4;   
     pub mod exercise_res_5;   
+    pub mod exercise_res_6;   
 }

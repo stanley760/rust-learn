@@ -53,6 +53,7 @@ fn main() {
     convert::exercise_3::invoke();
     convert::exercise_4::invoke();
     convert::exercise_5::invoke();
+    convert::transmute::invoke();
     from_into::exercise_1::invoke();
     from_into::exercise_2::invoke();
     from_into::exercise_3::invoke();
@@ -68,5 +69,5 @@ fn main() {
     errors::exercise_res_3::invoke();
     errors::exercise_res_4::invoke();
     errors::exercise_res_5::invoke();
-    
+    errors::exercise_res_6::invoke();
 }
