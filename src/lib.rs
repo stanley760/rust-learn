@@ -144,3 +144,7 @@ pub mod closure {
     
     pub mod exercise_11;
 }
+
+pub mod iterator {
+    pub mod simulate_for;
+}
