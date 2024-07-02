@@ -9,6 +9,7 @@ use rust_learn::types;
 use rust_learn::vector;
 use rust_learn::errors;
 use rust_learn::lifetime;
+use rust_learn::closure;
 
 fn main() {
     diff_circle::invoke();
@@ -76,4 +77,9 @@ fn main() {
     lifetime::reborrow_lt::invoke();
     lifetime::exercise_5::invoke();
     lifetime::exercise_6::invoke();
+
+    closure::cacher::invoke();
+    closure::fn_once::invoke();
+    closure::moves::invoke();
+    closure::fn_mut::invoke();
 }

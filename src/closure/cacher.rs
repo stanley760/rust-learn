@@ -31,6 +31,13 @@ impl<T, E> Cacher<T, E>
     }
 }
 
+pub fn invoke() {
+    let mut c = Cacher::new(|a| a);
+    let _v1 = c.value("rust");
+    let v2 = c.value("golang");
+    println!("v2:{}", v2);
+}
+
 #[test]
 fn call_different_types() {
     let mut c = Cacher::new(|a| a);

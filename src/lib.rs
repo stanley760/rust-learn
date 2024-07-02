@@ -119,4 +119,28 @@ pub mod lifetime {
 
 pub mod closure {
     pub mod cacher;
+    pub mod fn_once;
+    
+    pub mod moves;
+    
+    pub mod fn_mut;
+    
+    pub mod exercise_1;
+    pub mod exercise_2;
+    
+    pub mod exercise_3;
+    
+    pub mod exercise_4;
+    
+    pub mod exercise_5;
+    
+    pub mod exercise_6;
+    
+    pub mod exercise_9;
+    
+    pub mod exercise_10;
+    
+    pub mod exercise_10_1;
+    
+    pub mod exercise_11;
 }
