@@ -147,4 +147,10 @@ pub mod closure {
 
 pub mod iterator {
     pub mod simulate_for;
+    
+    pub mod into_iter;
+    
+    pub mod counter;
+    
+    pub mod enumerate;
 }

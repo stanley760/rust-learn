@@ -1,3 +1,4 @@
+#[allow(unused)]
 fn create_fn() -> Box<dyn Fn(i32) -> i32> {
     let num = 5;
 

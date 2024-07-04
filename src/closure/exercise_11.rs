@@ -1,3 +1,4 @@
+#[allow(unused)]
 fn factory(x: i32) -> Box<dyn Fn(i32) -> i32> {
     let num = 5;
     
