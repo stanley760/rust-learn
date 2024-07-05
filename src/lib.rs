@@ -73,6 +73,9 @@ pub mod vector {
 pub mod types {
     pub mod express;
     pub mod num;
+    pub mod newtype;
+
+    pub mod int2enum;
 }
 
 pub mod characters {
@@ -153,4 +156,8 @@ pub mod iterator {
     pub mod counter;
     
     pub mod enumerate;
+}
+
+pub mod smart_ptr {
+    pub mod deref;
 }
