@@ -160,4 +160,6 @@ pub mod iterator {
 
 pub mod smart_ptr {
     pub mod deref;
+
+    pub mod implicit_trans;
 }

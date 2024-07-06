@@ -1,9 +1,9 @@
 use std::ops::Deref;
 
-struct MyBox<T>(T);
+pub struct MyBox<T>(T);
 
 impl<T> MyBox<T> {
-    fn new(x: T) -> Self {
+    pub fn new(x: T) -> Self {
         MyBox(x)
     }
 }
