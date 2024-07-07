@@ -162,4 +162,12 @@ pub mod smart_ptr {
     pub mod deref;
 
     pub mod implicit_trans;
+
+    pub mod diff_deref_convert;
+}
+
+pub mod reference {
+    pub mod rc;
+
+    pub mod cell;
 }
