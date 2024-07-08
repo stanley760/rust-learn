@@ -1,5 +1,10 @@
 pub mod circle {
     pub mod diff_circle;
+
+    pub mod weak;
+    pub mod weak_example;
+
+    pub mod circle_reference;
 }
 
 pub mod table {
@@ -170,4 +175,10 @@ pub mod reference {
     pub mod rc;
 
     pub mod cell;
+}
+
+pub mod thread {
+    pub mod example;
+    pub mod example1;
+    pub mod barrier;
 }
