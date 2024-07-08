@@ -29,12 +29,18 @@ impl Config {
     }
 }
 
-pub fn search<'a>(query: &str, contents: &'a str)| -> Vec<&'a str> {
-    // todo
-    let q_toLower = query.to_lowercase();
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
     contents
         .lines()
-        .filter(|line| line.to_lowercase().contains(q_toLower))
+        .filter(|line| line.contains(query))
+        .collect()
+}
+
+pub fn search_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let q_to_lower = query.to_lowercase();
+    contents
+        .lines()
+        .filter(|line| line.to_lowercase().contains(&q_to_lower))
         .collect()
 }
 
@@ -62,6 +68,6 @@ Rust:
 safe, fast, productive.
 Duct there.";
 
-        println!("{:?}", search(query, contents));
+        println!("{:?}", search_insensitive(query, contents));
     }
 }
