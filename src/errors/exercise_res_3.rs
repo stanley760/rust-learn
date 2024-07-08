@@ -25,6 +25,9 @@ fn read_file2() -> Result<String, io::Error> {
 }
 
 pub fn invoke() {
-    assert_eq!(read_file1().unwrap_err().to_string(), read_file2().unwrap_err().to_string());
+    assert_eq!(
+        read_file1().unwrap_err().to_string(),
+        read_file2().unwrap_err().to_string()
+    );
     println!("Success!")
 }

@@ -9,7 +9,7 @@ pub fn invoke() {
 }
 
 fn display(s: &str) {
-    println!("{}",s)
+    println!("{}", s)
 }
 
 #[test]

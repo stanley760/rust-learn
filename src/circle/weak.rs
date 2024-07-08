@@ -40,5 +40,5 @@ pub fn invoke() {
 
 #[test]
 fn invoke_test() {
-   invoke();
+    invoke();
 }

@@ -13,7 +13,7 @@ pub fn invoke() {
     println!("Success!")
 }
 
-fn divide(x:u8, y:u8) {
+fn divide(x: u8, y: u8) {
     println!("{}", x / y)
 }
 

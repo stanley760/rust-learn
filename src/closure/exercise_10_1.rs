@@ -12,4 +12,3 @@ fn invoke_test() {
     let fn_plain = create_fn();
     fn_plain(1);
 }
-

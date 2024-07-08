@@ -8,7 +8,6 @@ pub fn invoke() {
 
     inc();
 
-
     let _reborrow = &count;
 
     inc();

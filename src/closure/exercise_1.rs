@@ -7,13 +7,11 @@ pub fn invoke() {
     print();
 
     // `color` can be borrowed immutably again, because the closure only holds
-    // an immutable reference to `color`. 
+    // an immutable reference to `color`.
     let _reborrow = &color;
 
-    println!("{}",color);
+    println!("{}", color);
 }
-
-
 
 #[test]
 fn invoke_test() {

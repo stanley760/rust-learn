@@ -1,21 +1,19 @@
 struct Cacher<T, E>
-    where
-        T: Fn(E) -> E,
-        E: Copy
+where
+    T: Fn(E) -> E,
+    E: Copy,
 {
     query: T,
     value: Option<E>,
 }
 
 impl<T, E> Cacher<T, E>
-    where T: Fn(E) -> E,
-          E: Copy   
+where
+    T: Fn(E) -> E,
+    E: Copy,
 {
-    fn new(query: T) -> Cacher<T,E> {
-        Cacher {
-            query,
-            value: None,
-        }
+    fn new(query: T) -> Cacher<T, E> {
+        Cacher { query, value: None }
     }
 
     // 先查询缓存值 `self.value`，若不存在，则调用 `query` 加载

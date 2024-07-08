@@ -14,11 +14,9 @@ impl<T> Deref for MyBox<T> {
     }
 }
 
-
 #[test]
 
 fn invoke_test() {
     let x = MyBox::new(5);
     assert_eq!(*x, 5)
-
 }

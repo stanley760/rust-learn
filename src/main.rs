@@ -1,15 +1,15 @@
 use rust_learn::characters::strings;
 use rust_learn::circle::diff_circle;
+use rust_learn::closure;
 use rust_learn::convert;
+use rust_learn::errors;
 use rust_learn::from_into;
+use rust_learn::lifetime;
 use rust_learn::oth_convert;
 use rust_learn::table;
 use rust_learn::traitobj::*;
 use rust_learn::types;
 use rust_learn::vector;
-use rust_learn::errors;
-use rust_learn::lifetime;
-use rust_learn::closure;
 
 fn main() {
     diff_circle::invoke();
@@ -24,7 +24,6 @@ fn main() {
     advance_trait_generic_params::invoke();
     advance_limited_grammer::invoke();
 
-    
     diff::invoke();
     largest::invoke();
     restraint::invoke();
@@ -36,7 +35,6 @@ fn main() {
     types::express::invoke();
     dyn_stat_dispatch::invoke();
 
-
     vector::vec_sort::invoke();
     vector::exercise_1::invoke();
     vector::exercise_2::invoke();
@@ -46,8 +44,6 @@ fn main() {
     vector::vec_method::invoke();
     vector::dynamic_array::invoke();
     vector::trait_objs_type_array::invoke();
-    
-
 
     strings::push_str();
 
@@ -72,7 +68,7 @@ fn main() {
     errors::exercise_res_4::invoke();
     errors::exercise_res_5::invoke();
     errors::exercise_res_6::invoke();
-    
+
     lifetime::reborrow::invoke();
     lifetime::reborrow_lt::invoke();
     lifetime::exercise_5::invoke();

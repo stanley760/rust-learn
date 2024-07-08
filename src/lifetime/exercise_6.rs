@@ -5,7 +5,9 @@ fn print_a<T: Display + 'static>(t: &T) {
 }
 
 fn print_b<T>(t: &T)
-    where T: Display + 'static {
+where
+    T: Display + 'static,
+{
     println!("b: {}", t)
 }
 

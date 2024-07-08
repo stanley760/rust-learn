@@ -18,7 +18,6 @@ impl TryFrom<i32> for MyEnum {
             x if x == MyEnum::B as i32 => Ok(MyEnum::B),
             x if x == MyEnum::C as i32 => Ok(MyEnum::C),
             _ => Err(()),
-
         }
     }
 }
@@ -26,11 +25,10 @@ impl TryFrom<i32> for MyEnum {
 #[repr(i32)]
 #[allow(dead_code)]
 enum MyEnum1 {
-    A = 1, 
-    B, 
-    C
+    A = 1,
+    B,
+    C,
 }
-
 
 pub fn invoke() {
     let x = 3;
@@ -56,13 +54,12 @@ pub fn invoke() {
     let x = MyEnum1::A as i32;
 
     let y = unsafe { std::mem::transmute::<i32, MyEnum1>(x) };
-    
+
     match y {
         MyEnum1::A => println!("A"),
         MyEnum1::B => println!("B"),
         MyEnum1::C => println!("C"),
     }
-
 }
 
 #[test]

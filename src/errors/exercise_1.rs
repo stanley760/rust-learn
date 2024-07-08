@@ -3,7 +3,7 @@ fn drink(beverage: &str) {
         println!("Success!");
         // 实现下面的代码
         panic!("Ahhh, this is yucky.");
-     }
+    }
 
     println!("Exercise Failed if printing out this line!");
 }

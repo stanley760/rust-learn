@@ -33,7 +33,7 @@ pub mod convert {
     pub mod exercise_4;
 
     pub mod exercise_5;
-    
+
     pub mod transmute;
 }
 
@@ -77,8 +77,8 @@ pub mod vector {
 
 pub mod types {
     pub mod express;
-    pub mod num;
     pub mod newtype;
+    pub mod num;
 
     pub mod int2enum;
 }
@@ -98,68 +98,67 @@ pub mod from_into {
     pub mod exercise_5;
 }
 
-
 pub mod errors {
     pub mod exercise_1;
     pub mod exercise_2;
 
-    pub mod exercise_res_1;   
-    pub mod exercise_res_2;   
-    pub mod exercise_res_3;   
-    pub mod exercise_res_4;   
-    pub mod exercise_res_5;   
-    pub mod exercise_res_6;   
+    pub mod exercise_res_1;
+    pub mod exercise_res_2;
+    pub mod exercise_res_3;
+    pub mod exercise_res_4;
+    pub mod exercise_res_5;
+    pub mod exercise_res_6;
 }
 
 pub mod lifetime {
     pub mod reborrow;
-    
+
     pub mod nll;
-    
+
     pub mod reborrow_lt;
-    
+
     pub mod exercise_2;
-    
+
     pub mod exercise_5;
-    
+
     pub mod exercise_6;
 }
 
 pub mod closure {
     pub mod cacher;
     pub mod fn_once;
-    
+
     pub mod moves;
-    
+
     pub mod fn_mut;
-    
+
     pub mod exercise_1;
     pub mod exercise_2;
-    
+
     pub mod exercise_3;
-    
+
     pub mod exercise_4;
-    
+
     pub mod exercise_5;
-    
+
     pub mod exercise_6;
-    
+
     pub mod exercise_9;
-    
+
     pub mod exercise_10;
-    
+
     pub mod exercise_10_1;
-    
+
     pub mod exercise_11;
 }
 
 pub mod iterator {
     pub mod simulate_for;
-    
+
     pub mod into_iter;
-    
+
     pub mod counter;
-    
+
     pub mod enumerate;
 }
 
@@ -178,7 +177,7 @@ pub mod reference {
 }
 
 pub mod thread {
+    pub mod barrier;
     pub mod example;
     pub mod example1;
-    pub mod barrier;
 }
