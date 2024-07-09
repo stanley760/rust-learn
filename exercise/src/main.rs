@@ -1,15 +1,15 @@
-use rust_learn::characters::strings;
-use rust_learn::circle::diff_circle;
-use rust_learn::closure;
-use rust_learn::convert;
-use rust_learn::errors;
-use rust_learn::from_into;
-use rust_learn::lifetime;
-use rust_learn::oth_convert;
-use rust_learn::table;
-use rust_learn::traitobj::*;
-use rust_learn::types;
-use rust_learn::vector;
+use exercise::characters::strings;
+use exercise::circle::diff_circle;
+use exercise::closure;
+use exercise::convert;
+use exercise::errors;
+use exercise::from_into;
+use exercise::lifetime;
+use exercise::oth_convert;
+use exercise::table;
+use exercise::traitobj::*;
+use exercise::types;
+use exercise::vector;
 
 fn main() {
     diff_circle::invoke();

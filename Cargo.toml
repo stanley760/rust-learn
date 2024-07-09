@@ -1,13 +1,5 @@
-[package]
-name = "rust-learn"
-version = "0.1.0"
-edition = "2021"
-[lib]
-lib = { path = "/src" }
-
-[dependencies]
-rand = "0.8.5"
-num = "0.4.0"
-twox-hash = "1.6.3"
-num-traits = "0.2.19"
-num-derive = "0.4.2"
+[workspace]
+members = [
+    "exercise",
+    "grep",
+]
