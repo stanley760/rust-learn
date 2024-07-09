@@ -17,7 +17,7 @@ pub fn invoke() {
     assert_eq!(strong_v, None)
 }
 
-#[cfg(test)]
+#[test]
 fn invoke_test() {
     invoke();
 }

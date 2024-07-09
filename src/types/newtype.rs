@@ -8,8 +8,12 @@ impl fmt::Display for Wrapper {
     }
 }
 
+pub fn invoke() {
+    let w = Wrapper(vec![String::from("hello"), String::from("world")]);
+    println!("w:{}", w);
+}
+
 #[test]
 fn invoke_test() {
-    let w = Wrapper(vec!["hello".to_string(), "world".to_string()]);
-    println!("w:{}", w);
+    invoke();
 }
