@@ -10,8 +10,11 @@ use exercise::table;
 use exercise::traitobj::*;
 use exercise::types;
 use exercise::vector;
+use exercise::channel;
 
 fn main() {
+    channel::sender_many::invoke();
+    channel::exercise::invoke();
     diff_circle::invoke();
     table::map_lifetime::invoke();
     table::exercise_1::invoke();
@@ -78,4 +81,6 @@ fn main() {
     closure::fn_once::invoke();
     closure::moves::invoke();
     closure::fn_mut::invoke();
+
+
 }

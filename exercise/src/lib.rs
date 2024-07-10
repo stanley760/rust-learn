@@ -174,10 +174,22 @@ pub mod reference {
     pub mod rc;
 
     pub mod cell;
+
+    pub mod rc_many;
 }
 
 pub mod thread {
     pub mod barrier;
     pub mod example;
     pub mod example1;
+}
+
+pub mod channel {
+    pub mod exercise;
+
+    pub mod sender_many;
+}
+
+pub mod parallel {
+    pub mod mutex;
 }
