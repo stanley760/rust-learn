@@ -13,10 +13,12 @@ pub struct Process<'a> {
     pid: &'a str,
 }
 
-impl Process {
+impl Process<'_> {
     pub fn run() -> Vec<Self> {
         let output = if cfg!(target_os = "windows") {
             Command::new("cmd").args(&["/C", "netstat -ano"]).output().expect("failed to run cmd")
+        } else if cfg!(target_os="macos") {
+            Command::new("sh").args(&["-c", "netstat -anv"]).output().expect("failed to run in mac")
         } else {
             Command::new("sh").args(&["-c", "netstat -ano"]).output().expect("failed to run sh")
         };
