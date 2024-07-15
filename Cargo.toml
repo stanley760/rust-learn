@@ -1,7 +1,7 @@
 [workspace]
-members = [
+members = ["algorithm",
     "exercise",
-    "grep",
+    "grep", "processer",
 ]
 resolver = "2"
 
