@@ -1,19 +1,20 @@
 use std::process::Command;
+use std::str;
 
-#[derive(Debug, Clone, Copy)]
-pub struct Process<'a> {
-    protocol: &'a str,
+#[derive(Debug, Clone)]
+pub struct Process {
+    protocol: String,
 
-    innert_host: &'a str,
+    innert_host: String,
 
-    outer_host: &'a str,
+    outer_host: String,
 
-    status: &'a str,
+    status: String,
 
-    pid: &'a str,
+    pid: String,
 }
 
-impl Process<'_> {
+impl Process {
     pub fn run() -> Vec<Self> {
         let output = if cfg!(target_os = "windows") {
             Command::new("cmd").args(&["/C", "netstat -ano"]).output().expect("failed to run cmd")
@@ -22,19 +23,9 @@ impl Process<'_> {
         } else {
             Command::new("sh").args(&["-c", "netstat -ano"]).output().expect("failed to run sh")
         };
-        let output = String::from_utf8_lossy(&output.stdout);
-        println!("{}", output);
-        return vec![];
+        let output = str::from_utf8(&output.stdout).expect("failed to convert output to utf-8");
+        // todo return output.lines().skip(1)
+        vec![]
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = Process::run();
-        assert_eq!(result.len(), 0);
-    }
-}
