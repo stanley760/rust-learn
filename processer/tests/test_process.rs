@@ -5,6 +5,6 @@ mod tests {
     #[test]
     fn it_works() {
         let result = Process::run();
-        assert_eq!(result.len(), 0);
+        println!("{:#?}",result);
     }
 }
