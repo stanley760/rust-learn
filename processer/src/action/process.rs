@@ -26,10 +26,10 @@ impl Process {
 
         let output = String::from_utf8_lossy(&output.stdout);
 
-        output.lines().skip(numb).filter_map(|x| {
+        output.lines().filter_map(|x| {
             let parts: Vec<&str> = x.split_whitespace().collect();
             Self::hanle_cross_operate_system(parts)
-        }).collect()
+        }).skip(numb).collect()
     }
 
     fn hanle_cross_operate_system(parts: Vec<&str>) -> Option<Process> {
