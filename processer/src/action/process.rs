@@ -16,12 +16,12 @@ pub struct Process {
 
 impl Process {
     pub fn run() -> Vec<Self> {
-        let (output, numb) = if cfg!(target_os = "windows") {
-            (Command::new("cmd").args(&["/C", "netstat -ano"]).output().expect("failed to run cmd"), 1)
+        let output = if cfg!(target_os = "windows") {
+            Command::new("cmd").args(&["/C", "netstat -ano"]).output().expect("failed to run cmd")
         } else if cfg!(target_os="macos") {
-            (Command::new("sh").args(&["-c", "netstat -anv"]).output().expect("failed to run in mac"), 2)
+            Command::new("sh").args(&["-c", "netstat -anv"]).output().expect("failed to run in mac")
         } else {
-            (Command::new("sh").args(&["-c", "netstat -ano"]).output().expect("failed to run sh"), 1)
+            Command::new("sh").args(&["-c", "netstat -ano"]).output().expect("failed to run sh")
         };
 
         let output = String::from_utf8_lossy(&output.stdout);
@@ -29,7 +29,7 @@ impl Process {
         output.lines().filter_map(|x| {
             let parts: Vec<&str> = x.split_whitespace().collect();
             Self::hanle_cross_operate_system(parts)
-        }).skip(numb).collect()
+        }).skip(1).collect()
     }
 
     fn hanle_cross_operate_system(parts: Vec<&str>) -> Option<Process> {

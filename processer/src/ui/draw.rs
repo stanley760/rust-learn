@@ -83,10 +83,13 @@ impl Sandbox for TableList {
             .on_input(Message::KillInputChanged)
             .padding(5);
 
-        let btn_kill = button("kill")
+        let btn_kill = Button::new("kill")
             .padding(5)
             .width(Length::Fixed(35f32))
             .on_press(Message::Kill);
+        
+        
+        
         // todo table view
         Column::new().push(
             Row::new().push(port_text)
