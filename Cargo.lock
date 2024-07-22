@@ -1932,6 +1932,7 @@ name = "processer"
 version = "0.1.0"
 dependencies = [
  "iced",
+ "iced_wgpu",
 ]
 
 [[package]]

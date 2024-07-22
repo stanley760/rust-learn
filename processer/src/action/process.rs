@@ -3,15 +3,15 @@ use std::str;
 
 #[derive(Debug, Clone)]
 pub struct Process {
-    protocol: String,
+    pub protocol: String,
 
-    innert_host: String,
+    pub inner_host: String,
 
-    outer_host: String,
+    pub outer_host: String,
 
-    status: String,
+    pub status: String,
 
-    pid: String,
+    pub pid: String,
 }
 
 impl Process {
@@ -39,14 +39,14 @@ impl Process {
             return None;
         }
         let protocol = parts[0].to_string();
-        let innert_host = if macos_flag { parts[3].to_string() } else { parts[1].to_string() };
+        let inner_host = if macos_flag { parts[3].to_string() } else { parts[1].to_string() };
         let outer_host = if macos_flag { parts[4].to_string() } else { parts[2].to_string() };
         let status = if macos_flag { parts[5].to_string() } else { parts[3].to_string() };
         let pid = if macos_flag { parts[8].to_string() } else { parts[4].to_string() };
 
         Some(Process {
             protocol,
-            innert_host,
+            inner_host,
             outer_host,
             status,
             pid,

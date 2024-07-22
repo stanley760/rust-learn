@@ -1,6 +1,12 @@
 use iced::{Alignment, Element, Length, Sandbox};
-use iced::alignment::Vertical;
-use iced::widget::{button, Button, Column, Row, Space, Text, TextInput};
+use iced::alignment::{Horizontal, Vertical};
+use iced::widget::{button, column, Row, Space, text, text_input};
+
+use crate::action::process::Process;
+
+const TABLE_HEAD_FONT_SIZE: u16 = 18;
+const COLUMN_WIDTH_PORTION: u16 = 10;
+const HEADER_TEXT: [&'static str; 5] = ["protocol", "inner_host", "outer_host", "status", "pid"];
 
 #[derive(Default)]
 pub struct TableList {
@@ -48,12 +54,10 @@ impl Sandbox for TableList {
             }
             Message::KillInputChanged(val) => {
                 self.pid_in_val = val;
-                
             }
             Message::Search => {
                 // Handle search button press
                 println!("Searching for port {}", self.port_in_val);
-                
             }
             Message::Kill => {
                 // Handle kill button press
@@ -61,24 +65,25 @@ impl Sandbox for TableList {
             }
         }
     }
+    
 
     fn view(&self) -> Element<'_, Self::Message> {
-        let port_text = Text::new("port:").size(20).vertical_alignment(Vertical::Center);
-        let port_input = TextInput::new("input port numb"
-                                    , & self.port_in_val.clone())
+        let port_text = text("port:").size(20).vertical_alignment(Vertical::Center);
+        let port_input = text_input("input port numb"
+                                    , &self.port_in_val.clone())
             .on_input(Message::SearchInputChanged).padding(5);
 
-        let btn_search = Button::new("search")
+        let btn_search = button("search")
             .padding(5)
             .on_press(Message::Search);
 
-        let btn_reset = Button::new("reset")
+        let btn_reset = button("reset")
             .padding(5)
             .on_press(Message::Reset);
 
-        let pid_text = Text::new("pid:").size(20).vertical_alignment(Vertical::Center);
+        let pid_text = text("pid:").size(20).vertical_alignment(Vertical::Center);
 
-        let pid_input = TextInput::new("input pid numb"
+        let pid_input = text_input("input pid numb"
                                    , &self.pid_in_val)
             .on_input(Message::KillInputChanged)
             .padding(5);
@@ -87,29 +92,45 @@ impl Sandbox for TableList {
             .padding(5)
             .width(Length::Fixed(35f32))
             .on_press(Message::Kill);
-        // todo table view
-        Column::new().push(
-            Row::new().push(port_text)
-                .push(Space::new(5, 0))
-                .push(port_input)
-                .push(Space::new(10, 0))
-                .push(btn_search)
-                .push(Space::new(10, 0))
-                
-                .push(Space::new(10, 0))
-                .push(pid_text)
-                .push(Space::new(5, 0))
-                .push(pid_input)
-                .push(Space::new(10, 0))
-                .push(btn_kill)
-                .push(Space::new(10, 0))
-                .push(btn_reset))
-            
+
+        let row = Row::new().push(port_text)
+            .push(port_input)
+            .push(btn_search)
+            .push(Space::new(10, 0))
+            .push(pid_text)
+            .push(pid_input)
+            .push(btn_kill)
+            .push(btn_reset)
             .spacing(10)
-            .height(100)
-            .padding(20)
-            .max_width(800)
-            .align_items(Alignment::Center)
-            .into()
+            .height(80)
+            .padding(15)
+            .width(Length::Fill);
+
+
+        let header = Row::new()
+            .extend(HEADER_TEXT.iter().map(|header_text| {
+            text(header_text)
+                .size(TABLE_HEAD_FONT_SIZE)
+                .width(Length::FillPortion(COLUMN_WIDTH_PORTION))
+                .horizontal_alignment(Horizontal::Center).into()
+        })).width(Length::Fill).align_items(Alignment::Center);
+
+        // todo table view
+        let datas: Vec<Vec<String>> = Process::run().iter().map(|x| {
+            vec![x.protocol.clone(), x.inner_host.clone(), x.outer_host.clone(), x.status.clone(), x.pid.clone()]
+        }).collect();
+
+
+        // type AppRenderer = WgpuRenderer<Theme>;
+        // let table_body = datas.iter().map(|data| {
+        //     Row::new::<AppRenderer>()
+        //         .extend(data.iter().map(|data| {
+        //         text(data)
+        //             .width(Length::FillPortion(COLUMN_WIDTH_PORTION))
+        //             .into()
+        //     })).width(Length::Fill)
+        // }).collect::<Vec<_>>();
+
+        column![row, header].align_items(Alignment::Center).into()
     }
 }

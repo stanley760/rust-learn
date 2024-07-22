@@ -6,3 +6,4 @@ edition = "2021"
 path = "src/lib.rs"
 [dependencies]
 iced = "0.12.1"
+iced_wgpu = "0.12.1"
