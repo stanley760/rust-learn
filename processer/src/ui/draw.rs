@@ -65,7 +65,7 @@ impl Sandbox for TableList {
             }
         }
     }
-    
+
 
     fn view(&self) -> Element<'_, Self::Message> {
         let port_text = text("port:").size(20).vertical_alignment(Vertical::Center);
