@@ -1,8 +1,12 @@
 use iced::{Alignment, Element, Length, Sandbox};
-use iced::alignment::Vertical;
-use iced::widget::{button, Button, Column, Row, Space, Text, TextInput};
+use iced::alignment::{Horizontal, Vertical};
+use iced::widget::{button, column, Row, Space, text, text_input};
 
 use crate::action::process::Process;
+
+const TABLE_HEAD_FONT_SIZE: u16 = 18;
+const COLUMN_WIDTH_PORTION: u16 = 10;
+const HEADER_TEXT: [&'static str; 5] = ["protocol", "inner_host", "outer_host", "status", "pid"];
 
 #[derive(Default)]
 pub struct TableList {
@@ -11,7 +15,6 @@ pub struct TableList {
     btn_search: button::State,
     btn_reset: button::State,
     btn_kill: button::State,
-    //  table: Table,
 }
 
 #[derive(Debug, Clone)]
@@ -33,7 +36,6 @@ impl Sandbox for TableList {
             btn_search: Default::default(),
             btn_reset: Default::default(),
             btn_kill: Default::default(),
-            //druid_container: ,
         }
     }
 
@@ -64,89 +66,71 @@ impl Sandbox for TableList {
         }
     }
 
+
     fn view(&self) -> Element<'_, Self::Message> {
-        let port_text = Text::new("port:").size(20).vertical_alignment(Vertical::Center);
-        let port_input = TextInput::new(""
-                                        , &self.port_in_val.clone())
+        let port_text = text("port:").size(20).vertical_alignment(Vertical::Center);
+        let port_input = text_input("input port numb"
+                                    , &self.port_in_val.clone())
             .on_input(Message::SearchInputChanged).padding(5);
 
-        let btn_search = Button::new("search")
+        let btn_search = button("search")
             .padding(5)
             .on_press(Message::Search);
 
-        let btn_reset = Button::new("reset")
+        let btn_reset = button("reset")
             .padding(5)
             .on_press(Message::Reset);
 
-        let pid_text = Text::new("pid:").size(20).vertical_alignment(Vertical::Center);
+        let pid_text = text("pid:").size(20).vertical_alignment(Vertical::Center);
 
-        let pid_input = TextInput::new("" , &self.pid_in_val)
+        let pid_input = text_input("input pid numb"
+                                   , &self.pid_in_val)
             .on_input(Message::KillInputChanged)
             .padding(5);
 
-        let btn_kill = Button::new("kill")
+        let btn_kill = button("kill")
             .padding(5)
             .width(Length::Fixed(35f32))
             .on_press(Message::Kill);
 
-        let search = Row::new().push(port_text)
-            .push(Space::new(5, 0))
+        let row = Row::new().push(port_text)
             .push(port_input)
-            .push(Space::new(10, 0))
             .push(btn_search)
             .push(Space::new(10, 0))
-
-            .push(Space::new(10, 0))
             .push(pid_text)
-            .push(Space::new(5, 0))
             .push(pid_input)
-            .push(Space::new(10, 0))
             .push(btn_kill)
-            .push(Space::new(10, 0))
-            .push(btn_reset);
-
-        let header: Row<_, _, _> = Row::new().push(Text::new("协议"))
-            .push(Text::new("内部域名"))
-            .push(Text::new("外部域名"))
-            .push(Text::new("状态"))
-            .push(Text::new("进程标识"));
-        
-        let datas: Vec<Vec<String>> = Process::run()
-            .into_iter()
-            .map(|data| vec![
-                data.protocol.clone(),
-                data.innert_host.clone(),
-                data.outer_host.clone(),
-                data.status.clone(),
-                data.pid.clone(),
-            ]).collect();
-
-        let mut table = Column::new()
-            .push(header)
-            .padding(10)
-            .spacing(10);
-
-        for row in &datas {
-            let mut data_row = Row::new();
-            for item in row {
-                data_row = data_row.push(Text::new(item.clone()));
-            }
-            table = table.push(data_row);
-        }
-
-        let row = Row::new()
-            .align_items(Alignment::Center)
-            .spacing(20)
-            .push(table);
-
-        let ui = Column::new().push(search)
-            .push(row)
+            .push(btn_reset)
             .spacing(10)
-            .height(100)
-            .padding(20)
-            .max_width(800)
-            .align_items(Alignment::Center);
-        
-        ui.into()
+            .height(80)
+            .padding(15)
+            .width(Length::Fill);
+
+
+        let header = Row::new()
+            .extend(HEADER_TEXT.iter().map(|header_text| {
+            text(header_text)
+                .size(TABLE_HEAD_FONT_SIZE)
+                .width(Length::FillPortion(COLUMN_WIDTH_PORTION))
+                .horizontal_alignment(Horizontal::Center).into()
+        })).width(Length::Fill).align_items(Alignment::Center);
+
+        // todo table view
+        let datas: Vec<Vec<String>> = Process::run().iter().map(|x| {
+            vec![x.protocol.clone(), x.inner_host.clone(), x.outer_host.clone(), x.status.clone(), x.pid.clone()]
+        }).collect();
+
+
+        // type AppRenderer = WgpuRenderer<Theme>;
+        // let table_body = datas.iter().map(|data| {
+        //     Row::new::<AppRenderer>()
+        //         .extend(data.iter().map(|data| {
+        //         text(data)
+        //             .width(Length::FillPortion(COLUMN_WIDTH_PORTION))
+        //             .into()
+        //     })).width(Length::Fill)
+        // }).collect::<Vec<_>>();
+
+        column![row, header].align_items(Alignment::Center).into()
     }
 }
