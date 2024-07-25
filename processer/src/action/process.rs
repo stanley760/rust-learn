@@ -3,15 +3,15 @@ use std::str;
 
 #[derive(Debug, Clone)]
 pub struct Process {
-    protocol: String,
+   pub protocol: String,
 
-    innert_host: String,
+   pub innert_host: String,
 
-    outer_host: String,
+   pub outer_host: String,
 
-    status: String,
+   pub status: String,
 
-    pid: String,
+   pub pid: String,
 }
 
 impl Process {
