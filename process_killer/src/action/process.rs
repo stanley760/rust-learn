@@ -1,3 +1,5 @@
+use std::fmt::{Debug, format};
+use std::io::{Error, ErrorKind};
 use std::process::Command;
 use std::str;
 
@@ -30,6 +32,27 @@ impl Process {
             let parts: Vec<&str> = x.split_whitespace().collect();
             Self::hanle_cross_operate_system(parts)
         }).skip(1).collect()
+    }
+
+    pub fn kill(pid: &str) -> Result<(), Error> {
+        
+        let pid = pid.parse::<u32>().map_err(|_| Error::new(ErrorKind::InvalidInput, "it's not a number"))?;
+        
+        let result = if cfg!(target_os = "windows") {
+            Command::new("cmd")
+                .args(&["taskkill", "-PID", &pid.to_string(), "-F"])
+                .output()
+            // "failed to run on windows."
+        } else {
+            Command::new("sh")
+                .args(&["-kill", "-9", pid.to_string().as_str()])
+                .output()
+            // "failed to run on linux/mac."
+        };
+        match result {
+            Ok(_) => Ok(()),
+            Err(e) => Err(Error::new(ErrorKind::Other, format!("failed to execute the kill process: {}", e))),
+        }
     }
 
     fn hanle_cross_operate_system(parts: Vec<&str>) -> Option<Process> {

@@ -1928,7 +1928,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "processer"
+name = "process_killer"
 version = "0.1.0"
 dependencies = [
  "iced",

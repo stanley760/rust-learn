@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use processer::action::process::Process;
+    use process_killer::action::process::Process;
     
     #[test]
     fn it_works() {

@@ -1,6 +1,6 @@
-use iced::{Alignment, Element, Length, Sandbox};
+use iced::{Alignment, Application, Command, Element, Length};
 use iced::alignment::{Horizontal, Vertical};
-use iced::widget::{button, column, Row, Space, text, text_input};
+use iced::widget::{button, Column, Row, scrollable, Space, text, text_input};
 
 use crate::action::process::Process;
 
@@ -8,7 +8,7 @@ const TABLE_HEAD_FONT_SIZE: u16 = 18;
 const COLUMN_WIDTH_PORTION: u16 = 10;
 const HEADER_TEXT: [&'static str; 5] = ["protocol", "inner_host", "outer_host", "status", "pid"];
 
-#[derive(Default)]
+
 pub struct TableList {
     port_in_val: String,
     pid_in_val: String,
@@ -26,24 +26,29 @@ pub enum Message {
     Kill,
 }
 
-impl Sandbox for TableList {
+impl Application for TableList {
+    type Executor = iced::executor::Default;
     type Message = Message;
+    type Theme = iced::Theme;
+    type Flags = ();
 
-    fn new() -> Self {
-        Self {
+    fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
+        
+        
+        (TableList {
             port_in_val: String::new(),
             pid_in_val: String::new(),
             btn_search: Default::default(),
             btn_reset: Default::default(),
             btn_kill: Default::default(),
-        }
+        }, Command::none())
     }
 
     fn title(&self) -> String {
         String::from("process killer")
     }
 
-    fn update(&mut self, message: Self::Message) {
+    fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
         match message {
             Message::SearchInputChanged(val) => {
                 self.port_in_val = val;
@@ -63,14 +68,14 @@ impl Sandbox for TableList {
                 // Handle kill button press
                 println!("Killing process with pid {}", self.pid_in_val);
             }
-        }
+        };
+        Command::none()
     }
 
 
     fn view(&self) -> Element<'_, Self::Message> {
         let port_text = text("port:").size(20).vertical_alignment(Vertical::Center);
-        let port_input = text_input("input port numb"
-                                    , &self.port_in_val.clone())
+        let port_input = text_input("input port numb", &self.port_in_val.clone())
             .on_input(Message::SearchInputChanged).padding(5);
 
         let btn_search = button("search")
@@ -107,30 +112,38 @@ impl Sandbox for TableList {
             .width(Length::Fill);
 
 
-        let header = Row::new()
+        let table_header = Row::new()
             .extend(HEADER_TEXT.iter().map(|header_text| {
-            text(header_text)
-                .size(TABLE_HEAD_FONT_SIZE)
-                .width(Length::FillPortion(COLUMN_WIDTH_PORTION))
-                .horizontal_alignment(Horizontal::Center).into()
-        })).width(Length::Fill).align_items(Alignment::Center);
+                text(header_text)
+                    .size(TABLE_HEAD_FONT_SIZE)
+                    .width(Length::FillPortion(COLUMN_WIDTH_PORTION))
+                    .horizontal_alignment(Horizontal::Center).into()
+            })).width(Length::Fill).align_items(Alignment::Center);
 
-        // todo table view
+        let mut table_column = Column::new()
+            .align_items(Alignment::Center);
+
         let datas: Vec<Vec<String>> = Process::run().iter().map(|x| {
             vec![x.protocol.clone(), x.inner_host.clone(), x.outer_host.clone(), x.status.clone(), x.pid.clone()]
         }).collect();
 
+        let table_body: Vec<Row<_>> = datas.iter().map(|data| {
+            Row::new().extend(data.iter()
+                .map(|x|
+                    text(x)
+                        .width(Length::FillPortion(COLUMN_WIDTH_PORTION))
+                        .horizontal_alignment(Horizontal::Center).into()))
+                .width(Length::Fill).align_items(Alignment::Center).into()
+        }).collect::<Vec<_>>();
 
-        // type AppRenderer = WgpuRenderer<Theme>;
-        // let table_body = datas.iter().map(|data| {
-        //     Row::new::<AppRenderer>()
-        //         .extend(data.iter().map(|data| {
-        //         text(data)
-        //             .width(Length::FillPortion(COLUMN_WIDTH_PORTION))
-        //             .into()
-        //     })).width(Length::Fill)
-        // }).collect::<Vec<_>>();
-
-        column![row, header].align_items(Alignment::Center).into()
+        for row in table_body {
+            table_column = table_column.push(row);
+        }
+        
+        Column::new()
+            .push(row)
+            .push(table_header)
+            .push(scrollable(table_column).height(Length::Shrink).width(Length::Fill))
+            .align_items(Alignment::Center).into()
     }
 }
