@@ -1,4 +1,4 @@
-use std::fmt::{Debug, format};
+use std::fmt::Debug;
 use std::io::{Error, ErrorKind};
 use std::process::Command;
 use std::str;

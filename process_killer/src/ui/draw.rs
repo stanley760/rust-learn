@@ -1,6 +1,8 @@
 use iced::{Alignment, Application, Command, Element, Length};
 use iced::alignment::{Horizontal, Vertical};
-use iced::widget::{button, Column, Row, scrollable, Space, text, text_input};
+use iced::widget::{button, Button, Column, Row, scrollable, Space, text, Text, text_input, Tooltip, tooltip};
+use iced::widget::pick_list::overlay;
+use iced_wgpu::core::Widget;
 
 use crate::action::process::Process;
 
@@ -8,13 +10,14 @@ const TABLE_HEAD_FONT_SIZE: u16 = 18;
 const COLUMN_WIDTH_PORTION: u16 = 10;
 const HEADER_TEXT: [&'static str; 5] = ["protocol", "inner_host", "outer_host", "status", "pid"];
 
-
+#[allow(dead_code)]
 pub struct TableList {
     port_in_val: String,
     pid_in_val: String,
     btn_search: button::State,
     btn_reset: button::State,
     btn_kill: button::State,
+    error_message: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -33,14 +36,13 @@ impl Application for TableList {
     type Flags = ();
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
-        
-        
         (TableList {
             port_in_val: String::new(),
             pid_in_val: String::new(),
             btn_search: Default::default(),
             btn_reset: Default::default(),
             btn_kill: Default::default(),
+            error_message: None,
         }, Command::none())
     }
 
@@ -66,7 +68,13 @@ impl Application for TableList {
             }
             Message::Kill => {
                 // Handle kill button press
-                println!("Killing process with pid {}", self.pid_in_val);
+
+                match Process::kill(&self.pid_in_val) {
+                    Err(err) => {
+                        self.error_message = Some(format!("Failed to kill process: {}", err));
+                    }
+                    _ => {}
+                }
             }
         };
         Command::none()
@@ -88,8 +96,7 @@ impl Application for TableList {
 
         let pid_text = text("pid:").size(20).vertical_alignment(Vertical::Center);
 
-        let pid_input = text_input("input pid numb"
-                                   , &self.pid_in_val)
+        let pid_input = text_input("input pid numb", &self.pid_in_val)
             .on_input(Message::KillInputChanged)
             .padding(5);
 
@@ -97,6 +104,16 @@ impl Application for TableList {
             .padding(5)
             .width(Length::Fixed(35f32))
             .on_press(Message::Kill);
+
+        // let message = Row::new().push(
+        //     match &self.error_message {
+        //         Some(error_message) => {
+        //             Text::new(error_message).size(15)
+        //         }
+        //         None => {
+        //             Text::new("")
+        //         }
+        //     });
 
         let row = Row::new().push(port_text)
             .push(port_input)
@@ -129,21 +146,21 @@ impl Application for TableList {
 
         let table_body: Vec<Row<_>> = datas.iter().map(|data| {
             Row::new().extend(data.iter()
-                .map(|x|
-                    text(x)
-                        .width(Length::FillPortion(COLUMN_WIDTH_PORTION))
-                        .horizontal_alignment(Horizontal::Center).into()))
+                .map(|x| text(x)
+                    .width(Length::FillPortion(COLUMN_WIDTH_PORTION))
+                    .horizontal_alignment(Horizontal::Center).into()))
                 .width(Length::Fill).align_items(Alignment::Center).into()
         }).collect::<Vec<_>>();
 
         for row in table_body {
             table_column = table_column.push(row);
         }
-        
+
         Column::new()
             .push(row)
             .push(table_header)
             .push(scrollable(table_column).height(Length::Shrink).width(Length::Fill))
-            .align_items(Alignment::Center).into()
+            .align_items(Alignment::Center)
+            .into()
     }
 }
