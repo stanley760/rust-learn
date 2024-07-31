@@ -1,10 +1,10 @@
-use iced::{Application, Settings};
-use process_killer::action::process::Process;
-use process_killer::ui::draw::TableList;
+use dioxus::desktop::{Config, WindowBuilder};
+use dioxus::prelude::*;
+use process_killer::ui::draw::app;
 
-fn main() -> iced::Result {
-    Process::kill("123").unwrap_or_else(|err| println!("{}", err));
-    TableList::run(Settings::default())
-    
+fn main() {
+    LaunchBuilder::desktop()
+        .with_cfg(Config::new().with_window(WindowBuilder::new().with_resizable(true)))
+        .launch(app)
 }
 

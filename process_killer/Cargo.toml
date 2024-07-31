@@ -7,5 +7,7 @@ path = "src/lib.rs"
 [dependencies]
 dioxus = "0.5.6"
 dioxus-desktop = "0.5.6"
-iced = "0.12.1"
-iced_wgpu = "0.12.1"
+
+[features]
+default = ["desktop"]
+desktop = ["dioxus/desktop"]
