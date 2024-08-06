@@ -26,7 +26,7 @@ pub fn app() -> Element {
             
             table {
                 thead {
-                    tr {{ header_txt.as_slice().iter().map(|header_text| rsx!{th { "{header_text}" }}) }}
+                    tr {{ header_txt.iter().map(|header_text| rsx!{th { "{header_text}" }}) }}
                 }
                 
                 tbody {
