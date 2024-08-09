@@ -11,7 +11,7 @@ pub fn app() -> Element {
     rsx!(
         title { "Process Killer" }
         body {
-            link { rel: "stylesheet", href: "../../src/assets/style.css"}
+            link { rel: "stylesheet", href: "process_killer/assets/style.css"}
             div {
                 class: "div-form",
                 label { form: "port-label", "port:"}

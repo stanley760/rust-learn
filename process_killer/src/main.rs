@@ -9,7 +9,7 @@ use process_killer::ui::draw::app;
 fn main() {
     let buf = env::current_dir().unwrap();
     let exe_dir = buf.join("process_killer");
-    let icon_path = exe_dir.join("src").join("assets").join("icon.png");
+    let icon_path = exe_dir.join("assets").join("icon.png");
     let icon = image::open(icon_path).expect("Failed to load icon file");
 
     let window = WindowBuilder::new()
