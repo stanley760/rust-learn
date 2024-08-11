@@ -11,16 +11,17 @@ pub fn app() -> Element {
     rsx!(
         title { "Process Killer" }
         body {
+            link { rel: "stylesheet", href: "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"}
             link { rel: "stylesheet", href: "process_killer/assets/style.css"}
             div {
                 class: "div-form",
-                label { form: "port-label", "port:"}
-                input { form: "port-input", name: "port-input", class: "port-input"}
+                label { form: "port-label", class: "port", "port:"}
+                input { form: "port-input", name: "port-input", class: "port"}
                 button { form: "btn-search", name: "btn-search", "search"}
                 button { form: "btn-reset", name: "btn-reset", "reset" }
                 
                 label { form: "pid-label", "pid:"}
-                input { form: "pid-input", name: "pid-input", class: "pid-input"}
+                input { form: "pid-input", name: "pid-input", class: "pid"}
                 button { form: "btn-kill", name: "btn-kill", "kill"}
             }
             
