@@ -120,7 +120,7 @@ async fn print_resp(resp: Response) -> anyhow::Result<()> {
 }
 
 fn print_status(resp: &Response) {
-    let status = format!("{:?}{}", resp.version(), resp.status()).yellow();
+    let status = format!("{:?} {}", resp.version(), resp.status()).yellow();
     println!("{}\n", status);
 }
 
