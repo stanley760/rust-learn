@@ -1,7 +1,7 @@
-use std::fs;
 
 #[test]
 fn convert() {
+    use std::fs;
     let url = "http://www.rust-lang.org/";
     let output = "rust.md";
     println!("fetching url:{}", url);

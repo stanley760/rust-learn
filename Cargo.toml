@@ -1,7 +1,7 @@
 [workspace]
 members = ["algorithm",
     "exercise",
-    "grep", "httpie", "process_killer",
+    "grep", "httpie", "process_killer", "rcli",
 ]
 resolver = "2"
 
