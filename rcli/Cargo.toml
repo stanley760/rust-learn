@@ -2,10 +2,8 @@
 name = "rcli"
 version = "0.1.0"
 edition = "2021"
-author = "stanley"
-about = "A Rust CLI for csv"
-[lib]
-src = "src/lib.rs"
+authors = ["stanley"]
+
 [dependencies]
 anyhow = "1.0.93"
 clap = {version = "4.5.21", features = ["derive"]}

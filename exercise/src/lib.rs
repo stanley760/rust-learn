@@ -197,3 +197,13 @@ pub mod parallel {
 pub mod scrape_url {
     pub mod covert_md;
 }
+
+pub mod borrow {
+    pub mod multi_borrow;
+
+    pub mod many_times_borrow;
+
+    pub mod borrow_mut;
+
+    pub mod same_borrow_mut;
+}
