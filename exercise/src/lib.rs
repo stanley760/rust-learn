@@ -61,6 +61,8 @@ pub mod traitobj {
     pub mod trait_safe;
     pub mod trait_safe_2;
     pub mod wrapper_fmt;
+
+    pub mod blanket_impl;
 }
 
 pub mod vector {
