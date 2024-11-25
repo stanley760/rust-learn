@@ -110,6 +110,8 @@ pub mod errors {
     pub mod exercise_res_4;
     pub mod exercise_res_5;
     pub mod exercise_res_6;
+
+    pub mod dyn_errors;
 }
 
 pub mod lifetime {
