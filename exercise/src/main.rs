@@ -71,7 +71,7 @@ fn main() {
     errors::exercise_res_4::invoke();
     errors::exercise_res_5::invoke();
     errors::exercise_res_6::invoke();
-
+    errors::dyn_errors::test_dyn_error();
     lifetime::reborrow::invoke();
     lifetime::reborrow_lt::invoke();
     lifetime::exercise_5::invoke();

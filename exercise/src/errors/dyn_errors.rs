@@ -23,11 +23,11 @@ fn foo(num: u32) -> Result<String, Box<dyn Error>> {
     }
 }
 
-#[test]
-fn test_dyn_error() {
+
+pub fn test_dyn_error() {
     let result = foo(2);
     match result {
         Ok(s) => println!("{}", s),
-        Err(e) => println!("err:{}", e),
+        Err(e) => eprintln!("err:{}", e),
     }
 }
