@@ -1,0 +1,16 @@
+[package]
+name = "todolist"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.93"
+axum = "0.7.9"
+bb8 = "0.8.6"
+bb8-sqlite = "0.1.0"
+serde = { version = "1.0.215", features = ["derive"] }
+tokio = { version = "1.41.1", features = ["full"] }
+tower = { version = "0.5.1" }
+tower-http = { version = "0.6.2", features = ["trace", "fs"] }
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
