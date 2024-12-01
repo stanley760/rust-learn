@@ -4,7 +4,7 @@ pub mod domain {
     pub mod todo;
 }
 
-pub mod handler {
+pub mod repository {
     pub mod opts;
 }
 
@@ -13,5 +13,5 @@ pub mod routers {
 }
 
 pub mod config {
-    pub mod dbconnector;
+    pub mod connectdb;
 }
