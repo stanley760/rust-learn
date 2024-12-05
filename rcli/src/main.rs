@@ -5,6 +5,7 @@ use rcli::operation::{Opts, Subcommand};
 
 // cargo run -- csv -i assets/juventus.csv --format yaml
 // cargo run -- csv -i assets/juventus.csv --format json
+// cargo run -- csv -i assets/juventus.csv --format toml
 
 fn main() -> anyhow::Result<()>{
     let opts = Opts::parse();

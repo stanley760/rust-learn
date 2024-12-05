@@ -17,6 +17,11 @@ struct Player {
     kit: u8,
 }
 
+#[derive(Serialize)]
+struct MyArray {
+    items: Vec<toml::Value>,
+}
+
 pub fn parse_csv(input: &str, output : String, format: Format) -> anyhow::Result<()> {
     let mut reader = Reader::from_path(input)?;
     
@@ -30,8 +35,11 @@ pub fn parse_csv(input: &str, output : String, format: Format) -> anyhow::Result
         Format::Json => serde_json::to_string_pretty(&result)?,
         Format::Yaml => serde_yaml::to_string(&result)?,
         Format::Toml => {
-            todo!("转换类型错误需要重构");
-            toml::to_string(&result)?
+            let result : Vec<toml::Value> = result.into_iter()
+                .map(|r| toml::Value::try_from(r).unwrap())
+                .collect();
+            let arr = MyArray { items: result };
+            toml::to_string(&arr)?
         },
     };
 
