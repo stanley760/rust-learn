@@ -19,7 +19,7 @@ struct Player {
 
 #[derive(Serialize)]
 struct MyArray {
-    items: Vec<toml::Value>,
+    items: Vec<Value>,
 }
 
 pub fn parse_csv(input: &str, output : String, format: Format) -> anyhow::Result<()> {
@@ -35,9 +35,6 @@ pub fn parse_csv(input: &str, output : String, format: Format) -> anyhow::Result
         Format::Json => serde_json::to_string_pretty(&result)?,
         Format::Yaml => serde_yaml::to_string(&result)?,
         Format::Toml => {
-            let result : Vec<toml::Value> = result.into_iter()
-                .map(|r| toml::Value::try_from(r).unwrap())
-                .collect();
             let arr = MyArray { items: result };
             toml::to_string(&arr)?
         },
