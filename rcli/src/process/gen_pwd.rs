@@ -1,5 +1,6 @@
 use anyhow::Ok;
 use rand::seq::SliceRandom;
+use zxcvbn::zxcvbn;
 use crate::operation::opts::GenPwdOpts;
 
 const LOWERCASE: &[u8] = b"abcdefghijklmnopqrstuvwxyz";
@@ -39,7 +40,10 @@ pub fn parse_gen_pwd(opts: &GenPwdOpts) -> anyhow::Result<()> {
     }
 
     pwd.shuffle(&mut rng);
-    println!("{}", String::from_utf8(pwd)?);
-    
+    let password = String::from_utf8(pwd)?;
+    println!("{}", password);
+
+    let estimate = zxcvbn(&password, &[]);
+    eprintln!("password level: {:?}", estimate.score() as u8);
     Ok(())
 }
