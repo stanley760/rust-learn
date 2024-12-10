@@ -1,7 +1,7 @@
 use anyhow::Ok;
 use rand::seq::SliceRandom;
 use zxcvbn::zxcvbn;
-use crate::operation::opts::GenPwdOpts;
+use crate::operation::genpwd::GenPwdOpts;
 
 const LOWERCASE: &[u8] = b"abcdefghijklmnopqrstuvwxyz";
 const UPPERCASE: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
