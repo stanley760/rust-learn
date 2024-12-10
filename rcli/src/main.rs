@@ -1,6 +1,6 @@
 use clap::Parser;
 use rcli::process::parse_csv;
-
+use rcli::process::gen_pwd;
 use rcli::operation::{Opts, Subcommand};
 
 // cargo run -- csv -i assets/juventus.csv --format yaml
@@ -17,6 +17,10 @@ fn main() -> anyhow::Result<()>{
                 format!("output.{}", opts.format)
             };
             parse_csv(&opts.input, output, opts.format)?;
+        }
+        Subcommand::Genpwd(opts) => {
+
+            println!("{:?}", gen_pwd::parse_gen_pwd(&opts)?);
         }
     }
     Ok(())

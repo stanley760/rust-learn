@@ -15,6 +15,8 @@ pub struct Opts {
 pub enum Subcommand {
     #[command(name = "csv", about = "CSV subcommand")]
     Csv(CsvOpts),
+    #[command(name = "genpwd", about = "Generate a random password")]
+    Genpwd(GenPwdOpts),
 }
 
 #[derive(Parser, Debug, Clone, Copy)]
@@ -40,6 +42,24 @@ pub struct CsvOpts {
 
     #[arg(long, default_value_t = true)]
     pub header: bool,
+}
+
+#[derive(Debug, Parser)]
+pub struct GenPwdOpts {
+    #[arg(long, default_value_t = 16)]
+    pub length: u8,
+
+    #[arg(long, default_value_t = true)]
+    pub lowercase: bool,
+
+    #[arg(long, default_value_t = true)]
+    pub uppercase: bool,
+
+    #[arg(long, default_value_t= true)]
+    pub numbers: bool,
+
+    #[arg(long, default_value_t= true)]
+    pub symbols: bool,
 }
 
 fn verify_input(input: &str) -> Result<String, &'static str> {
