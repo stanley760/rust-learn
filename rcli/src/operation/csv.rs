@@ -1,8 +1,9 @@
 use std::fmt;
 use std::fmt::Formatter;
-use std::path::Path;
 use std::str::FromStr;
 use clap::Parser;
+
+use super::verify_input;
 
 #[derive(Parser, Debug, Clone, Copy)]
 pub enum Format {
@@ -29,14 +30,6 @@ pub struct CsvOpts {
     pub header: bool,
 }
 
-
-fn verify_input(input: &str) -> Result<String, &'static str> {
-    if Path::new(input).exists()  {
-        Ok(input.into())
-    } else {
-        Err("Input file does not exist")
-    }
-}
 
 fn parse_format(format: &str) -> Result<Format, anyhow::Error> {
     format.parse::<Format>()
