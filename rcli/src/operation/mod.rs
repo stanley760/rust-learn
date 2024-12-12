@@ -37,6 +37,10 @@ fn verify_input(input: &str) -> Result<String, &'static str> {
 
 #[cfg(test)]
 mod tests {
+    use crate::operation::base64::Base64Format;
+
+    use crate::process::{process_base64_decode, process_base64_encode};
+
     use super::*;
 
     #[test]
@@ -45,5 +49,19 @@ mod tests {
         // assert_eq!(verify_input("*"), Err("file not existed."));
         assert_eq!(verify_input("assets/juventus.csv"), Ok("assets/juventus.csv".into()));
         
+    }
+
+    #[test]
+    fn test_process_encode() {
+        let input = "cargo.toml";
+        let format = Base64Format::Standard;
+        assert!(process_base64_encode(input, format).is_ok());
+    }
+
+    #[test]
+    fn test_process_decode() {
+        let input = "cargo.toml";
+        let format = Base64Format::Standard;
+        assert!(process_base64_decode(input, format).is_ok());
     }
 }
