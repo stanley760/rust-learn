@@ -1,13 +1,18 @@
-pub mod base64;
-pub mod csv;
-pub mod genpwd;
-use std::path::Path;
+mod base64;
+mod csv;
+mod genpwd;
+mod text;
 
-use base64::Base64Opts;
-use genpwd::GenPwdOpts;
 use clap::Parser;
+use std::path::Path;
 use self::csv::CsvOpts;
 
+pub use base64::Base64Opts;
+pub use genpwd::GenPwdOpts;
+pub use text::TextOpts;
+pub use text::TextSignFormat;
+pub use base64::Base64Format;
+pub use csv::Format;
 
 #[derive(Parser, Debug)]
 #[command(author, version, long_about = None)]
@@ -25,6 +30,9 @@ pub enum Subcommand {
 
     #[command(subcommand)]
     Base64(Base64Opts),
+
+    #[command(subcommand)]
+    Text(TextOpts),
 }
 
 fn verify_input(input: &str) -> Result<String, &'static str> {

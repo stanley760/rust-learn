@@ -1,14 +1,14 @@
 use anyhow::Ok;
-use rand::seq::SliceRandom;
 use zxcvbn::zxcvbn;
-use crate::operation::genpwd::GenPwdOpts;
+use rand::seq::SliceRandom;
+use crate::operation::GenPwdOpts;
 
 const LOWERCASE: &[u8] = b"abcdefghijklmnopqrstuvwxyz";
 const UPPERCASE: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const NUMBERS: &[u8] = b"0123456789";
 const SYMBOLS: &[u8] = b"!@#$%^&*()_+-=[]{}|;:,.<>/?";
 
-pub fn parse_gen_pwd(opts: &GenPwdOpts) -> anyhow::Result<()> {
+pub fn parse_gen_pwd(opts: &GenPwdOpts) -> anyhow::Result<()>{
     let mut rng = rand::thread_rng();
     let mut pwd = Vec::new();
     let mut chars = Vec::new();
