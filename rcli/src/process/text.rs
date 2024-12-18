@@ -14,6 +14,11 @@ pub trait TextVerify {
     fn verify(&self,  data: impl Read, sig: &[u8]) -> Result<bool>;
 }
 
+pub trait KeyLoader {
+    fn load(path: impl AsRef<std::path::Path>) -> Result<Self>
+        where Self: Sized;
+}
+
 pub struct Blake3 {
     pub key: [u8; 32],
 }
@@ -44,6 +49,13 @@ impl TextVerify for Blake3 {
     }
 }
 
+impl KeyLoader for Blake3 {
+    fn load(path: impl AsRef<std::path::Path>) -> Result<Self> {
+        let key = fs::read(path)?;
+        Self::try_new(&key)
+    }
+}
+
 impl TextSign for Ed25519Signer {
     fn sign(&self, reader: &mut dyn Read) -> Result<Vec<u8>> {
         let mut buf = Vec::new();
@@ -61,6 +73,20 @@ impl TextVerify for Ed25519Verifier {
     }
 }
 
+impl KeyLoader for Ed25519Signer {
+    fn load(path: impl AsRef<std::path::Path>) -> Result<Self> {
+        let key = fs::read(path)?;
+        Self::try_new(&key)
+    }
+}
+
+impl KeyLoader for Ed25519Verifier {
+    fn load(path: impl AsRef<std::path::Path>) -> Result<Self> {
+        let key = fs::read(path)?;
+        Self::try_new(&key)
+    }
+}
+
 pub fn process_sign(input: &str, key: &str, format: TextSignFormat) -> Result<()> {
     let mut reader = read_file(input)?;
 
@@ -69,9 +95,30 @@ pub fn process_sign(input: &str, key: &str, format: TextSignFormat) -> Result<()
             let sign = Blake3::load(key)?;
             sign.sign(&mut reader)?
         },
-        TextSignFormat::Ed25519 => todo!(),
+        TextSignFormat::Ed25519 => {
+            let load = Ed25519Signer::load(key)?;
+            load.sign(&mut reader)?
+        },
     };
     let result = BASE64_URL_SAFE_NO_PAD.encode(result);
+    println!("{}", result);
+    Ok(())
+}
+
+pub fn process_verify(input: &str, key: &str, format: TextSignFormat, sig: &str) -> Result<()> {
+    let mut reader = read_file(input)?;
+    let sig = BASE64_URL_SAFE_NO_PAD.decode(sig)?;
+
+    let result = match format {
+        TextSignFormat::Blake3 => {
+            let sign = Blake3::load(key)?;
+            sign.verify(&mut reader, &sig)?
+        },
+        TextSignFormat::Ed25519 => {
+            let load = Ed25519Verifier::load(key)?;
+            load.verify(&mut reader, &sig)?
+        }
+    };
     println!("{}", result);
     Ok(())
 }
@@ -88,10 +135,6 @@ impl Blake3 {
         Ok(Blake3::new(key))
     }
 
-    pub fn load(path: impl AsRef<std::path::Path>) -> Result<Self> {
-        let key = fs::read(path)?;
-        Self::try_new(&key)
-    }
 }
 
 impl Ed25519Signer {
@@ -104,10 +147,6 @@ impl Ed25519Signer {
         Ok(Ed25519Signer::new(key))
     }
 
-    pub fn load(path: impl AsRef<std::path::Path>) -> Result<Self> {
-        let key = fs::read(path)?;
-        Self::try_new(&key)
-    }
 }
 
 impl Ed25519Verifier {
@@ -120,8 +159,4 @@ impl Ed25519Verifier {
         Ok(Ed25519Verifier::new(key))
     }
 
-    pub fn load(path: impl AsRef<std::path::Path>) -> Result<Self> {
-        let key = fs::read(path)?;
-        Self::try_new(&key)
-    }
 }
