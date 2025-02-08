@@ -4,8 +4,8 @@ use rcli::parse_gen_pwd;
 use rcli::process_base64_decode;
 use rcli::process_base64_encode;
 use rcli::process_sign;
+use rcli::process_verify;
 use rcli::Base64Opts;
-use rcli::TextSignFormat;
 use rcli::{Opts, Subcommand};
 // cargo run -- csv -i assets/juventus.csv --format yaml
 // cargo run -- csv -i assets/juventus.csv --format json
@@ -36,15 +36,12 @@ fn main() -> anyhow::Result<()> {
         },
 
         Subcommand::Text(opts) => match opts {
-            rcli::TextOpts::Sign(opts) => match opts.format {
-                TextSignFormat::Blake3 => {
-                    process_sign(&opts.input, &opts.key, opts.format)?;
-                }
-                rcli::TextSignFormat::Ed25519 => {
-                    println!("Ed25519");
-                }
+            rcli::TextOpts::Sign(opts) => {
+                process_sign(&opts.input, &opts.key, opts.format)?;
             },
-            rcli::TextOpts::Verify(opts) => {}
+            rcli::TextOpts::Verify(opts) => {
+                process_verify(&opts.input, &opts.key, opts.format, &opts.sig)?;
+            }
         },
     }
     Ok(())
