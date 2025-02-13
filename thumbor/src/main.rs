@@ -1,7 +1,13 @@
 mod pb;
-use std::sync::Arc;
+mod engine;
+use engine::{Engine, Photon};
+use std::hash::{Hash, Hasher};
+use std::{collections::hash_map::DefaultHasher,sync::Arc};
 use std::num::NonZeroUsize;
+use axum::http::{HeaderMap, HeaderValue};
+use axum::Extension;
 use bytes::Bytes;
+use image::ImageOutputFormat;
 use lru::LruCache;
 use pb::*;
 
@@ -11,6 +17,7 @@ use serde::Deserialize;
 use tokio::sync::Mutex;
 use tower::ServiceBuilder;
 use tower_http::add_extension::AddExtensionLayer;
+use tracing::{info, instrument};
 
 #[derive(Deserialize)]
 struct Params {
@@ -45,13 +52,53 @@ async fn main() {
         .unwrap();
 }
 
-async fn generate(Path(Params { spec, url }): Path<Params>) -> Result<String, StatusCode> {
-    let url = percent_decode_str(&url).decode_utf8_lossy();
+async fn generate(Path(Params { spec, url }): Path<Params>, Extension(cache): Extension<Cache>) -> Result<(HeaderMap, Vec<u8>), StatusCode> {
+    
     let spec: ImageSpec = spec
         .as_str()
         .try_into()
         .map_err(|_| StatusCode::BAD_REQUEST)?;
-    Ok(format!("url: {}\n spec: {:#?}", url, spec))
+    let url: &str = &percent_decode_str(&url).decode_utf8_lossy();
+    let data = retrieve_image(&url, cache)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    // 生成图片
+    // 使用 image engine 处理
+    let mut engine: Photon = data
+        .try_into()
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    engine.apply(&spec.specs);
+
+    let image = engine.generate(ImageOutputFormat::Jpeg(85));
+
+    info!("Finished processing: image size {}", image.len());
+    let mut headers = HeaderMap::new();
+
+    headers.insert("content-type", HeaderValue::from_static("image/jpeg"));
+    Ok((headers, image))
+}
+
+#[instrument(level = "info", skip(cache))]
+async fn retrieve_image(url: &str, cache: Cache) -> anyhow::Result<Bytes> {
+    let mut hasher = DefaultHasher::new();
+    url.hash(&mut hasher);
+    let key = hasher.finish();
+    let lock = &mut cache.lock().await;
+
+    let data = match lock.get(&key) {
+        Some(val) => {
+            info!("cache hit key: {}", key);
+            val.to_owned()
+        }
+        None => {
+            info!("cache miss key: {}", key);
+            let resp = reqwest::get(url).await?;
+            let data = resp.bytes().await?;
+            lock.put(key, data.clone());
+            data
+        }
+    };
+    Ok(data)
 }
 
 fn print_test_url(url: &str) {

@@ -5923,7 +5923,7 @@ dependencies = [
  "axum 0.8.1",
  "base64 0.13.1",
  "bytes",
- "image 0.25.5",
+ "image 0.23.14",
  "lazy_static",
  "lru 0.13.0",
  "percent-encoding",
