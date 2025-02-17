@@ -14,7 +14,7 @@ fn init() -> Option<&'static mut Config> {
     });
     Some(Box::leak(x))
 }
-
+#[allow(static_mut_refs)]
 pub fn invoke() {
     unsafe {
         CONFIG = init();

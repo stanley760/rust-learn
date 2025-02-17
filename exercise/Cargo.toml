@@ -13,3 +13,5 @@ num-traits = "0.2.19"
 num-derive = "0.4.2"
 reqwest = { version = "0.12.9", features = ["blocking"] }
 html2md = "0.2"
+serde = { version = "1.0.217", features = ["derive"] }
+serde_json = "1.0.138"

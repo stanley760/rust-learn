@@ -1882,6 +1882,8 @@ dependencies = [
  "num-traits",
  "rand 0.8.5",
  "reqwest 0.12.12",
+ "serde",
+ "serde_json",
  "twox-hash",
 ]
 

@@ -7,6 +7,10 @@ pub mod circle {
     pub mod circle_reference;
 }
 
+pub mod cow {
+    pub mod exercise;
+}
+
 pub mod table {
     pub mod map_lifetime;
 
@@ -61,8 +65,12 @@ pub mod traitobj {
     pub mod trait_safe;
     pub mod trait_safe_2;
     pub mod wrapper_fmt;
-
+    pub mod drop_copy_trait;
+    pub mod default_display_trait;
+    pub mod send_sync_trait;
+    pub mod as_ref_trait;
     pub mod blanket_impl;
+    pub mod linked_list_new;
 }
 
 pub mod vector {
