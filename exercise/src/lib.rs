@@ -7,6 +7,10 @@ pub mod circle {
     pub mod circle_reference;
 }
 
+pub mod collector {
+    pub mod exercise_1;
+}
+
 pub mod cow {
     pub mod exercise;
 }
@@ -71,6 +75,7 @@ pub mod traitobj {
     pub mod as_ref_trait;
     pub mod blanket_impl;
     pub mod linked_list_new;
+    pub mod mystring;
 }
 
 pub mod vector {
@@ -143,6 +148,8 @@ pub mod closure {
     pub mod moves;
 
     pub mod fn_mut;
+
+    pub mod exercise_fn;
 
     pub mod exercise_1;
     pub mod exercise_2;
