@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package abi;
+
+message CommandRequest {
+    oneof request_data {
+        Hget hget = 1;
+        Hgetall Hgetall = 2;
+        Hmget hmget = 3;
+        Hset hset = 4;
+        Hmset hmset = 5;
+        Hdel hdel = 6;
+        Hmdel hmdel = 7;
+        Hexist hexist = 8;
+        Hmexist hmexist = 9;
+    }
+}
+
+message CommandResponse {
+    uint32 status = 1;
+    string message = 2;
+    repeated Value values = 3;
+    repeated Kvpair pairs = 4;
+}
+
+// get the value in the key from the table.
+message Hget {
+    string table = 1;
+    string key = 2;
+}
+
+// get all of kv pairs from the table.
+message Hgetall {
+    string table = 1;
+}
+
+// get the values with a group of keys in the table.
+message Hmget {
+    string table = 1;
+    repeated string keys = 2;
+}
+
+// defined the return value.
+message Value {
+    oneof value {
+        string string = 1;
+        bytes binary = 2;
+        int64 integer = 3;
+        double float = 4;
+        bool bool = 5;
+    }
+}
+
+// defined what is kvpair.
+message Kvpair {
+    string key = 1;
+    Value value = 2;
+}
+
+// set the value in the key from the table.
+// if the table not exist, create a new table.
+message Hset {
+    string table = 1;
+    Kvpair pair = 2;
+}
+
+// set the values with a group of kv pairs in the table.
+// if the table not exist, create a new table.
+message Hmset {
+    string table = 1;
+    repeated Kvpair pairs = 2;
+}
+
+// delete the key from the table.
+message Hdel {
+    string table = 1;
+    string key = 2;
+}
+
+// delete the keys from the table.
+message Hmdel {
+    string table = 1;
+    repeated string keys = 2;
+}
+
+// check the key is existed or not.
+message Hexist {
+    string table = 1;
+    string key = 2;
+}
+
+// check a group keys are existed or not.
+message Hmexist {
+    string table = 1;
+    repeated string keys = 2;
+}
