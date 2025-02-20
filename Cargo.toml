@@ -1,7 +1,7 @@
 [workspace]
 members = ["algorithm", "concurrentcy",
     "exercise", "getinfo",
-    "grep", "halo_web", "httpie", "kv_server", "process_killer", "rcli", "real_weather", "thumbor", "todolist",
+    "grep", "halo_web", "httpie", "kv_server", "process_killer", "rcli", "thumbor", "todolist",
 ]
 resolver = "2"
 
