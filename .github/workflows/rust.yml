@@ -16,6 +16,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Install protobuf
+      run: |
+        brew install protobuf
+        echo "PROTOC=$(which protoc)" >> $GITHUB_ENV
+
     - name: Build
       run: cargo build --verbose
     - name: Run test
