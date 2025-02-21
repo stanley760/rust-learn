@@ -37,7 +37,7 @@ impl CommandService for Hgetall {
 
 #[cfg(test)]
 mod tests {
-    use crate::{CommandRequest, Kvpair, MemTable, Value};
+    use crate::{assert_res_error, assert_res_ok, CommandRequest, Kvpair, MemTable, Value};
     use crate::command_request::RequestData;
     use super::*;
 

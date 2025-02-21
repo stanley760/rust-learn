@@ -9,6 +9,7 @@ dashmap = { version = "6.1.0", features = ["inline"] }
 http = "1.2.0"
 prost = "0.10.4"
 thiserror = "2.0.11"
+tokio-tower = "0.6.0"
 tracing = "0.1.41"
 
 

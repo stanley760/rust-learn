@@ -29,14 +29,3 @@ pub fn assert_res_error(res: CommandResponse, code: u32, msg: &str) {
     assert_eq!(res.values, &[]);
     assert_eq!(res.pairs, &[]);
 }
-
-#[cfg(test)]
-mod tests {
-    use crate::MemTable;
-
-    #[test]
-    fn service_should_works() {
-        // todo 待实现
-        //let service = Service::new(MemTable::default());
-    }
-}
