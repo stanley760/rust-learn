@@ -7,7 +7,7 @@ edition = "2021"
 bytes = "1.10.0"
 dashmap = { version = "6.1.0", features = ["inline"] }
 http = "1.2.0"
-prost = "0.13.5"
+prost = "0.10.4"
 thiserror = "2.0.11"
 tracing = "0.1.41"
 
@@ -21,4 +21,4 @@ tracing-subscriber = "0.3.19"
 
 
 [build-dependencies]
-prost-build = "0.13.5"
+prost-build = "0.10.4"
