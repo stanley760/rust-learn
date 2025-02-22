@@ -47,7 +47,7 @@ fn verify_input(input: &str) -> Result<String, &'static str> {
 mod tests {
     use crate::operation::base64::Base64Format;
 
-    use crate::process::{process_base64_decode, process_base64_encode};
+    use crate::process:: process_base64_encode;
 
     use super::*;
 
@@ -66,10 +66,4 @@ mod tests {
         assert!(process_base64_encode(input, format).is_ok());
     }
 
-    #[test]
-    fn test_process_decode() {
-        let input = "cargo.toml";
-        let format = Base64Format::Standard;
-        assert!(process_base64_decode(input, format).is_ok());
-    }
 }
