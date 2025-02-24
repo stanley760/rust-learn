@@ -1,10 +1,78 @@
-use crate::{CommandResponse, Storage};
+use std::sync::Arc;
+use command_service::dispatch;
+use tracing::debug;
+use crate::{CommandRequest, CommandResponse, MemTable, Storage};
 
 mod command_service;
 
 
 pub trait CommandService {
     fn execute(self, store: &impl Storage) -> CommandResponse;
+}
+/// 
+/// the code S = MemTable means the default storage value is MemTable.
+/// 
+pub struct Service<S = MemTable> {
+    inner: Arc<ServiceInner<S>>,
+}
+
+impl<S> Clone for Service<S> {
+    fn clone(&self) -> Self {
+        Self {
+            inner: Arc::clone(&self.inner),
+        }
+    }
+}
+
+pub struct ServiceInner<S> {
+    store: S,
+}
+
+impl<S: Storage> Service<S> {
+    pub fn new(store: S) -> Self {
+        Self {
+            inner: Arc::new(ServiceInner {
+                store,
+            }),
+        }
+    }
+
+    pub fn execute(&self, cmd: CommandRequest) -> CommandResponse {
+        let store = &self.inner.store;
+        // TODO: send the event which is on_received.
+        let res = dispatch(cmd, store);
+        debug!("response: {:?}", res);
+        // TODO: send the event which is on_executed.
+
+        res
+    }
+}
+
+
+
+#[cfg(test)]
+mod tests {
+    use std::thread;
+
+    use super::*;
+    use crate::MemTable;
+    
+    #[test]
+    fn service_should_works() {
+        let service = Service::new(MemTable::default());
+        
+        let cloned = service.clone();
+
+        let handle = thread::spawn(move || {
+            let res = cloned.execute(CommandRequest::new_hset("t1", "k1", "v1".into()));
+            assert_res_ok(res, &[Value::default()], &[]);
+        });
+
+        handle.join().unwrap();
+
+        let res = service.execute(CommandRequest::new_hget("t1", "k1"));
+        assert_res_ok(res, &["v1".into()], &[]);
+    }
 }
 
 
