@@ -6,8 +6,10 @@ use anyhow::{Result, anyhow};
 
 
 fn main() -> Result<()> {
-    
-
+    let a = Matrix::new(vec![1, 2, 3, 4], 2, 2);
+    let b = Matrix::new(vec![1, 2, 3, 4, 5, 6], 2, 3);
+    let c = multiply(&a, &b)?;
+    println!("{:?}", c);
     Ok(())
 }
 
@@ -17,6 +19,7 @@ struct Matrix<T> {
     row: usize,
     col: usize,
 }
+
 
 fn multiply<T>(a: &Matrix<T>, b: &Matrix<T>) -> Result<Matrix<T>> 
     where T: Copy + Add<Output = T> + Mul<Output = T> + AddAssign + Default + Debug {

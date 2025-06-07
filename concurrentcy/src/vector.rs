@@ -1,13 +1,24 @@
 use anyhow::{Result, anyhow};
-use std::{fmt::Debug, ops::{Add, AddAssign, Mul}};
-
-
+use std::{fmt::Debug, ops::{Add, AddAssign, Deref, Mul}};
 
 pub struct Vector<T> {
     data: Vec<T>,
 }
+impl<T> Deref for Vector<T>   {
+    type Target = Vec<T>;
+    
+    fn deref(&self) -> &Self::Target {
+        &self.data
+    }
+}
+impl<T> Vector<T>  {
+    pub fn new(data: impl Into<Vec<T>>) -> Self {
+        Vector { data: data.into() }
+        
+    }
+}
 
-fn dot_product<T>(a: Vec<T>, b: Vec<T>) -> Result<T>
+pub fn dot_product<T>(a: Vector<T>, b: Vector<T>) -> Result<T>
     where T: Copy + Add<Output = T> + Mul<Output = T> + AddAssign + Default + Debug {
     if a.len() != b.len() {
         return Err(anyhow!("Matrix dot error: a.len() != b.len()"));
