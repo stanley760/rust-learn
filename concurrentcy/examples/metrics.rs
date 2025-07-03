@@ -11,7 +11,7 @@ fn main() -> Result<()> {
     // metrics.inc("a");
     // metrics.inc("b");
     // metrics.dec("a");
-    println!("{:?}", metrics.snapshot());
+    println!("{:?}", metrics);
     for idx in 0..N {
         task_worker(idx, metrics.clone())?;
     }
@@ -22,7 +22,7 @@ fn main() -> Result<()> {
 
     loop {
         thread::sleep(Duration::from_secs(1));
-        println!("{:?}", metrics.snapshot());
+        println!("{:?}", metrics);
     }
 }
 

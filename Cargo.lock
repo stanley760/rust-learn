@@ -1031,6 +1031,7 @@ name = "concurrentcy"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "dashmap 6.1.0",
  "oneshot",
  "rand 0.9.1",
 ]
