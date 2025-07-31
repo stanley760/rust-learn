@@ -11,3 +11,7 @@ rand = "0.9.1"
 dashmap = "6.0.0"
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+criterion = { version = "0.7.0", features = ["html_reports"] }
+[[bench]]
+name = "arc_benchmark"
+harness = false
