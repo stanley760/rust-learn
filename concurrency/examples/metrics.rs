@@ -1,7 +1,7 @@
 use std::{thread, time::Duration};
 use rand::Rng;
 use anyhow::{Ok, Result};
-use concurrentcy::Metrics;
+use concurrency::Metrics;
 
 const N: usize = 2;
 const M: usize = 4;

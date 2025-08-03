@@ -1,5 +1,5 @@
 [workspace]
-members = ["algorithm", "concurrentcy",
+members = ["algorithm", "concurrency",
     "exercise", "getinfo",
     "grep", "halo_web", "httpie", "kv_server", "ml-learning", "process_killer", "rcli", "thumbor", "todolist",
 ]

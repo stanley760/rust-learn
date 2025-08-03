@@ -1,5 +1,5 @@
 use anyhow::Result;
-use concurrentcy::{multiply, Matrix};
+use concurrency::{multiply, Matrix};
 
 
 fn main() -> Result<()> {
