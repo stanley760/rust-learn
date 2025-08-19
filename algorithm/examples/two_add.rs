@@ -50,7 +50,7 @@ impl ListNode {
 
 struct LinkListSolution;
 
-
+// 使用一个 while 循环迭代判断 a 不为空或 b 不为空时进行相加操作，直到一个先为空或两个一起为空为止表示相加结束
 impl LinkListSolution {
     pub(crate) fn two_add(mut a: Option<Box<ListNode>>, mut b: Option<Box<ListNode>>) 
         ->  Option<Box<ListNode>> {
