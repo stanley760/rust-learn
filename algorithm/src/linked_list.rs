@@ -33,8 +33,10 @@ impl<T:Clone> ListNode<T> {
     }
 
     pub fn remove(prev: &Rc<RefCell<ListNode<T>>>) {
-        prev.borrow_mut().next = prev.borrow().next.as_ref()
-            .and_then(|node| node.borrow().next.clone());
+        let p = prev.borrow_mut().next.take();
+        if let Some(node) = p {
+            prev.borrow_mut().next = node.borrow_mut().next.take();
+        }
     }
 
     pub fn to_vec(n0: &Rc<RefCell<ListNode<T>>>) -> Vec<T> {

@@ -20,5 +20,7 @@ fn test_linked_list() {
     ListNode::insert(&n1, n5);
 
     assert_eq!(ListNode::to_vec(&n0), vec![1, 3, 6, 2, 5, 4]);
+    ListNode::remove(& n0);
+    assert_eq!(ListNode::to_vec(&n0), vec![1, 6, 2, 5, 4]);
 }
 
