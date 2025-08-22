@@ -12,7 +12,7 @@ pub struct ListNode<T> {
     pub next: Option<Rc<RefCell<ListNode<T>>>>,
 }
 
-impl<T:Clone> ListNode<T> {
+impl<T:Clone + PartialEq> ListNode<T> {
     pub fn new(val: T) -> Self {
         Self { val, next: None }
     }
@@ -47,6 +47,29 @@ impl<T:Clone> ListNode<T> {
             current = node.borrow().next.clone();
         }
         res
+    }
+
+    pub fn access(n0: &Rc<RefCell<ListNode<T>>>, index: usize) -> Option<T> {
+        let mut current = Some(n0.clone());
+        for _ in 0..index {
+            if let Some(node) = current {
+                current = node.borrow().next.clone();
+            } else {
+                return None;
+            }
+        }
+        current.map(|node| node.borrow().val.clone())
+    }
+
+    pub fn find(n0: &Rc<RefCell<ListNode<T>>>, val: T) -> Option<Rc<RefCell<ListNode<T>>>> {
+        let mut current = Some(n0.clone());
+        while let Some(node) = current {
+            if node.borrow().val == val {
+                return Some(node);
+            }
+            current = node.borrow().next.clone();
+        }
+        None
     }
 }
 

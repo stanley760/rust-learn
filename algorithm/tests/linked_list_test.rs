@@ -22,5 +22,11 @@ fn test_linked_list() {
     assert_eq!(ListNode::to_vec(&n0), vec![1, 3, 6, 2, 5, 4]);
     ListNode::remove(& n0);
     assert_eq!(ListNode::to_vec(&n0), vec![1, 6, 2, 5, 4]);
+
+    let val = ListNode::access(&n0, 1);
+    assert_eq!(val, Some(6));
+
+    let node = ListNode::find(&n0, 6);
+    assert_eq!(node.map(|node| node.borrow().val.clone()), Some(6));
 }
 

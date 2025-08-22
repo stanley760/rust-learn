@@ -1,5 +1,7 @@
 use std::{cell::RefCell, rc::Rc};
 
+use algorithm::ListNode;
+
 use crate::fibonacci::Fibonacci;
 
 mod fibonacci;
@@ -20,31 +22,7 @@ fn main() {
     n2.borrow_mut().next = Some(n3.clone());
     n3.borrow_mut().next = Some(n4.clone());
 
-    let n = access(n0.clone(), 2);
+    let n = ListNode::access(&n0, 2);
     println!("{:?}", n);
 }
 
-#[derive(Debug)]
-struct ListNode<T> {
-    val: T, // 节点值
-    next: Option<Rc<RefCell<ListNode<T>>>>, // 指向下一节点的指针
-}
-
-fn access<T>(head: Rc<RefCell<ListNode<T>>>, index: i32) -> Option<Rc<RefCell<ListNode<T>>>> {
-    fn dfs<T>(
-        head: Option<&Rc<RefCell<ListNode<T>>>>,
-        index: i32,
-    ) -> Option<Rc<RefCell<ListNode<T>>>> {
-        if index <= 0 {
-            return head.cloned();
-        }
-
-        if let Some(node) = head {
-            dfs(node.borrow().next.as_ref(), index - 1)
-        } else {
-            None
-        }
-    }
-
-    dfs(Some(head).as_ref(), index)
-}
