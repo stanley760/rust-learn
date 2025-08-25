@@ -5,6 +5,22 @@ use std::{cell::RefCell, rc::Rc};
 /// 通过它可以从当前节点访问到下一个节点。
 /// 
 /// 链表的设计使得各个节点可以分散存储在内存各处，它们的内存地址无须连续。
+/// Warning: This code is not recommended. use [unsafe_linked_queue]
+/// 
+/// # example
+/// ```
+///  use algorithm::Queue;
+///  let mut queue = Queue::new();
+///  queue.push(1);
+///  queue.push(2);
+///  queue.push(3);
+///  let mut iter = queue.iter();
+///  assert_eq!(iter.next(), Some(&1));
+///  assert_eq!(iter.next(), Some(&2));
+///  assert_eq!(iter.next(), Some(&3));
+///  assert_eq!(iter.next(), None);
+/// ```
+/// 
 
 #[derive(Debug)]
 pub struct ListNode<T> {
