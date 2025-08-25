@@ -41,7 +41,7 @@ impl<T: Copy + PartialEq + Sized> ArrayStack<T> {
         self.data.clear();
     }
 
-    pub fn iter(&self) -> std::slice::Iter<T> {
+    pub fn iter(&self) -> std::slice::Iter<'_, T> {
         self.data.iter()
     }
 }

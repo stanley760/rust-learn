@@ -1,5 +1,8 @@
 use std::ptr;
-
+/// implementation of a queue using a singly linked list with raw pointers.
+/// # the unsafe code is encapsulated within the Queue struct, providing a safe interface.
+/// It supports standard queue operations such as push, pop, peek, and iteration.
+/// It actually uses stack memory for its nodes, avoiding heap allocation overhead.
 pub struct Queue<T> {
     head: Link<T>,
     tail: *mut Node<T>,
@@ -85,7 +88,7 @@ impl<T> Queue<T> {
         IntoIter(self)
     }
 
-    pub fn iter(&self) -> Iter<T> {
+    pub fn iter(&self) -> Iter<'_, T> {
         unsafe {
             Iter {
                 next: self.head.as_ref(),
@@ -93,7 +96,7 @@ impl<T> Queue<T> {
         }
     }
 
-    pub fn iter_mut(&mut self) -> IterMut<T> {
+    pub fn iter_mut(&mut self) -> IterMut<'_, T> {
         unsafe {
             IterMut {
                 next: self.head.as_mut(),
