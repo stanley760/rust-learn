@@ -1,3 +1,6 @@
+// the queue is implemented by the circlular array
+// the front of the queue is the element at the front of the array
+// the rear of the queue is the element at the end of the array
 
 pub struct ArrayQueue<T> {
     data: Vec<T>,

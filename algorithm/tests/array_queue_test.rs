@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use algorithm::ArrayQueue;
 
 #[test]
@@ -28,4 +30,18 @@ fn test_array_queue() {
     assert_eq!(queue.size(), 4);
 
     assert_eq!(queue.to_vec(), vec![0, 0, 0, 0, 2, 3, 4, 5]);
+}
+
+#[test]
+fn test_vec_deque() {
+    let mut dequeue = VecDeque::new();
+    dequeue.push_back(1);
+    dequeue.push_back(2);
+    dequeue.push_back(3);
+    dequeue.push_front(4);
+    dequeue.push_front(5);
+
+    assert_eq!(dequeue.len(), 5);
+    assert_eq!(dequeue.front(), Some(&5));
+    assert_eq!(dequeue.back(), Some(&3));
 }
