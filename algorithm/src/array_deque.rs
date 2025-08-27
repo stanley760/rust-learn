@@ -148,6 +148,28 @@ impl<T> ArrayDeque<T> {
         }
     }
 
+    pub fn find(&self, value: &T) -> Option<usize>
+    where 
+        T: PartialEq<T> 
+    {
+        unsafe {
+            let mut cur = self.front;
+
+            let mut index = 0;
+
+            while let Some(node) = cur {
+                if &(*node.as_ptr()).elem == value {
+                    return Some(index);
+                }
+                cur = (*node.as_ptr()).back;
+                index += 1;
+
+            }
+            None
+        }
+
+    }
+
     pub fn remove(&mut self, index: usize) -> Option<T> {
         if index >= self.len {
             panic!("Index out of bounds");
