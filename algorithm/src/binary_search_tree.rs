@@ -49,6 +49,10 @@ impl<T> TreeNode<T> {
             }
         }
     }
+
+    pub fn bfs() {
+        todo!("bfs implements")
+    }
 }
 
 impl<T: Ord> BinarySearchTree<T> {
@@ -75,17 +79,15 @@ impl<T: Ord> BinarySearchTree<T> {
     }
 
     unsafe fn insert_value(node: Link<T>, value: T) -> Link<T> {
-        unsafe {
-            if node.is_null() {
-                Box::into_raw(Box::new(TreeNode::new(value)))
-            } else {
-                match value.cmp(&(*node).data) {
-                    Ordering::Less => (*node).left = Self::insert_value((*node).left, value),
-                    Ordering::Greater => (*node).right = Self::insert_value((*node).right, value),
-                    Ordering::Equal => {}
-                }
-                node
+        if node.is_null() {
+            Box::into_raw(Box::new(TreeNode::new(value)))
+        } else {
+            match value.cmp(&(*node).data) {
+                Ordering::Less => (*node).left = Self::insert_value((*node).left, value),
+                Ordering::Greater => (*node).right = Self::insert_value((*node).right, value),
+                Ordering::Equal => {}
             }
+            node
         }
     }
 
