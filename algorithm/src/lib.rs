@@ -11,7 +11,8 @@ mod hash_table_chaining;
 mod binary_search_tree;
 mod heap;
 mod avl_tree;
-
+mod algo_search;
+mod algo_sort;
 pub use array::*;
 pub use linked_list::*;
 pub use list::*;

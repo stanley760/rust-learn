@@ -46,7 +46,13 @@ impl<T: Ord> AVLTree<T> {
     
     pub fn remove(&mut self, value: &T) -> bool {
         // 删除操作的实现
-        unimplemented!()
+        unsafe {
+            let res = remove_node(&mut self.root, value);
+            if res {
+                self.length -= 1;
+            }
+            res
+        }
     }
 
 }
@@ -164,7 +170,7 @@ unsafe fn insert_node<T: Ord>(root:&mut *mut TreeNode<T>, value: T) -> bool {
     }
 }
 
-unsafe fn remove_node<T: Ord>(root: &mut *mut TreeNode<T>, value: T) -> bool {
+unsafe fn remove_node<T: Ord>(root: &mut *mut TreeNode<T>, value: &T) -> bool {
     // 删除节点的实现
     if root.is_null() {
         return false; // 节点不存在
