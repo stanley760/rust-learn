@@ -9,3 +9,14 @@ pub fn invoke() {
     let r3 = &mut s;
     println!("{}", r3);
 }
+
+#[cfg(test)]
+mod test {
+
+    use super::*;
+
+    #[test]
+    fn test_nll() {
+        invoke();
+    }
+}

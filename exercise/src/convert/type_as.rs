@@ -21,3 +21,85 @@ pub fn invoke() {
 
     println!("Success!")
 }
+
+#[derive(Debug)]
+struct Number {
+    value: i32,
+}
+
+impl From<i32> for Number {
+    fn from(v: i32) -> Number {
+        Number { value: v }
+    }
+}
+
+#[cfg(test)]
+mod test {
+
+    use super::*;
+    #[test]
+    fn test_from_into() {
+        let i1: i32 = false.into();
+        let i2: i32 = i32::from(false);
+        assert_eq!(i1, i2);
+        assert_eq!(i1, 0);
+        let _i3: u32 = 'a'.into();
+        let _s: String = 'a'.into();
+
+    }
+
+    #[test]
+    fn test_from_trait() {
+        let num = Number::from(30);
+        assert_eq!(num.value, 30);
+
+        let num : Number = 30.into();
+        assert_eq!(num.value, 30);
+    }
+
+    #[test]
+    fn test_try_into_trait() {
+        let n : i16 = 256;
+
+        let n: u8 = n.try_into().unwrap_or_else(|_| {
+            println!("Failed to convert i16 to u8");
+            0
+        });
+
+        assert_eq!(n, 0);
+    }
+
+    #[test]
+    fn test_from_trait_error() {
+        use std::io::Error;
+        use std::num::ParseIntError;
+        use std::fs;
+        #[derive(Debug)]
+        enum CliErr {
+            IoError(Error),
+            ParseError(ParseIntError),
+        }
+
+        impl From<Error> for CliErr {
+            fn from(value: Error) -> Self {
+                CliErr::IoError(value)
+            }
+        }
+
+        impl From<ParseIntError> for CliErr {
+            fn from(value: ParseIntError) -> Self {
+                CliErr::ParseError(value)
+            }
+        }
+
+        fn open_and_parse_file(file_name: &str) -> Result<i32, CliErr> {
+            let contents = fs::read_to_string(file_name)?;
+            let num = contents.trim().parse::<i32>()?;
+            Ok(num)
+        }
+
+        let res = open_and_parse_file("exercise_6.rs");
+        println!("{:#?}", res)
+    }
+}
+
