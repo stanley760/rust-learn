@@ -35,7 +35,6 @@ impl From<i32> for Number {
 
 #[cfg(test)]
 mod test {
-
     use super::*;
     #[test]
     fn test_from_into() {
@@ -45,7 +44,6 @@ mod test {
         assert_eq!(i1, 0);
         let _i3: u32 = 'a'.into();
         let _s: String = 'a'.into();
-
     }
 
     #[test]
@@ -53,13 +51,13 @@ mod test {
         let num = Number::from(30);
         assert_eq!(num.value, 30);
 
-        let num : Number = 30.into();
+        let num: Number = 30.into();
         assert_eq!(num.value, 30);
     }
 
     #[test]
     fn test_try_into_trait() {
-        let n : i16 = 256;
+        let n: i16 = 256;
 
         let n: u8 = n.try_into().unwrap_or_else(|_| {
             println!("Failed to convert i16 to u8");
@@ -71,9 +69,9 @@ mod test {
 
     #[test]
     fn test_from_trait_error() {
+        use std::fs;
         use std::io::Error;
         use std::num::ParseIntError;
-        use std::fs;
         #[derive(Debug)]
         enum CliErr {
             IoError(Error),
@@ -101,5 +99,81 @@ mod test {
         let res = open_and_parse_file("exercise_6.rs");
         println!("{:#?}", res)
     }
-}
+    use std::cell::RefCell;
+    use std::rc::Rc;
+    use std::sync::Once;
+    use std::thread;
+    use List::{Cons, Nil};
+    #[derive(Debug)]
+    enum List {
+        Cons(i32, RefCell<Rc<List>>),
+        Nil,
+    }
 
+    impl List {
+        fn tail(&self) -> Option<&RefCell<Rc<List>>> {
+            match self {
+                Cons(_, item) => Some(item),
+                Nil => None,
+            }
+        }
+    }
+    #[test]
+    fn test_out_memory() {
+        let a = Rc::new(Cons(5, RefCell::new(Rc::new(Nil))));
+
+        println!("a的初始化rc计数 = {}", Rc::strong_count(&a));
+        println!("a指向的节点 = {:?}", a.tail());
+
+        // 创建`b`到`a`的引用
+        let b = Rc::new(Cons(10, RefCell::new(Rc::clone(&a))));
+
+        println!("在b创建后，a的rc计数 = {}", Rc::strong_count(&a));
+        println!("b的初始化rc计数 = {}", Rc::strong_count(&b));
+        println!("b指向的节点 = {:?}", b.tail());
+
+        // 利用RefCell的可变性，创建了`a`到`b`的引用
+        if let Some(link) = a.tail() {
+            *link.borrow_mut() = Rc::clone(&b);
+        }
+
+        println!("在更改a后，b的rc计数 = {}", Rc::strong_count(&b));
+        println!("在更改a后，a的rc计数 = {}", Rc::strong_count(&a));
+
+        // 下面一行println!将导致循环引用
+        // 我们可怜的8MB大小的main线程栈空间将被它冲垮，最终造成栈溢出
+        println!("a next item = {:?}", a.tail());
+    }
+
+    static mut VAL: usize = 0;
+    static INIT: Once = Once::new();
+
+    #[test]
+    fn test_once() {
+        let handle2 = thread::spawn(move || {
+            println!("Thread 2: about to call call_once");
+            INIT.call_once(|| unsafe {
+                println!("Thread 2: executing closure");
+                VAL = 2;
+            });
+            println!("Thread 2: call_once completed");
+        });
+
+        let handle1 = thread::spawn(move || {
+            println!("Thread 1: about to call call_once");
+            INIT.call_once(|| {
+                println!("Thread 1: executing closure");
+                unsafe {
+                    VAL = 1;
+                }
+            });
+            println!("Thread 1: call_once completed");
+        });
+
+
+        handle2.join().unwrap();
+        handle1.join().unwrap();
+
+        println!("VAL: {}", unsafe { VAL });
+    }
+}
