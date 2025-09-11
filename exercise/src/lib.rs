@@ -211,6 +211,7 @@ pub mod channel {
 
 pub mod parallel {
     pub mod mutex;
+    pub mod thread_variables;
 }
 
 pub mod scrape_url {
