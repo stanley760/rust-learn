@@ -1,15 +1,16 @@
+#[allow(unused)]
 fn call(arg: u64, c: &impl Fn(u64) -> u64) -> u64 {
     c(arg)
 }
-
+#[allow(unused)]
 fn call_mut(arg: u64, c: &mut impl FnMut(u64) -> u64) -> u64 {
     c(arg)
 }
-
+#[allow(unused)]
 fn call_once(arg: u64, c: impl FnOnce(u64) -> u64) -> u64 {
     c(arg)
 }
-
+#[cfg(test)]
 mod test {
     use super::*;
     #[test]

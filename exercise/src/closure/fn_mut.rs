@@ -15,16 +15,16 @@ pub fn invoke() {
 fn exec<'a, F: FnMut(&'a str)>(mut f: F) {
     f("hello")
 }
-
+#[allow(unused)]
 fn call_once(arg: String, c: impl FnOnce(String) -> (String, String)) -> (String, String) {
     c(arg)
 }
-
+#[allow(unused)]
 fn not_closure(arg: String) -> (String, String) {
     (arg, "Rosie".into())
 }
 
-
+#[cfg(test)]
 mod test {
     use super::*;
     #[test]

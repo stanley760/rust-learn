@@ -24,5 +24,5 @@ pub use array_deque::*;
 pub use hash_table::*;
 pub use hash_table_chaining::*;
 pub use binary_search_tree::*;
-pub use heap::*;
+pub use heap::{Heap, MaxHeap, MinHeap};
 pub use avl_tree::*;

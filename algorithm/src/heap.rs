@@ -59,14 +59,14 @@ impl<T: Default> Heap<T> {
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         if self.right_child_idx(idx) > self.count {
-            return self.left_child_idx(idx);
+            self.left_child_idx(idx)
         } else {
             let left_child_idx = self.left_child_idx(idx);
             let right_child_idx = self.right_child_idx(idx);
             if (self.comparator)(&self.items[left_child_idx], &self.items[right_child_idx]) {
-                return left_child_idx;
+                left_child_idx
             } else {
-                return right_child_idx;
+                right_child_idx
             }
         }
     }

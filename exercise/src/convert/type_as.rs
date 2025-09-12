@@ -21,7 +21,7 @@ pub fn invoke() {
 
     println!("Success!")
 }
-
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Number {
     value: i32,

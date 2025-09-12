@@ -7,7 +7,8 @@ pub fn invoke() {
     println!("Success!");
 
     let raw_bytes = [0x78, 0x56, 0x34, 0x12];
-    let numb = unsafe { transmute::<[u8; 4], i32>(raw_bytes) };
+    // let numb = unsafe { transmute::<[u8; 4], i32>(raw_bytes) };
+    let numb = i32::from_ne_bytes(raw_bytes);
     assert_eq!(numb, 0x12345678);
     let numb = u32::from_ne_bytes(raw_bytes); //从内存转换到native字节序列类型
     assert_eq!(numb, 0x12345678);

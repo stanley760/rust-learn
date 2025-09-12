@@ -1,10 +1,10 @@
-
+#[allow(dead_code)]
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 struct Name {
     pub name: String,
     pub flags: u32,
 }
-
+#[allow(dead_code)]
 impl Name {
     pub fn new(name: impl AsRef<str>, flags: u32) -> Self {
         Self {

@@ -1,5 +1,5 @@
 use std::fmt::{self, Display, Formatter};
-
+#[allow(dead_code)]
 #[derive(Debug, Clone, Default)]
 struct Developer {
     name: String,
@@ -20,7 +20,7 @@ impl Default for Language {
         Language::Rust
     }
 }
-
+#[allow(dead_code)]
 impl Developer {
 
     fn new(name: &str) -> Self {
