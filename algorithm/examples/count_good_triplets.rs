@@ -51,15 +51,43 @@ impl Solution {
         }
         count
     }
-    // 2. ORDER + MIDDLE + THREE POINTERS.
-    /// 枚举 j 和 k，可以确定 Ai 的范围。
-    ///
-    ///      ∣ Ai − Aj ∣ ≤a 等价于 Aj − a ≤ Ai ≤ Aj+a。
-    ///      ∣ Ai −Ak ∣ ≤ c 等价于 Ak − c ≤ Ai ≤Ak + c。
-    ///      此外还有 0 ≤ Ai ≤ max(A)。
-    ///
-    ///  计算这三个范围（区间）的交集，得到 Ai 的范围为
-    ///            [max(Aj − a,Ak − c,0),min(Aj + a,Ak + c,max(A))]
+   // 2. PREFIX SUM
+   /// ```
+   /// 枚举 j 和 k，可以确定 Ai的范围。
+   ///
+   ///     ∣Ai − Aj∣≤a 等价于 Aj−a≤Ai≤Aj+a。
+   ///     ∣Ai−Ak∣≤c 等价于 Ak−c≤Ai≤Ak+c。
+   ///     此外还有 0≤Ai≤max(A)。
+   ///
+   /// 计算这三个范围（区间）的交集，得到 Ai 的范围为
+   /// [max(Aj−a,Ak−c,0),min(Aj+a,Ak+c,max(A))]
+   /// ```
+    pub fn count_good_triplets_prefix_sum(arr: Vec<i32>, a: i32, b: i32, c: i32) -> i32 {
+        let max = *arr.iter().max().unwrap();
+        let mut s = vec![0; (max + 2) as usize];
+        let mut res = 0;
+
+        arr.iter().enumerate().for_each(|(j, &y)| {
+            for &z in &arr[j+1..] {
+                if (y -z) > b {
+                    break;
+                }
+                let l = (y-a).max(z -c).max(0);
+                let r = (y + a).min(z + c).min(max);
+                // l > r + 1, s[r + 1] - s[l]  < 0
+                res += 0.max(s[(r+1) as usize] - s[l as usize])
+            }
+            for v in y+1..max+2 {
+                s[v as usize] += 1;
+            }
+        });
+
+        res
+    }
+
+    // 3. ORDER + MIDDLE + THREE POINTERS.
+    // x: arr[i] y: arr[j] z: arr[k]
+    // 1. firstly, loop all elements of the middle array which is arr[j];
     pub fn count_good_triplets(arr: Vec<i32>, a: i32, b: i32, c: i32) -> i32 {
         let mut idx_arr = (0..arr.len()).collect::<Vec<_>>();
         idx_arr.sort_unstable_by_key(|&i| arr[i]);
@@ -68,19 +96,21 @@ impl Solution {
 
         for &j in &idx_arr {
             let y = arr[j];
-            let mut left = vec![];
-            for &i in &idx_arr {
-                if i < j && ((arr[i] - y).abs() <= a) {
-                    left.push(arr[i]);
-                }
-            }
+            // 收集满足条件的左侧元素 (i < j 且 |arr[i] - arr[j]| <= a)
+            let left: Vec<i32> = idx_arr.iter()
+                .filter(|&&i| (i < j) && (arr[i] - y).abs() <= a)
+                .map(|&i| arr[i])
+                .collect();
 
-            let mut right = vec![];
-            for &k in &idx_arr {
-                if k > j && ((arr[k] - y).abs() <= b) {
-                    right.push(arr[k]);
-                }
-            }
+            // 收集满足条件的右侧元素 (k > j 且 |arr[k] - arr[j]| <= b)
+            let right: Vec<i32> = idx_arr.iter()
+                .skip_while(|&&i| i <= j)
+                .filter(|&&k| (k > j) &&(arr[k] - y).abs() <= b)
+                .map(|&k| arr[k])
+                .collect();
+
+
+            // 使用双指针技术计算满足 |x - z| <= c 的组合数
             let mut k1 = 0;
             let mut k2 = 0;
             for x in left {
@@ -101,5 +131,6 @@ impl Solution {
 
 fn main() {
     assert_eq!(Solution::count_good_triplets(vec![3,0,1,1,9,7], 7, 2, 3), 4);
+    assert_eq!(Solution::count_good_triplets_prefix_sum(vec![3,0,1,1,9,7], 7, 2, 3), 4);
     assert_eq!(Solution::count_good_triplets_force(vec![3,0,1,1,9,7], 7,2,3), 4);
 }
