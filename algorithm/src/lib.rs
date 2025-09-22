@@ -13,6 +13,8 @@ mod heap;
 mod avl_tree;
 mod algo_search;
 mod algo_sort;
+
+pub mod sliding_window;
 pub use array::*;
 pub use linked_list::*;
 pub use list::*;
@@ -26,3 +28,5 @@ pub use hash_table_chaining::*;
 pub use binary_search_tree::*;
 pub use heap::{Heap, MaxHeap, MinHeap};
 pub use avl_tree::*;
+
+pub use sliding_window::*;

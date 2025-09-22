@@ -18,7 +18,7 @@ pub struct Process {
 
 impl Process {
     pub fn run() -> Vec<Self> {
-        let output = if cfg!(target_os = "windows") {
+        let output = if cfg!(target_os = "sliding_windows") {
             Command::new("cmd").args(&["/C", "netstat -ano"]).output().expect("failed to run cmd")
         } else if cfg!(target_os="macos") {
             Command::new("sh").args(&["-c", "netstat -anv"]).output().expect("failed to run in mac")
@@ -60,11 +60,11 @@ impl Process {
         
         let pid = pid.parse::<u32>().map_err(|_| Error::new(ErrorKind::InvalidInput, "it's not a number"))?;
         
-        let result = if cfg!(target_os = "windows") {
+        let result = if cfg!(target_os = "sliding_windows") {
             Command::new("cmd")
                 .args(&["taskkill", "-PID", &pid.to_string(), "-F"])
                 .output()
-            // "failed to run on windows."
+            // "failed to run on sliding_windows."
         } else {
             Command::new("sh")
                 .args(&["-kill", "-9", pid.to_string().as_str()])
@@ -78,7 +78,7 @@ impl Process {
     }
 
     fn hanle_cross_operate_system(parts: Vec<&str>) -> Option<Self> {
-        let windows_flag = cfg!(target_os = "windows");
+        let windows_flag = cfg!(target_os = "sliding_windows");
         let macos_flag = cfg!(target_os = "macos");
         if (parts.len() < 5 && windows_flag) || (macos_flag && parts.len() < 8) {
             return None;
