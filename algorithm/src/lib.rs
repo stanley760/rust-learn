@@ -28,5 +28,6 @@ pub use hash_table_chaining::*;
 pub use binary_search_tree::*;
 pub use heap::{Heap, MaxHeap, MinHeap};
 pub use avl_tree::*;
-
+pub use algo_sort::*;
+pub use algo_search::binary_search;
 pub use sliding_window::*;
