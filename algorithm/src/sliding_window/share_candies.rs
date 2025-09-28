@@ -1,3 +1,5 @@
+use std::collections::{HashMap, HashSet};
+
 // 您将获得一个 从0开始的 整数数组 candies ，其中 `candies[i]`表示第 i 个糖果的味道。你妈妈想让你和你妹妹分享这些糖果，给她 k 个 连续 的糖果，但你想保留尽可能多的糖果口味。
 // 在与妹妹分享后，返回 最多 可保留的 独特 口味的糖果。
 // 输入: candies = [1,2,2,3,4,3], k = 3
@@ -24,7 +26,38 @@
 pub struct Solution;
 
 impl Solution {
+    /// 分析：candies = [1,2,2,3,4,3], k = 3
+    /// 1.保证是连续的子数组长度为k,因此得出第一个窗口candies[0,k-1]
     pub fn share_candies(candies: Vec<i32>, k: i32) -> i32 {
-        todo!();
+        let k = k as usize;
+        let mut cnt = HashMap::new();
+        let n = candies.len();
+
+        if k == 0 {
+            return candies.iter().collect::<HashSet<_>>().len() as i32;
+        }
+
+        // 初始化哈希表, 统计第一个窗口 [0, k-1]出现的次数
+        for i in k..n  {
+            *cnt.entry(candies[i]).or_insert(0) += 1;
+        }
+
+        let mut ans = cnt.len();
+        // 滑动窗口从[1, k]到[n - k, n - 1]，i代表滑动窗口的右边界
+        for i in k..n {
+
+            // 移除即将进入窗口的元素
+            let remove = candies[i];
+            *cnt.entry(remove).or_insert(0) -= 1;
+            if *cnt.entry(remove).or_insert(0) == 0 {
+                cnt.remove(&remove);
+            }
+            // 添加即将离开窗口的元素
+            let add = candies[i - k];
+            *cnt.entry(add).or_insert(0) += 1;
+            ans = ans.max(cnt.len());
+            println!("i: {}, cnt: {:?}, ans: {:?}", i, cnt, ans);
+        }
+        ans as _
     }
 }

@@ -1,6 +1,7 @@
 // 好友给自己制定了一份健身计划。想请你帮他评估一下这份计划是否合理。
 //
-// 给定一个数组 caloriescalories，其中 calories[i] 代表好友第 i 天需要消耗的卡路里总量。再给定 lowerlower 代表较低消耗的卡路里，upperupper 代表较高消耗的卡路里。再给定一个整数 k，代表连续 k 天。
+// 给定一个数组 calories，其中 calories[i] 代表好友第 i 天需要消耗的卡路里总量。
+// 再给定 lowerlower 代表较低消耗的卡路里，upperupper 代表较高消耗的卡路里。再给定一个整数 k，代表连续 k 天。
 //
 // 如果你的好友在这一天以及之后连续 k 天内消耗的总卡路里 T 小于 lowerlower，则这一天的计划相对糟糕，并失去 1 分。
 // 如果你的好友在这一天以及之后连续 k 天内消耗的总卡路里 T 高于 upperupper，则这一天的计划相对优秀，并得到 1 分。
@@ -19,6 +20,7 @@ pub struct Solution;
 
 impl Solution {
     pub fn diet_plan_performance(calories: Vec<i32>, k: i32, lower: i32, upper: i32) -> i32 {
+        let k = k as usize;
         todo!()
     }
 }

@@ -15,6 +15,8 @@ mod algo_search;
 mod algo_sort;
 
 pub mod sliding_window;
+
+pub mod sorting;
 pub use array::*;
 pub use linked_list::*;
 pub use list::*;
