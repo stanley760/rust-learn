@@ -14,3 +14,4 @@ pub mod max_score;
 pub mod min_arrivals_to_discard;
 pub mod share_candies;
 pub mod diet_plan_performance;
+pub mod max_satisfied;

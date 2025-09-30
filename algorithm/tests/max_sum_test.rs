@@ -12,10 +12,10 @@ mod test {
 
     #[test]
     pub fn test_instance2() {
-        let nums = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        let m = 5;
-        let k = 5;
-        assert_eq!(Solution::max_sum(nums, m, k), 20);
+        let nums = vec![5,9,9,2,4,5,4];
+        let m = 1;
+        let k = 3;
+        assert_eq!(Solution::max_sum(nums, m, k), 23);
     }
 
     #[test]

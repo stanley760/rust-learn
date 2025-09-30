@@ -17,6 +17,8 @@ mod algo_sort;
 pub mod sliding_window;
 
 pub mod sorting;
+pub mod invalid_ip_address;
+
 pub use array::*;
 pub use linked_list::*;
 pub use list::*;
