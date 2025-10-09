@@ -35,12 +35,14 @@
 //
 // 因此，最大可能利润是 9，无需任何修改即可达成。
 
-
+#[allow(dead_code)]
 pub struct PrefixSumSolution;
+#[allow(dead_code)]
 pub struct SlidingWindowSolution;
 impl PrefixSumSolution {
     /// 前缀和
     ///
+    #[allow(unused)]
     pub fn max_profit(prices: Vec<i32>, strategy: Vec<i32>, k: i32 ) -> i32 {
         let k = k as usize;
         let n = prices.len();
@@ -71,6 +73,7 @@ impl PrefixSumSolution {
 impl SlidingWindowSolution {
     /// 滑动窗口
     ///
+    #[allow(unused)]
     pub fn max_profit(prices: Vec<i32>, strategy: Vec<i32>, k: i32 ) -> i32 {
         let mut total = 0;
         let mut sum = 0;

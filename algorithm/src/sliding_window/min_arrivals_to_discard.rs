@@ -49,20 +49,22 @@ use std::collections::HashMap;
 pub struct Solution;
 
 impl Solution {
-    pub fn min_arrivals_to_discard(arrivals: Vec<i32>, w: i32, m: i32) -> i32 {
+    pub fn min_arrivals_to_discard(mut arrivals: Vec<i32>, w: i32, m: i32) -> i32 {
         let mut ans = 0;
         let mut count = HashMap::new();
         let window_size = w as usize;
 
-        for (i, &item) in arrivals.iter().enumerate() {
+        for i in 0..arrivals.len() {
+            let item = arrivals[i];
             // 先维护滑动窗口大小
             // 当窗口大小超过 w 时，移除最左边的元素
             if i >= window_size {
                 let out_item = arrivals[i - window_size];
-                let out_count = count.get_mut(&out_item).unwrap();
-                *out_count -= 1;
-                if *out_count == 0 {
-                    count.remove(&out_item);
+                if let Some(out_count) = count.get_mut(&out_item) {
+                    *out_count -= 1;
+                    if *out_count == 0 {
+                        count.remove(&out_item);
+                    }
                 }
             }
 
@@ -70,6 +72,7 @@ impl Solution {
             // 如果当前窗口中该类型物品已经达到了 m 次，则需要丢弃
             let current_count = *count.get(&item).unwrap_or(&0);
             if current_count >= m {
+                arrivals[i] = -1;
                 ans += 1;
                 // 物品被丢弃，不加入窗口计数
             } else {
@@ -78,6 +81,25 @@ impl Solution {
             }
         }
 
+        ans
+    }
+
+    #[allow(unused)]
+    pub fn min_arrivals_to_discard1(mut arrivals: Vec<i32>, w: i32, m: i32) -> i32 {
+        let (n, w) = (arrivals.len(), w as usize);
+        let mut cnt = HashMap::new();
+        let mut ans = 0;
+        for r in 0..n {
+            if cnt.get(&arrivals[r]).is_some_and(|&v| v == m) {
+                arrivals[r] = 0;
+                ans += 1;
+            } else {
+                *cnt.entry(arrivals[r]).or_insert(0) += 1;
+            }
+            if r + 1 >= w {
+                *cnt.entry(arrivals[r + 1 - w]).or_insert(0) -= 1;
+            }
+        }
         ans
     }
 }
