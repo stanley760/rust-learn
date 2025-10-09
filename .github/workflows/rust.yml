@@ -11,17 +11,25 @@ env:
 
 jobs:
   build:
-
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
+
+    # 👇 新增：安装最新稳定版 Rust
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: stable
+
     - name: Install protobuf
       run: |
-        brew install protobuf
+        sudo apt-get update
+        sudo apt-get install -y protobuf-compiler
         echo "PROTOC=$(which protoc)" >> $GITHUB_ENV
 
     - name: Build
       run: cargo build --verbose
+
     - name: Run test
       run: cargo test --verbose
