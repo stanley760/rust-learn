@@ -1,35 +1,27 @@
-name: Rust
+name: 🦀 Rust CI
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-env:
-  CARGO_TERM_COLOR: always
+on: [push, pull_request]
 
 jobs:
   build:
+    name: 🐧 Build & Test on Linux
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-    # 👇 新增：安装最新稳定版 Rust
-    - name: Install Rust toolchain
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        toolchain: stable
+      - name: 🛠️ Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
 
-    - name: Install protobuf
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y protobuf-compiler
-        echo "PROTOC=$(which protoc)" >> $GITHUB_ENV
+      - name: ⚙️ Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler libglib2.0-dev pkg-config
 
-    - name: Build
-      run: cargo build --verbose
+      - name: 🏗️ Build
+        run: cargo build --verbose
 
-    - name: Run test
-      run: cargo test --verbose
+      - name: 🧪 Run tests
+        run: cargo test --verbose
