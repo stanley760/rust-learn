@@ -7,6 +7,7 @@ use crate::operation::Format;
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(unused)]
 struct Player {
     name: String,
     position: String,
