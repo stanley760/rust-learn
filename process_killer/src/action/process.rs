@@ -18,7 +18,7 @@ pub struct Process {
 
 impl Process {
     pub fn run() -> Vec<Self> {
-        let output = if cfg!(target_os = "sliding_windows") {
+        let output = if cfg!(target_os = "windows") {
             Command::new("cmd").args(&["/C", "netstat -ano"]).output().expect("failed to run cmd")
         } else if cfg!(target_os="macos") {
             Command::new("sh").args(&["-c", "netstat -anv"]).output().expect("failed to run in mac")
@@ -50,7 +50,7 @@ impl Process {
             }
         });
         if result.is_empty() {
-            return Err(Error::new(ErrorKind::NotFound, "not found"));
+            return Err(Error::new(ErrorKind::NotFound, format!("the port {} not found", port)));
         }
         
         Ok(result)
@@ -60,7 +60,7 @@ impl Process {
         
         let pid = pid.parse::<u32>().map_err(|_| Error::new(ErrorKind::InvalidInput, "it's not a number"))?;
         
-        let result = if cfg!(target_os = "sliding_windows") {
+        let result = if cfg!(target_os = "windows") {
             Command::new("cmd")
                 .args(&["taskkill", "-PID", &pid.to_string(), "-F"])
                 .output()
@@ -78,7 +78,7 @@ impl Process {
     }
 
     fn hanle_cross_operate_system(parts: Vec<&str>) -> Option<Self> {
-        let windows_flag = cfg!(target_os = "sliding_windows");
+        let windows_flag = cfg!(target_os = "windows");
         let macos_flag = cfg!(target_os = "macos");
         if (parts.len() < 5 && windows_flag) || (macos_flag && parts.len() < 8) {
             return None;
