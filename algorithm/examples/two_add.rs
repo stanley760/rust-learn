@@ -8,7 +8,8 @@ fn main() {
     l2.as_mut().unwrap().next = Some(Box::new(ListNode::new(6)));
     l2.as_mut().unwrap().next.as_mut().unwrap().next = Some(Box::new(ListNode::new(4)));
 
-    println!("Test case 1 result: {:?}", LinkListSolution::two_add(l1, l2));
+    println!("Test case 1 result: {:?}", LinkListSolution::two_add(l1.clone(), l2.clone()));
+    println!("Test case 1 result: {:?}", LinkListSolution::add_two_numbers(l1, l2));
 
     // Test case 2: [0] + [0] = [0]
     let l3 = Some(Box::new(ListNode::new(0)));
@@ -35,7 +36,7 @@ fn main() {
 
 
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub struct ListNode {
     pub val: i32,
     pub next: Option<Box<ListNode>>,
@@ -71,6 +72,39 @@ impl LinkListSolution {
             sum /= 10;
         }
         dummy.unwrap().next.take()
-    } 
+    }
+
+    pub fn add_two_numbers(
+        mut l1: Option<Box<ListNode>>,
+        mut l2: Option<Box<ListNode>>,
+    ) -> Option<Box<ListNode>> {
+        let mut dummy = Some(Box::new(ListNode::new(0)));
+        let mut cur = &mut dummy;
+        let mut carry = 0;
+        
+        while l1.is_some() || l2.is_some() || carry != 0 {
+            let l1_val = if l1.is_some() {
+                l1.as_mut().unwrap().val
+            } else {
+                0
+            };
+            let l2_val = if l2.is_some() {
+                l2.as_mut().unwrap().val
+            } else { 
+                0
+            };
+            let sum = l1_val + l2_val + carry;
+            carry = sum / 10;
+            cur.as_mut().unwrap().next = Some(Box::new(ListNode::new(sum % 10)));
+            cur = &mut cur.as_mut().unwrap().next;
+            if l1.is_some() {
+                l1 = l1.unwrap().next;
+            }
+            if l2.is_some() {
+                l2 = l2.unwrap().next;
+            }
+        }
+        dummy.unwrap().next.take()
+    }
 }
 
