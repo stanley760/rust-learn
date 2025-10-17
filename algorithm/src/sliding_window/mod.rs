@@ -16,3 +16,5 @@ pub mod share_candies;
 pub mod diet_plan_performance;
 pub mod max_satisfied;
 mod max_profit;
+
+mod length_of_longest_substring;
