@@ -18,3 +18,9 @@ pub mod max_satisfied;
 mod max_profit;
 
 mod length_of_longest_substring;
+
+mod trap;
+
+mod check_palindrome_formation;
+
+mod num_subseq;
