@@ -31,3 +31,7 @@ mod num_subseq;
 mod bag_of_tokens_score;
 
 mod sort_colors;
+
+mod apply_operations;
+
+mod duplicate_zeros;
