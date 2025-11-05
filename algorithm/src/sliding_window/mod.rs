@@ -27,3 +27,7 @@ mod trap;
 mod check_palindrome_formation;
 
 mod num_subseq;
+
+mod bag_of_tokens_score;
+
+mod sort_colors;
