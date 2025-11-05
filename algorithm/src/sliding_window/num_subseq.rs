@@ -1,6 +1,7 @@
+#[allow(dead_code)]
 struct Solution;
 
-
+#[allow(unused)]
 impl Solution {
     pub fn num_subseq(nums: Vec<i32>, target: i32) -> i32 {
         const MOD :i32 = 1_000_000_007;

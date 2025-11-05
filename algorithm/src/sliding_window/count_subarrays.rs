@@ -1,5 +1,6 @@
+#[allow(dead_code)]
 pub struct Solution;
-
+#[allow(unused)]
 impl Solution {
     /// [LeetCode][lc] 2302.
     /// [left,right],[left+1,right],…,[right,right]

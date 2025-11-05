@@ -1,5 +1,6 @@
+#[allow(dead_code)]
 pub struct Solution;
-
+#[allow(unused)]
 impl Solution {
     pub fn check_palindrome_formation(a: String, b: String) -> bool {
          Self::check(a.clone(), b.clone()) ||  Self::check(b, a)

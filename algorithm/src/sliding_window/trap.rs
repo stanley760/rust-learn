@@ -1,5 +1,6 @@
+#[allow(dead_code)]
 pub struct Solution;
-
+#[allow(unused)]
 impl Solution {
     pub fn trap(height: Vec<i32>) -> i32 {
         let mut ans = 0;
