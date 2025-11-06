@@ -35,3 +35,9 @@ mod sort_colors;
 mod apply_operations;
 
 mod duplicate_zeros;
+
+mod add_spaces;
+
+mod get_common;
+
+mod merge;

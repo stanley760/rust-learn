@@ -1,5 +1,7 @@
+#[allow(dead_code)]
 pub struct Solution;
 
+#[allow(unused)]
 impl Solution {
     pub fn duplicate_zeros(arr: &mut Vec<i32>) {
         let n = arr.len();
