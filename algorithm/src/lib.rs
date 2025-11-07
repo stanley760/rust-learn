@@ -14,6 +14,8 @@ mod avl_tree;
 mod algo_search;
 mod algo_sort;
 
+pub mod binary;
+
 pub mod sliding_window;
 
 pub mod sorting;
