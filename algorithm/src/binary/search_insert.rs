@@ -17,6 +17,7 @@ impl Solution {
     }
 }
 // cargo test --package algorithm --lib -- binary::search_insert::tests --nocapture
+#[cfg(test)]
 mod tests {
     use super::Solution;
 
