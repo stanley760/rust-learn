@@ -98,7 +98,7 @@ impl SpecTransform<&Resize> for Photon {
 
 impl SpecTransform<&Watermark> for Photon {
     fn transform(&mut self, op: &Watermark) {
-        multiple::watermark(&mut self.0, &WATERMARK, op.x, op.y);
+        multiple::watermark(&mut self.0, &WATERMARK, op.x.into(), op.y.into());
     }
 }
 
