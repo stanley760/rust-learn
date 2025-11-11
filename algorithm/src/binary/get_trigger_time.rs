@@ -3,10 +3,10 @@ struct Solution;
 impl Solution {
      pub fn get_trigger_time(increase: Vec<Vec<i32>>, requirements: Vec<Vec<i32>>) -> Vec<i32> {
         let mut prev_sum = vec![[0; 3]; increase.len() + 1];
-        increase.iter().for_each(|i| {
-            prev_sum[i + 1][0] = prev_sum[i][0] + increase[i][0];
-            prev_sum[i + 1][1] = prev_sum[i][1] + increase[i][1];
-            prev_sum[i + 1][2] = prev_sum[i][2] + increase[i][2];
+        increase.iter().enumerate().for_each(|(i, item)| {
+            prev_sum[i + 1][0] = prev_sum[i][0] + item[0];
+            prev_sum[i + 1][1] = prev_sum[i][1] + item[1];
+            prev_sum[i + 1][2] = prev_sum[i][2] + item[2];
         });
         
         let mut res = vec![-1; requirements.len()];
