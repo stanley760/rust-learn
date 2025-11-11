@@ -15,3 +15,5 @@ mod find_the_distance_value;
 mod answer_queries;
 
 mod num_smaller_by_frequency;
+
+mod find_special_integer;
