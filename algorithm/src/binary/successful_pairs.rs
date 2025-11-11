@@ -30,6 +30,18 @@ impl Solution {
         }
         left
     }
+
+    pub fn successful_pairs2(spells: Vec<i32>, potions: Vec<i32>, success: i64) -> Vec<i32> {
+        let mut spells = spells;
+        let n = potions.len();
+        for s in spells.iter_mut() {
+            let success = (success as f64) / (*s as f64);
+            let target = potions.partition_point(|&x|(x as f64) < success);
+
+            *s = n as i32 - target as i32;
+        }
+        spells
+    }
 }
 
 #[cfg(test)]
@@ -42,6 +54,7 @@ mod tests {
         let success = 7;
 
         assert_eq!(Solution::successful_pairs(spells.clone(), potions.clone(), success), vec![4, 0, 3]);
+        assert_eq!(Solution::successful_pairs2(spells.clone(), potions.clone(), success), vec![4, 0, 3]);
     }
 
     #[test]

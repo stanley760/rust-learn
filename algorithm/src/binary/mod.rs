@@ -17,3 +17,9 @@ mod answer_queries;
 mod num_smaller_by_frequency;
 
 mod find_special_integer;
+
+mod find_closest_elements;
+
+mod count_fair_pairs;
+
+mod get_trigger_time;

@@ -2,6 +2,7 @@ use std::{
     collections::LinkedList,
     ops::{Deref, DerefMut, Index},
 };
+#[allow(dead_code)]
 struct List<T>(LinkedList<T>);
 
 impl<T> Deref for List<T> {

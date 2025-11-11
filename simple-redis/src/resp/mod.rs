@@ -14,7 +14,8 @@ pub enum RespFrame {
     Set(HashSet<RespFrame>),
 }
 
+#[allow(dead_code)]
 pub struct SimpleString(String);
-
+#[allow(dead_code)]
 pub struct SimpleError(String);
 

@@ -1,7 +1,7 @@
 
 use std::fmt;
 
-
+#[allow(unused)]
 #[derive(Clone, Copy)]
 struct RawBuffer {
     ptr: *mut u8,

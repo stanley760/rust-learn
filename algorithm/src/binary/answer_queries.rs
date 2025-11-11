@@ -23,6 +23,19 @@ impl Solution {
 
         res
     }
+
+    fn answer_queries2(nums: Vec<i32>, queries: Vec<i32>) -> Vec<i32> {
+        let mut nums = nums;
+        nums.sort_unstable();
+        for i in 1..nums.len() {
+            nums[i] += nums[i - 1];
+        }
+
+        queries
+            .into_iter()
+            .map(|q| nums.partition_point(|&x| x <= q) as i32)
+            .collect()
+    }
 }
 
 // cargo test --package algorithm --lib -- binary::answer_queries::tests --nocapture
@@ -38,10 +51,19 @@ mod tests {
             Solution::answer_queries(nums.clone(), queries.clone()),
             vec![2, 3, 4]
         );
+        assert_eq!(
+            Solution::answer_queries2(nums.clone(), queries.clone()),
+            vec![2, 3, 4]
+        );
+        
         let nums = vec![2, 3, 4, 5];
         let queries = vec![1];
         assert_eq!(
             Solution::answer_queries(nums.clone(), queries.clone()),
+            vec![0]
+        );
+        assert_eq!(
+            Solution::answer_queries2(nums.clone(), queries.clone()),
             vec![0]
         );
     }

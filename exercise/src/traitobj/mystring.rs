@@ -2,14 +2,16 @@ use core::{fmt, str};
 use std::ops::Deref;
 
 
-
+#[allow(dead_code)]
 const MINI_STRING_MAX_LENGTH: usize = 30; 
 
+#[allow(dead_code)]
 struct MiniString {
     len: u8,
     data: [u8; MINI_STRING_MAX_LENGTH],
 }
 
+#[allow(dead_code)]
 impl MiniString {
     fn new(v: impl AsRef<str>) -> Self {
         let bt = v.as_ref().as_bytes();
@@ -38,6 +40,7 @@ impl fmt::Debug for MiniString {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 enum MyString {
     Inline(MiniString),
