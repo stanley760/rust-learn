@@ -3,18 +3,18 @@ struct Solution;
 #[allow(dead_code)]
 impl Solution {
     pub fn maximum_candies(candies: Vec<i32>, k: i64) -> i32 {
-        let mut left = 0;
-        let mut right = (candies.iter().map(|&c| c as i64).sum::<i64>() / k) as i32;
+        let mut left = 0i64;
+        let mut right = candies.iter().map(|&c| c as i64).sum::<i64>() / k;
         while left < right {
             let mid = (left + right + 1) >> 1;
-            let count = candies.iter().map(|&c| (c / mid) as i64).sum::<i64>();
+            let count = candies.iter().map(|&c| c as i64/ mid ).sum::<i64>();
             if count >= k as _ {
                 left = mid;
             } else {
                 right = mid -1;
             }
         }
-        left
+        left as _
     }
 }
 
