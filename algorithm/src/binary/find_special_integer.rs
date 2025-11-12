@@ -16,6 +16,16 @@ impl Solution {
         }
         arr[threshold * 3 + 2]
     }
+
+    pub fn find_special_integer2(arr: Vec<i32>) -> i32 {
+      let t = arr.len() / 4;
+        for i in 0..arr.len() - 1 {
+            if arr[i] == arr[i + t] {
+                return arr[i];
+            }
+        }
+        arr[0]
+    }
 }
 
 // cargo test --package algorithm --lib -- binary::find_special_integer::tests --nocapture
@@ -26,10 +36,13 @@ mod tests {
     #[test]
     fn test_find_special_integer() {
         let arr = vec![1, 2, 2, 6, 6, 6, 6, 7, 10];
-        assert_eq!(Solution::find_special_integer(arr), 6);
+        assert_eq!(Solution::find_special_integer(arr.clone()), 6);
+        assert_eq!(Solution::find_special_integer2(arr), 6);
         let arr = vec![1, 1];
-        assert_eq!(Solution::find_special_integer(arr), 1);
+        assert_eq!(Solution::find_special_integer(arr.clone()), 1);
+        assert_eq!(Solution::find_special_integer2(arr), 1);
         let arr = vec![1, 2, 2, 3, 2];
-        assert_eq!(Solution::find_special_integer(arr), 2);
+        assert_eq!(Solution::find_special_integer(arr.clone()), 2);
+        assert_eq!(Solution::find_special_integer2(arr), 2);
     }
 }

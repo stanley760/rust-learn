@@ -1,5 +1,7 @@
+#[allow(dead_code)]
 struct Solution;
 
+#[allow(dead_code)]
 impl Solution {
      pub fn get_trigger_time(increase: Vec<Vec<i32>>, requirements: Vec<Vec<i32>>) -> Vec<i32> {
         let mut prev_sum = vec![[0; 3]; increase.len() + 1];
