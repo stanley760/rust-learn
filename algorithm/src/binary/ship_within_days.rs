@@ -1,5 +1,6 @@
+#[allow(dead_code)]
 struct Solution;
-
+#[allow(dead_code)]
 impl Solution {
     pub fn ship_within_days(weights: Vec<i32>, days: i32) -> i32 {
         let mut left = *weights.iter().max().unwrap();

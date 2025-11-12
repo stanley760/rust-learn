@@ -29,3 +29,7 @@ mod smallest_divisor;
 mod successful_pairs;
 
 pub mod ship_within_days;
+
+mod h_index;
+
+mod maximum_candies;
