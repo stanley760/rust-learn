@@ -4,6 +4,6 @@ fn same_borrow_mut() {
     let mut x = 5;
     let r1 = &mut x;
     // let r2 = r1;           // ❌ value borrowed here after move
-    let r2 = r1.clone();
+    let r2 = *r1;
     println!("r1: {}, r2: {}", r1, r2);
 }

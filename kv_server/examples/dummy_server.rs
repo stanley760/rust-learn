@@ -4,6 +4,7 @@ use futures::prelude::*;
 use kv_server::{CommandRequest, CommandResponse};
 use tracing::info;
 #[tokio::main]
+#[allow(clippy::field_reassign_with_default)]
 async fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
 

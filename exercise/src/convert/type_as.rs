@@ -106,6 +106,7 @@ mod test {
     use std::sync::Once;
     use std::thread;
     use List::{Cons, Nil};
+    #[allow(dead_code)]
     enum List {
         Cons(i32, RefCell<Rc<List>>),
         Nil,
@@ -121,7 +122,7 @@ mod test {
             }
         }
     }
-
+    #[allow(dead_code)]
     impl List {
         fn tail(&self) -> Option<&RefCell<Rc<List>>> {
             match self {
@@ -132,6 +133,7 @@ mod test {
     }
     // #[test]
     #[ignore]
+    #[allow(dead_code)]
     fn test_out_memory() {
         let a = Rc::new(Cons(5, RefCell::new(Rc::new(Nil))));
 

@@ -39,7 +39,7 @@ mod test {
     #[test]
     pub fn test_exercise2() {
         let name = String::from("Tyr");
-        let vec = vec!["Rust", "Elixir", "Javascript"];
+        let vec = ["Rust", "Elixir", "Javascript"];
         let v = &vec[..];
         let data = (1, 2, 3, 4);
         let c = move || {

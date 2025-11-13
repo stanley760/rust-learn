@@ -16,6 +16,6 @@ pub fn invoke() {
 
 #[test]
 fn test_fn_once() {
-    let vec1 = vec![1, 2, 3];
+    let vec1 = [1, 2, 3];
     fn_once(|len| len == vec1.len());
 }

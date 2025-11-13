@@ -39,7 +39,7 @@ message Fliph {}
 message Flipv {}
 // contrast ratio
 message Contrast { float contrast = 1; }
-// 
+// filter
 message Filter {
     enum Filter {
         UNSPECIFIED = 0;
