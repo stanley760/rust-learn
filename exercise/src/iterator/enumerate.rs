@@ -8,7 +8,7 @@ pub fn invoke() {
         .map(|(_, x)| x)
         // 1 + 3 + 5 = 9
         .sum::<i32>();
-        //.fold(0, |acc, x| acc + x);
+    //.fold(0, |acc, x| acc + x);
     println!("{}", va)
 }
 

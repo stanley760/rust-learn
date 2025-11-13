@@ -27,7 +27,6 @@ pub struct IterMut<'a, T> {
 }
 
 impl<T> Queue<T> {
-    
     pub fn new() -> Self {
         Queue {
             head: ptr::null_mut(),
@@ -141,9 +140,9 @@ impl<T> Drop for Queue<T> {
 }
 
 impl<T> Default for Queue<T> {
-     fn default() -> Self {
-         Self::new()
-     }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl<T> Iterator for IntoIter<T> {

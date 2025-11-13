@@ -43,7 +43,7 @@ impl<T: Copy + PartialEq + Sized> ArrayStack<T> {
     }
 }
 
-impl <T: Copy + PartialEq + Sized> Default for ArrayStack<T> {
+impl<T: Copy + PartialEq + Sized> Default for ArrayStack<T> {
     fn default() -> Self {
         Self::new()
     }

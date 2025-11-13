@@ -59,7 +59,7 @@ impl<T: Ord> AVLTree<T> {
         }
     }
 }
-impl <T: Ord> Default for AVLTree<T> {
+impl<T: Ord> Default for AVLTree<T> {
     fn default() -> Self {
         Self::new()
     }

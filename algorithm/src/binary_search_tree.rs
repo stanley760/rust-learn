@@ -254,7 +254,7 @@ impl<T> Drop for BinarySearchTree<T> {
     fn drop(&mut self) {}
 }
 
-impl <T: Ord> Default for BinarySearchTree<T> {
+impl<T: Ord> Default for BinarySearchTree<T> {
     fn default() -> Self {
         Self::new()
     }

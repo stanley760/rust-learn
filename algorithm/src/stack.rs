@@ -7,7 +7,7 @@ pub struct Stack<T> {
     size: usize,
 }
 #[allow(dead_code)]
-impl<T: Copy + PartialEq + Sized>  Stack<T> {
+impl<T: Copy + PartialEq + Sized> Stack<T> {
     pub fn new() -> Self {
         Self {
             first: None,
