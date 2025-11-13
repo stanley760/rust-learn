@@ -1,6 +1,6 @@
+use std::env;
 use std::error::Error;
 use std::fs;
-use std::env;
 
 pub fn read_file(config: Config) -> Result<(), Box<dyn Error>> {
     let result = fs::read_to_string(config.filename)?;
@@ -33,7 +33,11 @@ impl Config {
         let query = args[1].clone();
         let filename = args[2].clone();
         let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
-        Ok(Config { query, filename, case_sensitive })
+        Ok(Config {
+            query,
+            filename,
+            case_sensitive,
+        })
     }
 }
 
@@ -51,7 +55,6 @@ pub fn search_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
         .filter(|line| line.to_lowercase().contains(&q_to_lower))
         .collect()
 }
-
 
 #[cfg(test)]
 mod tests {

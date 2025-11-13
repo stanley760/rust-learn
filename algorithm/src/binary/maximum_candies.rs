@@ -7,17 +7,16 @@ impl Solution {
         let mut right = candies.iter().map(|&c| c as i64).sum::<i64>() / k;
         while left < right {
             let mid = (left + right + 1) >> 1;
-            let count = candies.iter().map(|&c| c as i64/ mid ).sum::<i64>();
+            let count = candies.iter().map(|&c| c as i64 / mid).sum::<i64>();
             if count >= k as _ {
                 left = mid;
             } else {
-                right = mid -1;
+                right = mid - 1;
             }
         }
         left as _
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -25,11 +24,11 @@ mod tests {
 
     #[test]
     fn test_maximum_candies() {
-        let candies = vec![5,8,6];
+        let candies = vec![5, 8, 6];
         let k = 3;
         assert_eq!(Solution::maximum_candies(candies, k), 5);
 
-        let candies = vec![2,5];
+        let candies = vec![2, 5];
         let k = 11;
         assert_eq!(Solution::maximum_candies(candies, k), 0);
     }

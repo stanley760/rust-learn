@@ -5,7 +5,6 @@ use clap::Parser;
 
 use super::verify_input;
 
-
 #[derive(Parser, Debug)]
 pub enum Base64Opts {
     #[command(name = "encode", about = "Encode a string to base64")]
@@ -69,4 +68,3 @@ impl fmt::Display for Base64Format {
         write!(f, "{}", Into::<&str>::into(*self))
     }
 }
-

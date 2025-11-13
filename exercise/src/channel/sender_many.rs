@@ -31,5 +31,6 @@ pub fn invoke() {
         });
     });
 
-    rx.iter().for_each(|rec| println!("receive the info: {}", rec));
+    rx.iter()
+        .for_each(|rec| println!("receive the info: {}", rec));
 }

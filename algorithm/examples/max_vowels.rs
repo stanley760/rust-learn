@@ -21,8 +21,9 @@ impl Solution {
 
             ans = ans.max(count);
 
-            if ans == k { // 答案已经等于理论最大值
-               break;
+            if ans == k {
+                // 答案已经等于理论最大值
+                break;
             }
 
             // 左端点离开窗口，为下一个循环做准备
@@ -32,7 +33,6 @@ impl Solution {
             } else {
                 count
             };
-
         }
 
         ans as _

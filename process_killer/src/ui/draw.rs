@@ -1,11 +1,20 @@
-use dioxus::prelude::*;
 use crate::action::process::Process;
+use dioxus::prelude::*;
 
 pub fn app() -> Element {
-    let header_txt : [&str; 5] = ["protocol", "inner_host", "outer_host", "status", "pid",];
-    let init_datas: Vec<Vec<String>> = Process::run().iter().map(|x| {
-        vec![x.protocol.clone(), x.inner_host.clone(), x.outer_host.clone(), x.status.clone(), x.pid.clone()]
-    }).collect();
+    let header_txt: [&str; 5] = ["protocol", "inner_host", "outer_host", "status", "pid"];
+    let init_datas: Vec<Vec<String>> = Process::run()
+        .iter()
+        .map(|x| {
+            vec![
+                x.protocol.clone(),
+                x.inner_host.clone(),
+                x.outer_host.clone(),
+                x.status.clone(),
+                x.pid.clone(),
+            ]
+        })
+        .collect();
     let mut datas = use_signal(|| init_datas);
     let mut port_value = use_signal(|| String::new());
     let mut pid_value = use_signal(|| String::new());
@@ -47,7 +56,7 @@ pub fn app() -> Element {
                 button { form: "btn-reset", name: "btn-reset", onclick: move |_| {
                     port_value.set(String::new()); pid_value.set(String::new())
                 }, "reset" }
-                
+
                 label { form: "pid-label", "pid:"}
                 input { form: "pid-input", name: "pid-input",value: "{pid_value}",
                     oninput: move |event| {
@@ -64,12 +73,12 @@ pub fn app() -> Element {
 
                 }, "kill"}
             }
-            
+
             table {
                 thead {
                     tr {{ header_txt.iter().map(|header_text| rsx!{th { "{header_text}" }}) }}
                 }
-                
+
                 tbody {
                     {datas.iter().map(|data| rsx! {tr {
                         {data.iter().map(|x| rsx!{td { "{x}" }})}

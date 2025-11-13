@@ -6,13 +6,11 @@ fn test_multiple_borrow() {
     let mut a = 10u32;
     let mut b = &mut a;
     *b = 20;
-    println!("{:?}",b);
+    println!("{:?}", b);
     let mut c = &mut b;
     **c = 30;
-    println!("{:?}",c);
-    let d =&mut c;
+    println!("{:?}", c);
+    let d = &mut c;
     ***d = 40;
     println!("{d}");
-    
 }
-

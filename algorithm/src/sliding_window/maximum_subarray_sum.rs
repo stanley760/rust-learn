@@ -19,7 +19,6 @@ impl Solution {
                 ans = ans.max(sum);
             }
 
-
             let out = nums[i + 1 - k as usize];
             sum -= out as i64;
             let c = cnt.entry(out).or_insert(0);
@@ -27,7 +26,6 @@ impl Solution {
             if *c == 0 {
                 cnt.remove(&out);
             }
-
         }
         ans
     }

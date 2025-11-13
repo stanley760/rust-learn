@@ -1,13 +1,10 @@
-
 pub struct ArrayStack<T> {
     data: Vec<T>,
 }
 
 impl<T: Copy + PartialEq + Sized> ArrayStack<T> {
     pub fn new() -> Self {
-        Self {
-            data: Vec::new(),
-        }
+        Self { data: Vec::new() }
     }
 
     pub fn size(&self) -> usize {

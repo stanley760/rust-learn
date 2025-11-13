@@ -24,7 +24,6 @@ mod test {
         assert_eq!(10, *counter.lock().unwrap());
     }
 
-
     use std::{slice::from_raw_parts, str::from_utf8_unchecked};
 
     // 获取字符串的内存地址和长度

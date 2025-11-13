@@ -2,7 +2,6 @@ use std::{cell::RefCell, rc::Rc};
 
 use crate::ListNode;
 
-
 pub struct Stack<T> {
     first: Option<Rc<RefCell<ListNode<T>>>>,
     size: usize,
@@ -20,7 +19,7 @@ impl<T: Copy + PartialEq + Sized> Stack<T> {
         self.size
     }
 
-     pub fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         return self.size() == 0;
     }
 
@@ -58,5 +57,3 @@ impl<T: Copy + PartialEq + Sized> Stack<T> {
         res
     }
 }
-
-

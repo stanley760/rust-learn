@@ -1,4 +1,3 @@
-
 #[derive(Debug)]
 pub struct Heap<T: Default> {
     count: usize,
@@ -36,8 +35,8 @@ impl<T: Default> Heap<T> {
             if (self.comparator)(&self.items[idx], &self.items[parent_idx]) {
                 self.items.swap(idx, parent_idx);
             }
-            // update index to parent index. 
-            idx = parent_idx;    
+            // update index to parent index.
+            idx = parent_idx;
         }
     }
 
@@ -52,7 +51,7 @@ impl<T: Default> Heap<T> {
     fn left_child_idx(&self, idx: usize) -> usize {
         idx * 2
     }
-    
+
     fn right_child_idx(&self, idx: usize) -> usize {
         self.left_child_idx(idx) + 1
     }
@@ -94,8 +93,6 @@ impl<T: Default> Iterator for Heap<T> {
         }
         next
     }
-
-    
 }
 
 pub struct MinHeap;

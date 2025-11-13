@@ -40,4 +40,3 @@ mod tests {
         assert_eq!(Solution::smallest_divisor(nums, threshold), 4);
     }
 }
-

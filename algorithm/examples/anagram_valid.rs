@@ -12,8 +12,6 @@ impl Solution {
 
 impl Solution1 {
     pub fn is_anagram(s: String, t: String) -> bool {
-
-
         let mut cnt = [0; 26];
         for c in s.bytes() {
             cnt[(c - b'a') as usize] += 1;
@@ -26,12 +24,11 @@ impl Solution1 {
 }
 
 fn main() {
-
     let s = "anagram";
     let t = "nagaram";
     assert_eq!(Solution::is_anagram(s.to_owned(), t.to_owned()), true);
 
     let s = "rat";
-    let  t = "car";
+    let t = "car";
     assert_eq!(Solution1::is_anagram(s.to_owned(), t.to_owned()), false);
 }

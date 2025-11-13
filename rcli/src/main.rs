@@ -38,7 +38,7 @@ fn main() -> anyhow::Result<()> {
         Subcommand::Text(opts) => match opts {
             rcli::TextOpts::Sign(opts) => {
                 process_sign(&opts.input, &opts.key, opts.format)?;
-            },
+            }
             rcli::TextOpts::Verify(opts) => {
                 process_verify(&opts.input, &opts.key, opts.format, &opts.sig)?;
             }

@@ -14,8 +14,8 @@ impl Solution {
 }
 
 fn main() {
-    let nums = vec![2,5,1,3,4,7];
+    let nums = vec![2, 5, 1, 3, 4, 7];
     let n = 3;
-    let target = vec![2,3,5,4,1,7];
+    let target = vec![2, 3, 5, 4, 1, 7];
     assert_eq!(target, Solution::shuffle(nums, n));
 }

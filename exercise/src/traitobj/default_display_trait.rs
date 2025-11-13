@@ -22,7 +22,6 @@ impl Default for Language {
 }
 #[allow(dead_code)]
 impl Developer {
-
     fn new(name: &str) -> Self {
         Self {
             name: name.to_string(),
@@ -33,7 +32,11 @@ impl Developer {
 
 impl Display for Developer {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "name: {}, age: {}, language: {:?}", self.name, self.age, self.language)
+        write!(
+            f,
+            "name: {}, age: {}, language: {:?}",
+            self.name, self.age, self.language
+        )
     }
 }
 

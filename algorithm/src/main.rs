@@ -25,4 +25,3 @@ fn main() {
     let n = ListNode::access(&n0, 2);
     println!("{:?}", n);
 }
-

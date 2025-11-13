@@ -1,5 +1,5 @@
-use std::{fs::File, io:: Read};
 use anyhow::Result;
+use std::{fs::File, io::Read};
 
 pub fn read_file_string(input: &str) -> Result<String, anyhow::Error> {
     let mut reader: Box<dyn Read> = read_file(input)?;

@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 #[allow(dead_code)]
 fn arc_mutext_is_send_sync() {
-    let a= Arc::new(Mutex::new(1));
+    let a = Arc::new(Mutex::new(1));
     let b = a.clone();
     let c = a.clone();
     let handle = std::thread::spawn(move || {

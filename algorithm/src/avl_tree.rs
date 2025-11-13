@@ -1,4 +1,8 @@
-use std::{cmp::{Ordering, max}, mem, ops::Not};
+use std::{
+    cmp::{max, Ordering},
+    mem,
+    ops::Not,
+};
 
 struct TreeNode<T: Ord> {
     value: T,
@@ -34,7 +38,7 @@ impl<T: Ord> AVLTree<T> {
         self.length == 0
     }
 
-    pub fn insert(&mut self, value: T) -> bool{
+    pub fn insert(&mut self, value: T) -> bool {
         unsafe {
             let res = insert_node(&mut self.root, value);
             if res {
@@ -43,7 +47,7 @@ impl<T: Ord> AVLTree<T> {
             res
         }
     }
-    
+
     pub fn remove(&mut self, value: &T) -> bool {
         // 删除操作的实现
         unsafe {
@@ -54,10 +58,9 @@ impl<T: Ord> AVLTree<T> {
             res
         }
     }
-
 }
 
-impl<T: Ord > TreeNode<T> {
+impl<T: Ord> TreeNode<T> {
     fn child(&self, side: Side) -> *mut TreeNode<T> {
         match side {
             Side::Left => self.left,
@@ -108,7 +111,8 @@ impl<T: Ord > TreeNode<T> {
         self.update_height();
         let balance = self.balance_factor();
         match balance {
-            -2 => { // 左边过重
+            -2 => {
+                // 左边过重
                 let left_child = &mut *self.left;
                 if left_child.balance_factor() > 0 {
                     // 左-右情况：先左旋左子节点
@@ -116,8 +120,9 @@ impl<T: Ord > TreeNode<T> {
                 }
                 // 右旋当前节点
                 self.rotate(Side::Right);
-            },
-            2 => { // 右边过重
+            }
+            2 => {
+                // 右边过重
                 let right_child = &mut *self.right;
                 if right_child.balance_factor() < 0 {
                     // 右-左情况：先右旋右子节点
@@ -125,7 +130,7 @@ impl<T: Ord > TreeNode<T> {
                 }
                 // 左旋当前节点
                 self.rotate(Side::Left);
-            },
+            }
             _ => (), // 平衡因子在 -1、0、1 范围内，不需要平衡
         }
     }
@@ -142,7 +147,7 @@ impl Not for Side {
     }
 }
 
-unsafe fn insert_node<T: Ord>(root:&mut *mut TreeNode<T>, value: T) -> bool {
+unsafe fn insert_node<T: Ord>(root: &mut *mut TreeNode<T>, value: T) -> bool {
     if root.is_null() {
         // 创建新节点
         let new_node = Box::new(TreeNode {
@@ -176,13 +181,13 @@ unsafe fn remove_node<T: Ord>(root: &mut *mut TreeNode<T>, value: &T) -> bool {
         return false; // 节点不存在
     }
     let node = &mut **root;
-    let removed = match value.cmp(&node.value)  {
+    let removed = match value.cmp(&node.value) {
         Ordering::Less => remove_node(&mut node.left, value),
         Ordering::Greater => remove_node(&mut node.right, value),
         Ordering::Equal => {
             // 处理找到要删除的节点的情况
-            // todo 
-            todo!(); 
+            // todo
+            todo!();
         }
     };
     if removed {
@@ -192,11 +197,9 @@ unsafe fn remove_node<T: Ord>(root: &mut *mut TreeNode<T>, value: &T) -> bool {
     removed
 }
 
-
 #[cfg(test)]
 mod tests {
     use crate::AVLTree;
-
 
     #[test]
     fn insert() {

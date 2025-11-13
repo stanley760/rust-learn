@@ -43,7 +43,7 @@ impl PrefixSumSolution {
     /// 前缀和
     ///
     #[allow(unused)]
-    pub fn max_profit(prices: Vec<i32>, strategy: Vec<i32>, k: i32 ) -> i32 {
+    pub fn max_profit(prices: Vec<i32>, strategy: Vec<i32>, k: i32) -> i32 {
         let k = k as usize;
         let n = prices.len();
         // prices*strategy 前缀和
@@ -64,7 +64,7 @@ impl PrefixSumSolution {
         // [i−k/2,i−1] 的 prices[i] 之和(strategory=1)，即 sumSell[i]−sumSell[i−k/2]。
         // [i,n−1] 的 prices[i]⋅strategy[i] 之和，即 sum[n]−sum[i]。
         for i in k..=n {
-            ans = ans.max(sum[i - k] + sum[n] - sum[i] +  sum_prices[i]  - sum_prices[i - k / 2]);
+            ans = ans.max(sum[i - k] + sum[n] - sum[i] + sum_prices[i] - sum_prices[i - k / 2]);
         }
         ans
     }
@@ -74,7 +74,7 @@ impl SlidingWindowSolution {
     /// 滑动窗口
     ///
     #[allow(unused)]
-    pub fn max_profit(prices: Vec<i32>, strategy: Vec<i32>, k: i32 ) -> i32 {
+    pub fn max_profit(prices: Vec<i32>, strategy: Vec<i32>, k: i32) -> i32 {
         let mut total = 0;
         let mut sum = 0;
         let mut max_sum = 0;
@@ -82,11 +82,11 @@ impl SlidingWindowSolution {
         for i in 0..prices.len() {
             total += prices[i] * strategy[i];
             // 1. into window
-            sum += prices[i] * ( 1- strategy[i]);
+            sum += prices[i] * (1 - strategy[i]);
             // window size is less than the size of k.
             if i < (k - 1) {
-                if i >= (k/2 -1) {
-                    sum -= prices[i - (k/2 -1)]
+                if i >= (k / 2 - 1) {
+                    sum -= prices[i - (k / 2 - 1)]
                 }
                 continue;
             }
@@ -94,7 +94,7 @@ impl SlidingWindowSolution {
             max_sum = max_sum.max(sum);
 
             // 3. out of window.
-            sum -= prices[i - (k/2 - 1)] - prices[i - (k - 1)] * strategy[i - (k - 1)];
+            sum -= prices[i - (k / 2 - 1)] - prices[i - (k - 1)] * strategy[i - (k - 1)];
         }
 
         total + max_sum
@@ -103,8 +103,8 @@ impl SlidingWindowSolution {
 
 #[test]
 pub fn test_max_profit() {
-    let prices = vec![4,2,8];
-    let strategy = vec![-1,0,1];
+    let prices = vec![4, 2, 8];
+    let strategy = vec![-1, 0, 1];
     let k = 2;
     let ans = PrefixSumSolution::max_profit(prices.clone(), strategy.clone(), k);
     assert_eq!(ans, 10);

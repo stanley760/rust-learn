@@ -40,14 +40,13 @@ impl<T> Index<isize> for List<T> {
 mod test {
     use super::*;
 
-
     #[test]
     fn it_works() {
         let mut list: List<u32> = List::default();
         for i in 0..16 {
             list.push_back(i);
         }
-    
+
         assert_eq!(list[0], 0);
         assert_eq!(list[5], 5);
         assert_eq!(list[15], 15);
@@ -57,4 +56,3 @@ mod test {
         assert_eq!(list[-128], 0);
     }
 }
-

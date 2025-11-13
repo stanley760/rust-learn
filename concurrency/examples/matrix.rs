@@ -1,9 +1,7 @@
-use std::fmt::Debug; 
+use std::fmt::Debug;
 use std::ops::{Add, AddAssign, Mul};
 
-use anyhow::{Result, anyhow};
-
-
+use anyhow::{anyhow, Result};
 
 fn main() -> Result<()> {
     let a = Matrix::new(vec![1, 2, 3, 4], 2, 2);
@@ -20,9 +18,10 @@ struct Matrix<T> {
     col: usize,
 }
 
-
-fn multiply<T>(a: &Matrix<T>, b: &Matrix<T>) -> Result<Matrix<T>> 
-    where T: Copy + Add<Output = T> + Mul<Output = T> + AddAssign + Default + Debug {
+fn multiply<T>(a: &Matrix<T>, b: &Matrix<T>) -> Result<Matrix<T>>
+where
+    T: Copy + Add<Output = T> + Mul<Output = T> + AddAssign + Default + Debug,
+{
     if a.col != b.row {
         return Err(anyhow!("Matrix multiply error: a.col != b.row"));
     }
@@ -41,9 +40,15 @@ fn multiply<T>(a: &Matrix<T>, b: &Matrix<T>) -> Result<Matrix<T>>
     })
 }
 
-impl<T> Matrix<T> 
-    where T: Debug {
+impl<T> Matrix<T>
+where
+    T: Debug,
+{
     fn new(data: impl Into<Vec<T>>, row: usize, col: usize) -> Self {
-        Matrix { data: data.into(), row, col }
+        Matrix {
+            data: data.into(),
+            row,
+            col,
+        }
     }
 }

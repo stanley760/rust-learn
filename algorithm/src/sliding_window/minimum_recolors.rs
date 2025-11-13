@@ -39,7 +39,7 @@ impl Solution {
         let k = k as usize;
         let n = blocks.len();
         let arr = blocks.as_bytes();
-        // the worst result is k,and 
+        // the worst result is k,and
         let mut ans = k;
         let mut cnt = 0;
 
@@ -48,7 +48,7 @@ impl Solution {
                 cnt += 1;
             }
 
-            if i >= k && arr[i-k] == b'B' {
+            if i >= k && arr[i - k] == b'B' {
                 cnt -= 1;
             }
             ans = ans.min(k - cnt);

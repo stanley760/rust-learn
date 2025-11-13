@@ -14,7 +14,7 @@ struct Player {
     #[serde(rename = "DOB")]
     dob: String,
     #[serde(rename = "Nationality")]
-    nationality: String, 
+    nationality: String,
     #[serde(rename = "Kit Number")]
     kit: u8,
 }
@@ -24,22 +24,25 @@ struct MyArray {
     items: Vec<Value>,
 }
 
-pub fn parse_csv(input: &str, output : String, format: Format) -> anyhow::Result<()> {
+pub fn parse_csv(input: &str, output: String, format: Format) -> anyhow::Result<()> {
     let mut reader = Reader::from_path(input)?;
-    
+
     let headers = reader.headers()?.clone();
-    
-    let result = reader.records().map(| res| {
-        let record = res.unwrap();
-        headers.iter().zip(record.iter()).collect::<Value>()
-    }).collect::<Vec<Value>>();
+
+    let result = reader
+        .records()
+        .map(|res| {
+            let record = res.unwrap();
+            headers.iter().zip(record.iter()).collect::<Value>()
+        })
+        .collect::<Vec<Value>>();
     let content = match format {
         Format::Json => serde_json::to_string_pretty(&result)?,
         Format::Yaml => serde_yaml::to_string(&result)?,
         Format::Toml => {
             let arr = MyArray { items: result };
             toml::to_string(&arr)?
-        },
+        }
     };
 
     fs::write(output, content)?;

@@ -35,7 +35,6 @@ impl Solution {
             if grumpy[left as usize] == 1 {
                 sum[1] -= customers[left as usize];
             }
-
         }
         let ans = sum[0] + max_sum_1;
         ans

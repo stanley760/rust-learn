@@ -1,11 +1,11 @@
 use std::{collections::HashMap, str::FromStr};
 
 use anyhow::anyhow;
-use clap::{Args, Subcommand, Parser};
+use clap::{Args, Parser, Subcommand};
 use colored::Colorize;
 use mime::Mime;
-use reqwest::{Client, header, Response, Url};
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
+use reqwest::{header, Client, Response, Url};
 
 #[derive(Parser)]
 #[command(version="1.0.0", author="stanley", color=clap::ColorChoice::Always)]
@@ -49,10 +49,10 @@ enum PairType {
 
 impl FromStr for Pair {
     type Err = anyhow::Error;
-    
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let pair_type;
-        let split_char  = if s.contains(":") {
+        let split_char = if s.contains(":") {
             pair_type = PairType::Header;
             ':'
         } else {
@@ -90,7 +90,9 @@ async fn post(cli: Client, args: &Post) -> anyhow::Result<()> {
 
     for pair in args.body.iter() {
         match pair.t {
-            PairType::Param => {body.insert(&pair.k, &pair.v);}
+            PairType::Param => {
+                body.insert(&pair.k, &pair.v);
+            }
             PairType::Header => {
                 if let Ok(name) = HeaderName::from_str(pair.k.as_str()) {
                     if let Ok(value) = HeaderValue::from_str(pair.v.as_str()) {
@@ -104,9 +106,12 @@ async fn post(cli: Client, args: &Post) -> anyhow::Result<()> {
             }
         }
     }
-    let resp = cli.post(&args.url)
-                    .headers(header_map)
-                    .json(&body).send().await?;
+    let resp = cli
+        .post(&args.url)
+        .headers(header_map)
+        .json(&body)
+        .send()
+        .await?;
     Ok(print_resp(resp).await?)
 }
 
@@ -136,13 +141,14 @@ fn print_body(mime: Option<Mime>, resp: &String) {
             if v == mime::APPLICATION_JSON {
                 println!("{}", jsonxf::pretty_print(resp).unwrap().cyan())
             }
-        },
+        }
         _ => println!("{}", resp),
     }
 }
 
 fn get_content_type(resp: &Response) -> Option<Mime> {
-    resp.headers().get(header::CONTENT_TYPE)
+    resp.headers()
+        .get(header::CONTENT_TYPE)
         .map(|v| v.to_str().unwrap().parse().unwrap())
 }
 

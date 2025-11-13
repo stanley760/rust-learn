@@ -42,7 +42,6 @@ mod test {
         // 然而一旦它被当成 FnOnce 被调用，就无法被再次调用
         println!("result: {:?}", call_once("hi".into(), c));
 
-
         // Fn 也可以被当成 FnOnce 调用，只要接口一致就可以
         println!("result: {:?}", call_once("hola".into(), not_closure));
     }

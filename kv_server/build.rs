@@ -1,6 +1,6 @@
 use std::io::Result;
 
-fn main() -> Result<()>{
+fn main() -> Result<()> {
     let mut config = prost_build::Config::new();
     config.bytes(&["."]);
     config.type_attribute(".", "#[derive(PartialOrd)]");

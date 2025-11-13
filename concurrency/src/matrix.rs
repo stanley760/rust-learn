@@ -1,8 +1,8 @@
-use std::fmt::Debug; 
+use anyhow::{anyhow, Ok, Result};
+use std::fmt::Debug;
 use std::ops::{Add, AddAssign, Mul};
 use std::sync::mpsc;
 use std::thread;
-use anyhow::{anyhow, Ok, Result};
 
 use crate::{dot_product, Vector};
 
@@ -30,9 +30,10 @@ pub struct Msg<T> {
     pub output: oneshot::Sender<MsgOutput<T>>,
 }
 
-
-pub fn multiply<T>(a: &Matrix<T>, b: &Matrix<T>) -> Result<Matrix<T>> 
-    where T: Copy + Add<Output = T> + Mul<Output = T> + AddAssign + Default + Debug + Send + 'static {
+pub fn multiply<T>(a: &Matrix<T>, b: &Matrix<T>) -> Result<Matrix<T>>
+where
+    T: Copy + Add<Output = T> + Mul<Output = T> + AddAssign + Default + Debug + Send + 'static,
+{
     if a.col != b.row {
         return Err(anyhow!("Matrix multiply error: a.col != b.row"));
     }
@@ -63,9 +64,11 @@ pub fn multiply<T>(a: &Matrix<T>, b: &Matrix<T>) -> Result<Matrix<T>>
             let row_a = Vector::new(&a.data[i * a.col..(i + 1) * a.col]);
             let col_data = b.data[j..]
                 .iter()
-                .step_by(b.col).map(|&x| x).collect::<Vec<T>>();
+                .step_by(b.col)
+                .map(|&x| x)
+                .collect::<Vec<T>>();
             let col_b = Vector::new(col_data);
-            
+
             let idx = i * b.col + j;
             let msg_input = MsgInput::new(idx, row_a, col_b);
             let (tx, rx) = oneshot::channel::<MsgOutput<T>>();
@@ -79,7 +82,8 @@ pub fn multiply<T>(a: &Matrix<T>, b: &Matrix<T>) -> Result<Matrix<T>>
     }
 
     for rx in receiver {
-        let output = rx.recv()
+        let output = rx
+            .recv()
             .map_err(|e| anyhow!("Error receiving message: {:?}", e))?;
         data[output.idx] = output.data;
     }
@@ -90,11 +94,16 @@ pub fn multiply<T>(a: &Matrix<T>, b: &Matrix<T>) -> Result<Matrix<T>>
     })
 }
 
-impl<T> Matrix<T> 
-    where T: Debug {
-        
+impl<T> Matrix<T>
+where
+    T: Debug,
+{
     pub fn new(data: impl Into<Vec<T>>, row: usize, col: usize) -> Self {
-        Matrix { data: data.into(), row, col }
+        Matrix {
+            data: data.into(),
+            row,
+            col,
+        }
     }
 }
 
@@ -110,8 +119,10 @@ impl<T> Msg<T> {
     }
 }
 
-impl<T> Mul for Matrix<T> 
-    where T: Copy + Add<Output = T> + Mul<Output = T> + AddAssign + Default + Debug + Send + 'static {
+impl<T> Mul for Matrix<T>
+where
+    T: Copy + Add<Output = T> + Mul<Output = T> + AddAssign + Default + Debug + Send + 'static,
+{
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
@@ -129,6 +140,5 @@ mod test {
         let b = Matrix::new(vec![5, 6, 7, 8], 2, 2);
         let c = a * b;
         assert_eq!(c.data, vec![19, 22, 43, 50]);
-        
     }
 }

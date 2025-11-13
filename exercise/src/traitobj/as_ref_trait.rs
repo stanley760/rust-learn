@@ -21,7 +21,6 @@ fn print_ref(s: impl AsRef<str>) {
     println!("as_ref: {}", s.as_ref());
 }
 
-
 #[cfg(test)]
 mod test {
     use super::*;

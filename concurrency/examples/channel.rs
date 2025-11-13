@@ -1,5 +1,5 @@
-use std::{sync::mpsc, thread};
 use anyhow::Result;
+use std::{sync::mpsc, thread};
 
 fn main() -> Result<()> {
     let (tx, rx) = mpsc::channel();
@@ -10,6 +10,6 @@ fn main() -> Result<()> {
     });
     let msg = rx.recv()?;
     println!("{}", msg);
-    
+
     Ok(())
 }

@@ -4,12 +4,17 @@ impl Solution {
         let mut count = 0;
         for (i, elem) in words.iter().enumerate() {
             if i >= left as usize && i <= right as usize {
-                if (elem.starts_with('a') || elem.starts_with('e')
-                    || elem.starts_with('i') || elem.starts_with('o')
-                    || elem.starts_with('u')) && (elem.ends_with('a')
-                    || elem.ends_with('e') || elem.ends_with('i')
-                    || elem.ends_with('o') || elem.ends_with('u')) {
-
+                if (elem.starts_with('a')
+                    || elem.starts_with('e')
+                    || elem.starts_with('i')
+                    || elem.starts_with('o')
+                    || elem.starts_with('u'))
+                    && (elem.ends_with('a')
+                        || elem.ends_with('e')
+                        || elem.ends_with('i')
+                        || elem.ends_with('o')
+                        || elem.ends_with('u'))
+                {
                     count += 1;
                 }
             }

@@ -1,8 +1,8 @@
 use anyhow::Result;
 use async_prost::AsyncProstStream;
-use tracing::info;
-use kv_server::{CommandRequest, CommandResponse, MemTable, Service};
 use futures::prelude::*;
+use kv_server::{CommandRequest, CommandResponse, MemTable, Service};
+use tracing::info;
 #[tokio::main]
 async fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
@@ -16,7 +16,7 @@ async fn main() -> Result<()> {
         info!("client {:?} connected", addr);
         let svc = service.clone();
         tokio::spawn(async move {
-            let mut stream = 
+            let mut stream =
                 AsyncProstStream::<_, CommandRequest, CommandResponse, _>::from(stream).for_async();
             while let Some(Ok(msg)) = stream.next().await {
                 let res = svc.execute(msg);

@@ -24,7 +24,7 @@ mod tests {
 
     #[test]
     fn test_normal_case() {
-        let citations = vec![0,1,3,5,6];
+        let citations = vec![0, 1, 3, 5, 6];
         assert_eq!(Solution::h_index(citations), 3);
     }
 }

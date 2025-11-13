@@ -1,6 +1,5 @@
 use rand::Rng;
 
-
 pub fn random_acces(arr: &[i32]) -> i32 {
     let index = rand::rng().random_range(0..arr.len());
     arr[index]
@@ -44,6 +43,6 @@ pub fn find(arr: &[i32], target: i32) -> Option<usize> {
 pub fn extend(arr: &[i32], resize: usize) -> Vec<i32> {
     let mut res = vec![0; arr.len() + resize];
     res[..arr.len()].copy_from_slice(arr);
-    
+
     res
 }

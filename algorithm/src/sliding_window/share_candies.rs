@@ -38,14 +38,13 @@ impl Solution {
         }
 
         // 初始化哈希表, 统计第一个窗口 [0, k-1]出现的次数
-        for i in k..n  {
+        for i in k..n {
             *cnt.entry(candies[i]).or_insert(0) += 1;
         }
 
         let mut ans = cnt.len();
         // 滑动窗口从[1, k]到[n - k, n - 1]，i代表滑动窗口的右边界
         for i in k..n {
-
             // 移除即将进入窗口的元素
             let remove = candies[i];
             *cnt.entry(remove).or_insert(0) -= 1;

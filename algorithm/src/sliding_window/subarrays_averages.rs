@@ -42,11 +42,11 @@ impl Solution {
         for i in 0..n {
             let cur = nums[i];
             sum += cur as i64;
-            if i < 2*k {
+            if i < 2 * k {
                 continue;
             }
-            ans[i-k] = (sum / (2 * k + 1) as i64) as _;
-            sum -= nums[i - 2*k] as i64;
+            ans[i - k] = (sum / (2 * k + 1) as i64) as _;
+            sum -= nums[i - 2 * k] as i64;
         }
 
         ans

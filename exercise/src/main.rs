@@ -1,3 +1,4 @@
+use exercise::channel;
 use exercise::characters::strings;
 use exercise::circle::diff_circle;
 use exercise::closure;
@@ -10,7 +11,6 @@ use exercise::table;
 use exercise::traitobj::*;
 use exercise::types;
 use exercise::vector;
-use exercise::channel;
 
 fn main() {
     channel::sender_many::invoke();
@@ -81,6 +81,4 @@ fn main() {
     closure::fn_once::invoke();
     closure::moves::invoke();
     closure::fn_mut::invoke();
-
-
 }

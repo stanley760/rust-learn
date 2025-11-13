@@ -1,8 +1,8 @@
-use std::{env, process};
 use grep::Config;
+use std::{env, process};
 
 fn main() {
-    let args :Vec<String>= env::args().collect();
+    let args: Vec<String> = env::args().collect();
 
     let config = Config::new(&args).unwrap_or_else(|err| {
         eprintln!("error: {}", err);
@@ -14,4 +14,3 @@ fn main() {
         process::exit(1);
     }
 }
-

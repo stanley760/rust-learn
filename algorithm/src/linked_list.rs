@@ -3,10 +3,10 @@ use std::{cell::RefCell, rc::Rc};
 /// 链表（linked list）是一种线性数据结构，其中的每个元素都是一个节点对象，
 /// 各个节点通过“引用”相连接。引用记录了下一个节点的内存地址，
 /// 通过它可以从当前节点访问到下一个节点。
-/// 
+///
 /// 链表的设计使得各个节点可以分散存储在内存各处，它们的内存地址无须连续。
 /// Warning: This code is not recommended. use [unsafe_linked_queue]
-/// 
+///
 /// # example
 /// ```
 ///  use algorithm::Queue;
@@ -20,7 +20,7 @@ use std::{cell::RefCell, rc::Rc};
 ///  assert_eq!(iter.next(), Some(&3));
 ///  assert_eq!(iter.next(), None);
 /// ```
-/// 
+///
 
 #[derive(Debug)]
 pub struct ListNode<T> {
@@ -28,7 +28,7 @@ pub struct ListNode<T> {
     pub next: Option<Rc<RefCell<ListNode<T>>>>,
 }
 
-impl<T:Clone + PartialEq> ListNode<T> {
+impl<T: Clone + PartialEq> ListNode<T> {
     pub fn new(val: T) -> Self {
         Self { val, next: None }
     }
@@ -88,6 +88,3 @@ impl<T:Clone + PartialEq> ListNode<T> {
         None
     }
 }
-
-
-

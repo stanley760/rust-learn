@@ -1,5 +1,5 @@
+use criterion::{criterion_group, criterion_main, Criterion};
 use std::{hint::black_box, sync::Arc, thread};
-use criterion::{ criterion_group, criterion_main, Criterion};
 
 fn arc_thread(n: usize, clones_per_thread: usize) {
     let data = Arc::new(0);
@@ -24,7 +24,7 @@ fn arc_thread(n: usize, clones_per_thread: usize) {
 }
 
 fn arc_benchmark(c: &mut Criterion) {
-    c.bench_function("arc_benchmark", |b|  b.iter(|| arc_thread(8, 125000)));
+    c.bench_function("arc_benchmark", |b| b.iter(|| arc_thread(8, 125000)));
 }
 criterion_group!(benches, arc_benchmark);
 criterion_main!(benches);

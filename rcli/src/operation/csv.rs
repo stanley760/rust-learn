@@ -1,7 +1,7 @@
+use clap::Parser;
 use std::fmt;
 use std::fmt::Formatter;
 use std::str::FromStr;
-use clap::Parser;
 
 use super::verify_input;
 
@@ -29,7 +29,6 @@ pub struct CsvOpts {
     #[arg(long, default_value_t = true)]
     pub header: bool,
 }
-
 
 fn parse_format(format: &str) -> Result<Format, anyhow::Error> {
     format.parse::<Format>()

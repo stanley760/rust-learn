@@ -4,10 +4,10 @@ impl Solution {
     pub fn move_zeroes(nums: &mut Vec<i32>) {
         let mut temp = 0;
         for index in 0..nums.len() {
-           if nums[index] != 0 {
-               nums.swap(index, temp);
-               temp +=1;
-           }
+            if nums[index] != 0 {
+                nums.swap(index, temp);
+                temp += 1;
+            }
         }
     }
 }

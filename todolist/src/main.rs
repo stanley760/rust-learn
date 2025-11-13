@@ -1,9 +1,8 @@
-use tracing_subscriber::EnvFilter;
 use todolist::routers::router;
+use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
 async fn main() {
-
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
         .init();
@@ -12,7 +11,5 @@ async fn main() {
         .unwrap();
     tracing::info!("listening on {:?}", bind);
     let app = router::route().await.unwrap();
-    axum::serve(bind, app)
-    .await
-    .unwrap();
+    axum::serve(bind, app).await.unwrap();
 }

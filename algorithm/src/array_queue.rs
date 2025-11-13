@@ -66,7 +66,7 @@ impl<T: Copy + Default> ArrayQueue<T> {
         self.data = new_data;
         self.front = 0;
         self.capacity = new_capacity as i32;
-    } 
+    }
 
     pub fn to_vec(&self) -> Vec<T> {
         let cap = self.capacity;

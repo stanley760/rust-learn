@@ -126,7 +126,7 @@ pub fn heapify(arr: &mut [i32], heap_size: usize, root_index: usize) {
 pub fn bucket_sort(arr: &mut [f64]) {
     let k = arr.len() / 2;
 
-    let mut buckets  = vec![Vec::new(); k];
+    let mut buckets = vec![Vec::new(); k];
     for &num in arr.iter() {
         let index = (num * k as f64) as usize;
         buckets[index].push(num);
@@ -140,28 +140,25 @@ pub fn bucket_sort(arr: &mut [f64]) {
     for bucket in buckets {
         for &num in &bucket {
             arr[idx] = num;
-            idx += 1;   
+            idx += 1;
         }
     }
-
 }
 
 pub fn bucket_sort_normal_distribution(arr: &mut [f64]) {
     if arr.is_empty() {
         return;
     }
-    
+
     // 2. 根据数据分布特征确定桶的数量
     // 对于正态分布，我们在较小值区域使用更多的桶
     let mean = arr.iter().sum::<f64>() / arr.len() as f64;
-    let variance = arr.iter()
-        .map(|&x| (x - mean).powi(2))
-        .sum::<f64>() / arr.len() as f64;
+    let variance = arr.iter().map(|&x| (x - mean).powi(2)).sum::<f64>() / arr.len() as f64;
     let std_dev = variance.sqrt();
 
-        // 根据正态分布特性确定桶的数量
+    // 根据正态分布特性确定桶的数量
     let k = (arr.len() as f64).sqrt().ceil() as usize;
-    
+
     // 3. 创建桶并分配元素
     let mut buckets = vec![Vec::new(); k];
 
@@ -175,12 +172,12 @@ pub fn bucket_sort_normal_distribution(arr: &mut [f64]) {
         let bucket_index = ((cdf * (k - 1) as f64).floor() as usize).min(k - 1);
         buckets[bucket_index].push(num);
     }
-    
+
     // 4. 对每个桶进行排序
     for bucket in buckets.iter_mut() {
         bucket.sort_by(|a, b| a.partial_cmp(b).unwrap());
     }
-    
+
     // 5. 合并结果
     let mut idx = 0;
     for bucket in buckets {
@@ -203,10 +200,10 @@ fn erf(x: f64) -> f64 {
 
     let sign = if x < 0.0 { -1.0 } else { 1.0 };
     let x = x.abs();
-    
+
     let t = 1.0 / (1.0 + p * x);
     let y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * (-x * x).exp();
-    
+
     sign * y
 }
 
@@ -223,7 +220,7 @@ pub fn counting_sort(arr: &mut [i32]) {
         count[i as usize + 1] += count[i as usize];
     }
 
-    let n  =  arr.len();
+    let n = arr.len();
     let mut result = vec![0; n];
 
     for i in (0..n).rev() {
@@ -269,4 +266,3 @@ pub fn counting_sort_by_digit(arr: &mut [i32], exp: i32) {
 
     arr.copy_from_slice(&output);
 }
-

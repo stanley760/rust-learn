@@ -30,7 +30,6 @@ impl Solution {
         }
     }
 
-
     pub fn sort_colors_insert(nums: &mut Vec<i32>) {
         let mut p0 = 0;
         let mut p1 = 0;
@@ -41,13 +40,11 @@ impl Solution {
         // [0, 1, 1, 2, 2, 0]
         // [0, 0, 1, 1, 2, 2]
         for i in 0..nums.len() {
-
             let x = nums[i];
             nums[i] = 2;
             if x <= 1 {
                 nums[p1] = 1;
                 p1 += 1;
-
             }
 
             if x == 0 {
@@ -72,7 +69,11 @@ mod tests {
         let elapsed = start.elapsed();
         assert_eq!(nums, vec![0, 0, 1, 1, 2, 2]);
 
-        println!("Elapsed original: {:.3?} ({} ns)", elapsed, elapsed.as_nanos());
+        println!(
+            "Elapsed original: {:.3?} ({} ns)",
+            elapsed,
+            elapsed.as_nanos()
+        );
     }
 
     #[test]
@@ -82,6 +83,10 @@ mod tests {
         Solution::sort_colors_insert(&mut nums);
         let elapsed = start.elapsed();
         assert_eq!(nums, vec![0, 0, 1, 1, 2, 2]);
-        println!("Elapsed insert: {:.3?} ({} ns)", elapsed, elapsed.as_nanos());
+        println!(
+            "Elapsed insert: {:.3?} ({} ns)",
+            elapsed,
+            elapsed.as_nanos()
+        );
     }
 }

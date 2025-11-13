@@ -2,7 +2,7 @@ struct Solution;
 
 impl Solution {
     pub fn peak_index_in_mountain_array(arr: Vec<i32>) -> i32 {
-        let mut left = 0 ;
+        let mut left = 0;
 
         let mut right = arr.len() - 2;
 
@@ -18,7 +18,7 @@ impl Solution {
     }
 }
 
- fn main() {
-     let arr = vec![0,1,0];
-     println!("{:?}", Solution::peak_index_in_mountain_array(arr));
- }
+fn main() {
+    let arr = vec![0, 1, 0];
+    println!("{:?}", Solution::peak_index_in_mountain_array(arr));
+}

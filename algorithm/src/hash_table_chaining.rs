@@ -7,7 +7,7 @@ pub struct HashTableChaining {
     capacity: usize,
     load_thres: f32,
     extend_ratio: usize,
-    buckets: Vec<Vec<Pair>>
+    buckets: Vec<Vec<Pair>>,
 }
 
 impl HashTableChaining {
@@ -71,10 +71,7 @@ impl HashTableChaining {
             }
         }
         // if key not exists, insert.
-        self.buckets[idx].push(Pair {
-            key,
-            value: val,
-        });
+        self.buckets[idx].push(Pair { key, value: val });
         self.size += 1;
     }
     // get value by key.

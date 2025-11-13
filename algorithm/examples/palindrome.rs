@@ -27,10 +27,9 @@ fn main() {
     let n = 5;
     let start = 0;
     println!("Input: {} result4: {}", n, xor_operation(n, start)); // 输出: 8
-    
-    let nums = vec![1,2,3,1,1,3];
-    println!("result5: {}", num_identical_pairs(nums)); // 输出: 4
 
+    let nums = vec![1, 2, 3, 1, 1, 3];
+    println!("result5: {}", num_identical_pairs(nums)); // 输出: 4
 }
 
 pub fn is_palindrome(x: i32) -> bool {
@@ -51,24 +50,20 @@ pub fn is_palindrome(x: i32) -> bool {
 pub fn xor_operation(n: i32, start: i32) -> i32 {
     let arr: Vec<i32> = (0..n).collect();
 
-    let arr = arr.iter().map(|&x| start + 2*x).collect::<Vec<i32>>();
-    
+    let arr = arr.iter().map(|&x| start + 2 * x).collect::<Vec<i32>>();
+
     println!("{:?}", arr);
 
-
     arr.iter().fold(0, |acc, x| acc ^ x)
-
 }
 
 pub fn num_identical_pairs(nums: Vec<i32>) -> i32 {
-    let arr = nums
-        .into_iter()
-        .fold(vec![0u8; 100], |mut acc, num| {
-            acc[num as usize - 1] += 1;
-            acc
-        });
+    let arr = nums.into_iter().fold(vec![0u8; 100], |mut acc, num| {
+        acc[num as usize - 1] += 1;
+        acc
+    });
     println!("{:?}", arr);
-        arr.into_iter()
+    arr.into_iter()
         .filter(|amount| amount.ne(&0))
         .map(|amount| (amount as i32) * (amount as i32 - 1) / 2)
         .sum::<i32>()

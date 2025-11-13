@@ -149,8 +149,8 @@ impl<T> ArrayDeque<T> {
     }
 
     pub fn find(&self, value: &T) -> Option<usize>
-    where 
-        T: PartialEq<T> 
+    where
+        T: PartialEq<T>,
     {
         unsafe {
             let mut cur = self.front;
@@ -163,11 +163,9 @@ impl<T> ArrayDeque<T> {
                 }
                 cur = (*node.as_ptr()).back;
                 index += 1;
-
             }
             None
         }
-
     }
 
     pub fn remove(&mut self, index: usize) -> Option<T> {
@@ -198,15 +196,15 @@ impl<T> ArrayDeque<T> {
         }
     }
 
-    pub fn remove_value(&mut self, value: &T) -> bool 
-    where 
+    pub fn remove_value(&mut self, value: &T) -> bool
+    where
         T: PartialEq,
     {
         unsafe {
             let mut current = self.front;
             let mut index = 0;
 
-            while let Some(node) = current { 
+            while let Some(node) = current {
                 if (*node.as_ptr()).elem == *value {
                     self.remove(index);
                     return true;

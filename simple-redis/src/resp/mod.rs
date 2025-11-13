@@ -18,4 +18,3 @@ pub enum RespFrame {
 pub struct SimpleString(String);
 #[allow(dead_code)]
 pub struct SimpleError(String);
-

@@ -6,7 +6,7 @@
 #[test]
 fn test_borrow_mut() {
     //let a = 10;
-    let mut a = 10;      // a 所有权变量，生命周期一直到 "}"结束，执行Drop
+    let mut a = 10; // a 所有权变量，生命周期一直到 "}"结束，执行Drop
     let b = &mut a; // ❌ cannot borrow as mutable
     *b += 1;
     // println!("{a}");       // ❌ cannot borrow a as immutable

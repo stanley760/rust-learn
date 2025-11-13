@@ -26,10 +26,10 @@ mod tests {
     use super::*;
     #[test]
     fn test_trap() {
-        let height = vec![0,1,0,2,1,0,1,3,2,1,2,1];
+        let height = vec![0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1];
         assert_eq!(Solution::trap(height), 6);
 
-        let height = vec![4,2,0,3,2,5];
+        let height = vec![4, 2, 0, 3, 2, 5];
         assert_eq!(Solution::trap(height), 9);
     }
 }

@@ -1,39 +1,56 @@
-use anyhow::Ok;
-use zxcvbn::zxcvbn;
-use rand::seq::SliceRandom;
 use crate::operation::GenPwdOpts;
+use anyhow::Ok;
+use rand::seq::SliceRandom;
+use zxcvbn::zxcvbn;
 
 const LOWERCASE: &[u8] = b"abcdefghijklmnopqrstuvwxyz";
 const UPPERCASE: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const NUMBERS: &[u8] = b"0123456789";
 const SYMBOLS: &[u8] = b"!@#$%^&*()_+-=[]{}|;:,.<>/?";
 
-pub fn parse_gen_pwd(opts: &GenPwdOpts) -> anyhow::Result<()>{
+pub fn parse_gen_pwd(opts: &GenPwdOpts) -> anyhow::Result<()> {
     let mut rng = rand::thread_rng();
     let mut pwd = Vec::new();
     let mut chars = Vec::new();
 
     if opts.lowercase {
         chars.extend_from_slice(LOWERCASE);
-        pwd.push(*LOWERCASE.choose(&mut rng).expect("char won't be empty in lowercase."));
+        pwd.push(
+            *LOWERCASE
+                .choose(&mut rng)
+                .expect("char won't be empty in lowercase."),
+        );
     }
     if opts.uppercase {
         chars.extend_from_slice(UPPERCASE);
-        pwd.push(*UPPERCASE.choose(&mut rng).expect("char won't be empty in uppercase."));
+        pwd.push(
+            *UPPERCASE
+                .choose(&mut rng)
+                .expect("char won't be empty in uppercase."),
+        );
     }
 
     if opts.numbers {
         chars.extend_from_slice(NUMBERS);
-        pwd.push(*NUMBERS.choose(&mut rng).expect("char won't be empty in numbers."));
+        pwd.push(
+            *NUMBERS
+                .choose(&mut rng)
+                .expect("char won't be empty in numbers."),
+        );
     }
 
     if opts.symbols {
         chars.extend_from_slice(SYMBOLS);
-        pwd.push(*SYMBOLS.choose(&mut rng).expect("char won't be empty in symbol."));
+        pwd.push(
+            *SYMBOLS
+                .choose(&mut rng)
+                .expect("char won't be empty in symbol."),
+        );
     }
 
-    for _ in 0..(opts.length - pwd.len() as u8)  {
-        let c = chars.choose(&mut rng)
+    for _ in 0..(opts.length - pwd.len() as u8) {
+        let c = chars
+            .choose(&mut rng)
             .expect("char won't be empty in context.")
             .clone();
         pwd.push(c);

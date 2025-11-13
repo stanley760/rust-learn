@@ -7,15 +7,18 @@ impl Solution {
         potions.sort_unstable();
         let n = potions.len();
 
-        spells.iter().map(|&spell| {
-            // note: ⌈a/b​⌉=⌊(a+b−1)/b​⌋
-            let target = (success - 1) / spell as i64;
-            if target >= potions[potions.len() - 1] as i64 {
-                0
-            } else {
-                (n - Self::lower_bound(&potions, target as i32)) as i32
-            }
-        }).collect()
+        spells
+            .iter()
+            .map(|&spell| {
+                // note: ⌈a/b​⌉=⌊(a+b−1)/b​⌋
+                let target = (success - 1) / spell as i64;
+                if target >= potions[potions.len() - 1] as i64 {
+                    0
+                } else {
+                    (n - Self::lower_bound(&potions, target as i32)) as i32
+                }
+            })
+            .collect()
     }
 
     fn lower_bound(nums: &Vec<i32>, target: i32) -> usize {
@@ -36,7 +39,7 @@ impl Solution {
         let n = potions.len();
         for s in spells.iter_mut() {
             let success = (success as f64) / (*s as f64);
-            let target = potions.partition_point(|&x|(x as f64) < success);
+            let target = potions.partition_point(|&x| (x as f64) < success);
 
             *s = n as i32 - target as i32;
         }
@@ -53,8 +56,14 @@ mod tests {
         let potions = vec![1, 2, 3, 4, 5];
         let success = 7;
 
-        assert_eq!(Solution::successful_pairs(spells.clone(), potions.clone(), success), vec![4, 0, 3]);
-        assert_eq!(Solution::successful_pairs2(spells.clone(), potions.clone(), success), vec![4, 0, 3]);
+        assert_eq!(
+            Solution::successful_pairs(spells.clone(), potions.clone(), success),
+            vec![4, 0, 3]
+        );
+        assert_eq!(
+            Solution::successful_pairs2(spells.clone(), potions.clone(), success),
+            vec![4, 0, 3]
+        );
     }
 
     #[test]
@@ -62,6 +71,9 @@ mod tests {
         let spells = vec![3, 1, 2];
         let potions = vec![8, 5, 8];
         let success = 16;
-        assert_eq!(Solution::successful_pairs(spells.clone(), potions.clone(), success), vec![2, 0, 2]);
+        assert_eq!(
+            Solution::successful_pairs(spells.clone(), potions.clone(), success),
+            vec![2, 0, 2]
+        );
     }
 }

@@ -1,7 +1,7 @@
-use std::fmt::{Display, Formatter};
+use crate::error::kv::KvError;
 use abi::{command_request::RequestData, *};
 use http::StatusCode;
-use crate::error::kv::KvError;
+use std::fmt::{Display, Formatter};
 
 pub mod abi;
 
@@ -12,7 +12,7 @@ impl CommandRequest {
             request_data: Some(RequestData::Hget(Hget {
                 table: table.into(),
                 key: key.into(),
-            }))
+            })),
         }
     }
 
@@ -31,16 +31,17 @@ impl CommandRequest {
         Self {
             request_data: Some(RequestData::Hgetall(Hgetall {
                 table: table.into(),
-            }))
+            })),
         }
     }
-
-
 }
 
 impl Kvpair {
     pub fn new(key: impl Into<String>, value: Value) -> Self {
-        Self { key: key.into(), value: Some(value) }
+        Self {
+            key: key.into(),
+            value: Some(value),
+        }
     }
 }
 
@@ -102,12 +103,12 @@ impl From<Vec<Value>> for CommandResponse {
         Self {
             status: StatusCode::OK.as_u16() as _,
             values: value,
-           ..Default::default()
+            ..Default::default()
         }
     }
 }
 
-impl From<Vec<Kvpair>> for CommandResponse  {
+impl From<Vec<Kvpair>> for CommandResponse {
     fn from(value: Vec<Kvpair>) -> Self {
         Self {
             status: StatusCode::OK.as_u16() as _,
@@ -120,12 +121,12 @@ impl From<Vec<Kvpair>> for CommandResponse  {
 impl From<KvError> for CommandResponse {
     fn from(e: KvError) -> Self {
         let mut res = Self {
-            status: StatusCode::INTERNAL_SERVER_ERROR.as_u16() as _, 
+            status: StatusCode::INTERNAL_SERVER_ERROR.as_u16() as _,
             message: e.to_string(),
             values: vec![],
             pairs: vec![],
         };
-        
+
         match e {
             KvError::NotFound(_, _) => res.status = StatusCode::NOT_FOUND.as_u16() as _,
             KvError::InvalidCommand(_) => res.status = StatusCode::BAD_REQUEST.as_u16() as _,

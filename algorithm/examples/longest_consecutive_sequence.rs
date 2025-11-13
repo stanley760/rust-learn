@@ -22,12 +22,10 @@ use std::collections::HashSet;
 /// 输入：nums = [1,0,1,2]
 /// 输出：3
 
-
 struct Solution;
 
 impl Solution {
     pub fn longest_consecutive(nums: Vec<i32>) -> i32 {
-
         let hset = nums.into_iter().collect::<HashSet<i32>>();
         let mut res = 0;
         hset.iter().for_each(|e| {
@@ -48,16 +46,16 @@ impl Solution {
 }
 
 fn main() {
-    let x = vec![100,4,200,1,3,2];
+    let x = vec![100, 4, 200, 1, 3, 2];
     assert_eq!(Solution::longest_consecutive(x), 4);
 
-    let x1 = vec![0,3,7,2,5,8,4,6,0,1];
+    let x1 = vec![0, 3, 7, 2, 5, 8, 4, 6, 0, 1];
     assert_eq!(Solution::longest_consecutive(x1), 9);
 
-    let x2 = vec![1,0,1,2];
+    let x2 = vec![1, 0, 1, 2];
     assert_eq!(Solution::longest_consecutive(x2), 3);
 
-    let x3 =vec![0, 0];
+    let x3 = vec![0, 0];
     assert_eq!(Solution::longest_consecutive(x3), 1);
 
     let x4 = vec![1, 100];

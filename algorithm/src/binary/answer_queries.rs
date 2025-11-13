@@ -55,7 +55,7 @@ mod tests {
             Solution::answer_queries2(nums.clone(), queries.clone()),
             vec![2, 3, 4]
         );
-        
+
         let nums = vec![2, 3, 4, 5];
         let queries = vec![1];
         assert_eq!(

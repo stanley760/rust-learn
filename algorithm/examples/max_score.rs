@@ -10,7 +10,7 @@ impl Solution {
 
         let arr = s.as_bytes();
         // 遍历除最后一个字符外的所有字符（因为右子字符串不能为空）
-        for i in 0..arr.len()-1 {
+        for i in 0..arr.len() - 1 {
             if arr[i] == b'0' {
                 // 遇到'0'：左子字符串中0的个数增加
                 left_zeros += 1;

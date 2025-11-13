@@ -10,7 +10,7 @@ impl Solution {
             } else if nums1[i] < nums2[j] {
                 i += 1;
             } else {
-                j += 1; 
+                j += 1;
             }
         }
         -1

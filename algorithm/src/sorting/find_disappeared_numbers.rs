@@ -1,4 +1,3 @@
-
 pub struct Solution;
 
 // LeetCode 448

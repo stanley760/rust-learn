@@ -1,15 +1,15 @@
-mod pb;
 mod engine;
-use engine::{Engine, Photon};
-use std::hash::{Hash, Hasher};
-use std::{collections::hash_map::DefaultHasher,sync::Arc};
-use std::num::NonZeroUsize;
+mod pb;
 use axum::http::{HeaderMap, HeaderValue};
 use axum::Extension;
 use bytes::Bytes;
+use engine::{Engine, Photon};
 use image::ImageOutputFormat;
 use lru::LruCache;
 use pb::*;
+use std::hash::{Hash, Hasher};
+use std::num::NonZeroUsize;
+use std::{collections::hash_map::DefaultHasher, sync::Arc};
 
 use axum::{extract::Path, http::StatusCode, routing::get, Router};
 use percent_encoding::{percent_decode_str, percent_encode, NON_ALPHANUMERIC};
@@ -21,7 +21,7 @@ use tracing::{info, instrument};
 
 #[derive(Deserialize)]
 struct Params {
-    spec: String, 
+    spec: String,
     url: String,
 }
 
@@ -37,23 +37,27 @@ async fn main() {
     let app = Router::new()
         // `GET /image` 会执行 generate 函数，并把 spec 和 url 传递过去
         .route("/image/{spec}/{url}", get(generate))
-        .layer(ServiceBuilder::new()
-            .layer(AddExtensionLayer::new(cache))
-            .into_inner());
+        .layer(
+            ServiceBuilder::new()
+                .layer(AddExtensionLayer::new(cache))
+                .into_inner(),
+        );
 
     // 运行 web 服务器
-    let addr = tokio::net::TcpListener::bind("127.0.0.1:3000").await.unwrap();
+    let addr = tokio::net::TcpListener::bind("127.0.0.1:3000")
+        .await
+        .unwrap();
 
     print_test_url("https://images.pexels.com/photos/1562477/pexels-photo-1562477.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260");
 
     tracing::debug!("listening on {:?}", addr);
-    axum::serve(addr, app)
-        .await
-        .unwrap();
+    axum::serve(addr, app).await.unwrap();
 }
 
-async fn generate(Path(Params { spec, url }): Path<Params>, Extension(cache): Extension<Cache>) -> Result<(HeaderMap, Vec<u8>), StatusCode> {
-    
+async fn generate(
+    Path(Params { spec, url }): Path<Params>,
+    Extension(cache): Extension<Cache>,
+) -> Result<(HeaderMap, Vec<u8>), StatusCode> {
     let spec: ImageSpec = spec
         .as_str()
         .try_into()

@@ -1,8 +1,8 @@
-use std::{fs, io::Read};
-use anyhow::{Ok, Result};
 use crate::{read_file, TextSignFormat};
+use anyhow::{Ok, Result};
 use base64::{prelude::BASE64_URL_SAFE_NO_PAD, Engine};
 use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
+use std::{fs, io::Read};
 
 pub trait TextSign {
     /// sign the data from the reader and return the signature
@@ -11,12 +11,13 @@ pub trait TextSign {
 
 pub trait TextVerify {
     /// verify the signature of the data from the reader
-    fn verify(&self,  data: impl Read, sig: &[u8]) -> Result<bool>;
+    fn verify(&self, data: impl Read, sig: &[u8]) -> Result<bool>;
 }
 
 pub trait KeyLoader {
     fn load(path: impl AsRef<std::path::Path>) -> Result<Self>
-        where Self: Sized;
+    where
+        Self: Sized;
 }
 
 pub struct Blake3 {
@@ -29,7 +30,7 @@ pub struct Ed25519Signer {
 
 struct Ed25519Verifier {
     key: VerifyingKey,
-}     
+}
 
 impl TextSign for Blake3 {
     fn sign(&self, reader: &mut dyn Read) -> Result<Vec<u8>> {
@@ -40,7 +41,6 @@ impl TextSign for Blake3 {
 }
 
 impl TextVerify for Blake3 {
-
     fn verify(&self, mut data: impl Read, sig: &[u8]) -> Result<bool> {
         let mut buf = Vec::new();
         data.read_to_end(&mut buf)?;
@@ -94,11 +94,11 @@ pub fn process_sign(input: &str, key: &str, format: TextSignFormat) -> Result<()
         TextSignFormat::Blake3 => {
             let sign = Blake3::load(key)?;
             sign.sign(&mut reader)?
-        },
+        }
         TextSignFormat::Ed25519 => {
             let load = Ed25519Signer::load(key)?;
             load.sign(&mut reader)?
-        },
+        }
     };
     let result = BASE64_URL_SAFE_NO_PAD.encode(result);
     println!("{}", result);
@@ -113,7 +113,7 @@ pub fn process_verify(input: &str, key: &str, format: TextSignFormat, sig: &str)
         TextSignFormat::Blake3 => {
             let sign = Blake3::load(key)?;
             sign.verify(&mut reader, &sig)?
-        },
+        }
         TextSignFormat::Ed25519 => {
             let load = Ed25519Verifier::load(key)?;
             load.verify(&mut reader, &sig)?
@@ -128,13 +128,11 @@ impl Blake3 {
         Self { key }
     }
 
-
     pub fn try_new(key: &[u8]) -> Result<Self> {
         let key = &key[..32];
         let key = key.try_into().expect("invalid key");
         Ok(Blake3::new(key))
     }
-
 }
 
 impl Ed25519Signer {
@@ -146,7 +144,6 @@ impl Ed25519Signer {
         let key = SigningKey::from_bytes(key.try_into()?);
         Ok(Ed25519Signer::new(key))
     }
-
 }
 
 impl Ed25519Verifier {
@@ -158,5 +155,4 @@ impl Ed25519Verifier {
         let key = VerifyingKey::from_bytes(key.try_into()?)?;
         Ok(Ed25519Verifier::new(key))
     }
-
 }

@@ -1,4 +1,3 @@
-
 pub fn binary_search<T>(item: &T, array: &[T]) -> Option<usize>
 where
     T: Ord,

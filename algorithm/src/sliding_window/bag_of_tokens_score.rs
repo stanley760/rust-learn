@@ -13,7 +13,7 @@ impl Solution {
         let (mut left, mut right) = (0, n - 1);
         let (mut cur, mut res) = (0, 0);
         while left <= right {
-            if  power >= tokens[left] {
+            if power >= tokens[left] {
                 power -= tokens[left];
                 cur += 1;
                 left += 1;

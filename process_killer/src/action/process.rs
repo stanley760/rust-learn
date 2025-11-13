@@ -19,23 +19,38 @@ pub struct Process {
 impl Process {
     pub fn run() -> Vec<Self> {
         let output = if cfg!(target_os = "windows") {
-            Command::new("cmd").args(&["/C", "netstat -ano"]).output().expect("failed to run cmd")
-        } else if cfg!(target_os="macos") {
-            Command::new("sh").args(&["-c", "netstat -anv"]).output().expect("failed to run in mac")
+            Command::new("cmd")
+                .args(&["/C", "netstat -ano"])
+                .output()
+                .expect("failed to run cmd")
+        } else if cfg!(target_os = "macos") {
+            Command::new("sh")
+                .args(&["-c", "netstat -anv"])
+                .output()
+                .expect("failed to run in mac")
         } else {
-            Command::new("sh").args(&["-c", "netstat -ano"]).output().expect("failed to run sh")
+            Command::new("sh")
+                .args(&["-c", "netstat -ano"])
+                .output()
+                .expect("failed to run sh")
         };
 
         let output = String::from_utf8_lossy(&output.stdout);
 
-        output.lines().filter_map(|x| {
-            let parts: Vec<&str> = x.split_whitespace().collect();
-            Self::hanle_cross_operate_system(parts)
-        }).skip(1).collect()
+        output
+            .lines()
+            .filter_map(|x| {
+                let parts: Vec<&str> = x.split_whitespace().collect();
+                Self::hanle_cross_operate_system(parts)
+            })
+            .skip(1)
+            .collect()
     }
 
     pub fn search(port: &str) -> Result<Vec<Self>, Error> {
-        let port = port.parse::<u32>().map_err(|_| Error::new(ErrorKind::InvalidInput, "it's not a number"))?;
+        let port = port
+            .parse::<u32>()
+            .map_err(|_| Error::new(ErrorKind::InvalidInput, "it's not a number"))?;
         let mut result = Self::run();
         result.retain(|x| {
             let inner_host = &x.inner_host;
@@ -50,16 +65,20 @@ impl Process {
             }
         });
         if result.is_empty() {
-            return Err(Error::new(ErrorKind::NotFound, format!("the port {} not found", port)));
+            return Err(Error::new(
+                ErrorKind::NotFound,
+                format!("the port {} not found", port),
+            ));
         }
-        
+
         Ok(result)
     }
 
     pub fn kill(pid: &str) -> Result<(), Error> {
-        
-        let pid = pid.parse::<u32>().map_err(|_| Error::new(ErrorKind::InvalidInput, "it's not a number"))?;
-        
+        let pid = pid
+            .parse::<u32>()
+            .map_err(|_| Error::new(ErrorKind::InvalidInput, "it's not a number"))?;
+
         let result = if cfg!(target_os = "windows") {
             Command::new("cmd")
                 .args(&["taskkill", "-PID", &pid.to_string(), "-F"])
@@ -73,7 +92,10 @@ impl Process {
         };
         match result {
             Ok(_) => Ok(()),
-            Err(e) => Err(Error::new(ErrorKind::Other, format!("failed to execute the kill process: {}", e))),
+            Err(e) => Err(Error::new(
+                ErrorKind::Other,
+                format!("failed to execute the kill process: {}", e),
+            )),
         }
     }
 
@@ -84,10 +106,26 @@ impl Process {
             return None;
         }
         let protocol = parts[0].to_string();
-        let inner_host = if macos_flag { parts[3].to_string() } else { parts[1].to_string() };
-        let outer_host = if macos_flag { parts[4].to_string() } else { parts[2].to_string() };
-        let status = if macos_flag { parts[5].to_string() } else { parts[3].to_string() };
-        let pid = if macos_flag { parts[8].to_string() } else { parts[4].to_string() };
+        let inner_host = if macos_flag {
+            parts[3].to_string()
+        } else {
+            parts[1].to_string()
+        };
+        let outer_host = if macos_flag {
+            parts[4].to_string()
+        } else {
+            parts[2].to_string()
+        };
+        let status = if macos_flag {
+            parts[5].to_string()
+        } else {
+            parts[3].to_string()
+        };
+        let pid = if macos_flag {
+            parts[8].to_string()
+        } else {
+            parts[4].to_string()
+        };
 
         Some(Self {
             protocol,
@@ -98,4 +136,3 @@ impl Process {
         })
     }
 }
-

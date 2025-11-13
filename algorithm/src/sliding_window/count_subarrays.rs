@@ -7,7 +7,7 @@ impl Solution {
     pub fn count_subarrays(nums: Vec<i32>, k: i64) -> i64 {
         let mut sum = 0;
         let mut left = 0;
-        let mut ans =0;
+        let mut ans = 0;
         for (right, &x) in nums.iter().enumerate() {
             sum += x as i64;
             while sum * (right - left + 1) as i64 >= k {

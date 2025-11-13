@@ -31,20 +31,19 @@ impl Solution {
     }
 }
 
-
 #[test]
 fn test_normal_case() {
-    let mut arr = vec![1,0,2,3,0,4,5,0];
-    
+    let mut arr = vec![1, 0, 2, 3, 0, 4, 5, 0];
+
     Solution::duplicate_zeros(&mut arr);
-    let expect = vec![1,0,0,2,3,0,0,4];
+    let expect = vec![1, 0, 0, 2, 3, 0, 0, 4];
 
     assert_eq!(arr, expect);
 
-    let mut arr = vec![1,2,3];
+    let mut arr = vec![1, 2, 3];
     Solution::duplicate_zeros(&mut arr);
 
-    let expect = vec![1,2,3];
+    let expect = vec![1, 2, 3];
 
     assert_eq!(arr, expect);
 }

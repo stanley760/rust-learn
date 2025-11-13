@@ -1,17 +1,16 @@
-use std::sync::Arc;
-use command_service::dispatch;
-use tracing::debug;
 use crate::{CommandRequest, CommandResponse, MemTable, Storage};
+use command_service::dispatch;
+use std::sync::Arc;
+use tracing::debug;
 
 mod command_service;
-
 
 pub trait CommandService {
     fn execute(self, store: &impl Storage) -> CommandResponse;
 }
-/// 
+///
 /// the code S = MemTable means the default storage value is MemTable.
-/// 
+///
 pub struct Service<S = MemTable> {
     inner: Arc<ServiceInner<S>>,
 }
@@ -31,9 +30,7 @@ pub struct ServiceInner<S> {
 impl<S: Storage> Service<S> {
     pub fn new(store: S) -> Self {
         Self {
-            inner: Arc::new(ServiceInner {
-                store,
-            }),
+            inner: Arc::new(ServiceInner { store }),
         }
     }
 
@@ -48,19 +45,17 @@ impl<S: Storage> Service<S> {
     }
 }
 
-
-
 #[cfg(test)]
 mod tests {
     use std::thread;
 
     use super::*;
     use crate::MemTable;
-    
+
     #[test]
     fn service_should_works() {
         let service = Service::new(MemTable::default());
-        
+
         let cloned = service.clone();
 
         let handle = thread::spawn(move || {
@@ -74,7 +69,6 @@ mod tests {
         assert_res_ok(res, &["v1".into()], &[]);
     }
 }
-
 
 #[cfg(test)]
 use crate::{Kvpair, Value};

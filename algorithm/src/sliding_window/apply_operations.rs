@@ -8,14 +8,14 @@ impl Solution {
         let mut j = 0;
 
         for i in 0..nums.len() {
-            // 
+            //
             if i + 1 < nums.len() && nums[i] == nums[i + 1] {
                 nums[i] *= 2;
                 nums[i + 1] = 0;
             }
             if nums[i] != 0 {
                 nums.swap(i, j);
-                j+=1;
+                j += 1;
             }
         }
         nums
@@ -24,7 +24,7 @@ impl Solution {
 
 #[test]
 pub fn test_normal_case() {
-    let nums = vec![1,2,2,1,1,0];
+    let nums = vec![1, 2, 2, 1, 1, 0];
 
     let result = Solution::apply_operations(nums);
 

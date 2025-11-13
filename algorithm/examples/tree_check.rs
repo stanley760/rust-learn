@@ -12,12 +12,12 @@ impl TreeNode {
         TreeNode {
             val,
             left: None,
-            right: None
+            right: None,
         }
     }
 }
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 struct Solution;
 impl Solution {

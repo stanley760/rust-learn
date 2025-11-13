@@ -18,11 +18,9 @@ fn foo(num: u32) -> Result<String, Box<dyn Error>> {
         _ => {
             let err = CusError;
             Err(Box::new(err))
-
         }
     }
 }
-
 
 pub fn test_dyn_error() {
     let result = foo(2);

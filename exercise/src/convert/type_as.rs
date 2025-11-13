@@ -101,26 +101,26 @@ mod test {
         println!("{:#?}", res)
     }
     use std::cell::RefCell;
+    use std::fmt;
     use std::rc::Rc;
     use std::sync::Once;
     use std::thread;
     use List::{Cons, Nil};
-    use std::fmt;
     enum List {
         Cons(i32, RefCell<Rc<List>>),
         Nil,
     }
 
     impl fmt::Debug for List {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            List::Cons(value, next) => {
-                write!(f, "Cons({}, {:?})", value, next)
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            match self {
+                List::Cons(value, next) => {
+                    write!(f, "Cons({}, {:?})", value, next)
+                }
+                List::Nil => write!(f, "Nil"),
             }
-            List::Nil => write!(f, "Nil"),
         }
     }
-}
 
     impl List {
         fn tail(&self) -> Option<&RefCell<Rc<List>>> {
@@ -182,7 +182,6 @@ mod test {
             });
             println!("Thread 1: call_once completed");
         });
-
 
         handle2.join().unwrap();
         handle1.join().unwrap();

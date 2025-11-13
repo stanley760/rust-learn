@@ -11,9 +11,9 @@ pub struct GenPwdOpts {
     #[arg(long, default_value_t = true)]
     pub uppercase: bool,
 
-    #[arg(long, default_value_t= true)]
+    #[arg(long, default_value_t = true)]
     pub numbers: bool,
 
-    #[arg(long, default_value_t= true)]
+    #[arg(long, default_value_t = true)]
     pub symbols: bool,
 }

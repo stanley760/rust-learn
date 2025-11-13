@@ -1,10 +1,10 @@
-use std::result::Result::Ok;
 use anyhow::Result;
 use async_prost::AsyncProstStream;
 use futures::prelude::*;
+use kv_server::{CommandRequest, CommandResponse};
+use std::result::Result::Ok;
 use tokio::net::TcpStream;
 use tracing::info;
-use kv_server::{CommandRequest, CommandResponse};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -18,7 +18,7 @@ async fn main() -> Result<()> {
         AsyncProstStream::<_, CommandResponse, CommandRequest, _>::from(stream).for_async();
     // create with the command named HSET.
     let cmd = CommandRequest::new_hset("table1", "hello", "rust".into());
-    // send the command HSET. 
+    // send the command HSET.
     client.send(cmd).await?;
     if let Some(Ok(data)) = client.next().await {
         info!("Got response {:?}", data);

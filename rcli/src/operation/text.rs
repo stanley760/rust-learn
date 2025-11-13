@@ -1,4 +1,7 @@
-use std::{fmt::{self, Formatter}, str::FromStr};
+use std::{
+    fmt::{self, Formatter},
+    str::FromStr,
+};
 
 use clap::Parser;
 
@@ -15,7 +18,6 @@ pub enum TextOpts {
 
 #[derive(Debug, Parser)]
 pub struct TextSignOpts {
-    
     #[arg(short, long, value_parser = verify_input, default_value = "-")]
     pub input: String,
 
@@ -28,7 +30,6 @@ pub struct TextSignOpts {
 
 #[derive(Debug, Parser)]
 pub struct TextVerifyOpts {
-    
     #[arg(short, long, value_parser = verify_input, default_value = "-")]
     pub input: String,
 

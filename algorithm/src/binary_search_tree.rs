@@ -84,7 +84,6 @@ impl<T> TreeNode<T> {
         result
     }
 
-
     // post order traversal
     // left -> right -> root
     pub fn postorder_traversal(&self) -> Vec<&T> {
@@ -303,12 +302,10 @@ mod test {
         let expected_preorder = vec![&4, &2, &1, &3, &6, &5, &7];
         assert_eq!(preorder_result, expected_preorder);
 
-
         // 中序遍历：左 -> 根 -> 右
         let inorder_result = bst.inorder();
         let expected_inorder_result = vec![&1, &2, &3, &4, &5, &6, &7];
         assert_eq!(inorder_result, expected_inorder_result);
-
 
         // 后序遍历：左 -> 右 -> 根
         let postorder_result = bst.postorder();

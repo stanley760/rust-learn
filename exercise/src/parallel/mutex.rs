@@ -1,4 +1,7 @@
-use std::{sync::{Arc, Mutex}, thread};
+use std::{
+    sync::{Arc, Mutex},
+    thread,
+};
 
 pub fn invoke() {
     // Mutex<T> 有死锁风险

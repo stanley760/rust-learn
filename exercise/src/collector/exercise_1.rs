@@ -21,12 +21,11 @@ mod test {
 
     #[test]
     pub fn test_exercise() {
-        
         let mut map = BTreeMap::new();
         map.insert(Name::new("/etc/password", 0x1), 12);
         map.insert(Name::new("/etc/hosts", 0x1), 4);
         map.insert(Name::new("/home/tchen", 0x0), 28);
-    
+
         for item in map.iter() {
             println!("{:?}", item);
         }

@@ -1,9 +1,8 @@
 use core::{fmt, str};
 use std::ops::Deref;
 
-
 #[allow(dead_code)]
-const MINI_STRING_MAX_LENGTH: usize = 30; 
+const MINI_STRING_MAX_LENGTH: usize = 30;
 
 #[allow(dead_code)]
 struct MiniString {
@@ -27,16 +26,15 @@ impl MiniString {
 
 impl Deref for MiniString {
     type Target = str;
-    
+
     fn deref(&self) -> &Self::Target {
         str::from_utf8(&self.data[..self.len as usize]).unwrap()
     }
-    
 }
 
 impl fmt::Debug for MiniString {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}",  self.deref())
+        write!(f, "{}", self.deref())
     }
 }
 
@@ -60,7 +58,7 @@ impl Deref for MyString {
 
 impl From<&str> for MyString {
     fn from(value: &str) -> Self {
-        match value.len() > MINI_STRING_MAX_LENGTH  {
+        match value.len() > MINI_STRING_MAX_LENGTH {
             true => Self::Standard(value.to_owned()),
             _ => Self::Inline(MiniString::new(value)),
         }
@@ -76,7 +74,6 @@ impl fmt::Display for MyString {
 #[cfg(test)]
 mod test {
     use super::{MiniString, MyString};
-
 
     #[test]
     fn test_my_string() {
@@ -96,7 +93,7 @@ mod test {
             s2.len(),
             s2.chars().count()
         );
-    
+
         // MyString 可以使用一切 &str 接口，感谢 Rust 的自动 Deref
         assert!(s1.ends_with("world"));
         assert!(s2.starts_with("粉"));

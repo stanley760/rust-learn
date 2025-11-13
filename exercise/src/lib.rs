@@ -58,24 +58,24 @@ pub mod traitobj {
     pub mod advance_limited_grammer;
     pub mod advance_trait_generic_params;
     pub mod advance_trait_related;
+    pub mod as_ref_trait;
+    pub mod blanket_impl;
+    pub mod default_display_trait;
     pub mod diff;
+    pub mod drop_copy_trait;
     pub mod dyn_stat_dispatch;
     pub mod full_limited_grammer;
     pub mod largest;
+    pub mod linked_list_new;
+    pub mod mystring;
     pub mod newtype;
     pub mod restraint;
     pub mod same_method;
+    pub mod send_sync_trait;
     pub mod super_traits;
     pub mod trait_safe;
     pub mod trait_safe_2;
     pub mod wrapper_fmt;
-    pub mod drop_copy_trait;
-    pub mod default_display_trait;
-    pub mod send_sync_trait;
-    pub mod as_ref_trait;
-    pub mod blanket_impl;
-    pub mod linked_list_new;
-    pub mod mystring;
 }
 
 pub mod vector {

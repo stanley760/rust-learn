@@ -1,9 +1,11 @@
+use super::{Engine, SpecTransform};
+use crate::pb::*;
 use bytes::Bytes;
 use image::{DynamicImage, ImageBuffer, ImageOutputFormat};
 use lazy_static::lazy_static;
-use photon_rs::{effects, filters, multiple, native::open_image_from_bytes, transform, PhotonImage};
-use crate::pb::*;
-use super::{Engine, SpecTransform};
+use photon_rs::{
+    effects, filters, multiple, native::open_image_from_bytes, transform, PhotonImage,
+};
 
 lazy_static! {
     static ref WATERMARK: PhotonImage = {

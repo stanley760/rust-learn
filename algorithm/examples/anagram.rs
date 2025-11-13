@@ -12,7 +12,8 @@ impl HashSolution {
         // }
         // map.into_values().collect()
 
-        let x = strs.iter()
+        let x = strs
+            .iter()
             .map(|s| {
                 let mut v = s.as_bytes().to_vec();
                 v.sort_unstable();
@@ -29,8 +30,14 @@ impl HashSolution {
 }
 
 fn main() {
-
-    let strs = vec![String::from("eat"), String::from("tea"), String::from("tan"), String::from("ate"), String::from("nat"), String::from("bat")];
+    let strs = vec![
+        String::from("eat"),
+        String::from("tea"),
+        String::from("tan"),
+        String::from("ate"),
+        String::from("nat"),
+        String::from("bat"),
+    ];
     let res = HashSolution::group_anagrams(strs);
     println!("{:?}", res);
 }
