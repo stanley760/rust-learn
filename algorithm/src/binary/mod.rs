@@ -33,3 +33,7 @@ pub mod ship_within_days;
 mod h_index;
 
 mod maximum_candies;
+
+mod min_eating_speed;
+
+mod find_peak_grid;
