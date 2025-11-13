@@ -6,8 +6,8 @@ pub struct Stack<T> {
     first: Option<Rc<RefCell<ListNode<T>>>>,
     size: usize,
 }
-
-impl<T: Copy + PartialEq + Sized> Stack<T> {
+#[allow(dead_code)]
+impl<T: Copy + PartialEq + Sized>  Stack<T> {
     pub fn new() -> Self {
         Self {
             first: None,
@@ -20,7 +20,7 @@ impl<T: Copy + PartialEq + Sized> Stack<T> {
     }
 
     pub fn is_empty(&self) -> bool {
-        return self.size() == 0;
+        self.size() == 0
     }
 
     pub fn push(&mut self, val: T) {
@@ -55,5 +55,11 @@ impl<T: Copy + PartialEq + Sized> Stack<T> {
             current = next;
         }
         res
+    }
+}
+
+impl<T: Copy + PartialEq + Sized + Default> Default for Stack<T> {
+    fn default() -> Self {
+        Self::new()
     }
 }

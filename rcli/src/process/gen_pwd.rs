@@ -49,10 +49,9 @@ pub fn parse_gen_pwd(opts: &GenPwdOpts) -> anyhow::Result<()> {
     }
 
     for _ in 0..(opts.length - pwd.len() as u8) {
-        let c = chars
+        let c = *chars
             .choose(&mut rng)
-            .expect("char won't be empty in context.")
-            .clone();
+            .expect("char won't be empty in context.");
         pwd.push(c);
     }
 

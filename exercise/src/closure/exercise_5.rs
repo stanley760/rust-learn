@@ -9,7 +9,7 @@ fn fn_once1<F: Fn(usize) -> bool>(func: F) {
 }
 
 pub fn invoke() {
-    let vec1 = vec![1, 2, 3];
+    let vec1 = [1, 2, 3];
     println!("*******use fn_once*******");
     fn_once(|z| z == vec1.len());
     println!("*******use fn*******");

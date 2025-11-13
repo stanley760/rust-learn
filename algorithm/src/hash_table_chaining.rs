@@ -47,7 +47,7 @@ impl HashTableChaining {
 
         // init new hash table.
         self.capacity *= self.extend_ratio;
-        self.buckets = vec![Vec::new(); self.capacity as usize];
+        self.buckets = vec![Vec::new(); self.capacity];
         self.size = 0;
 
         // rehash.
@@ -93,5 +93,11 @@ impl HashTableChaining {
                 println!("{}: {}", pair.key, pair.value);
             }
         }
+    }
+}
+
+impl Default for HashTableChaining {
+    fn default() -> Self {
+        Self::new()
     }
 }

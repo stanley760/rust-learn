@@ -1,10 +1,10 @@
-use std::{sync::mpsc, thread, vec};
+use std::{sync::mpsc, thread};
 
 pub fn invoke() {
     let (tx, rx) = mpsc::channel::<String>();
 
     thread::spawn(move || {
-        let vals = vec![
+        let vals = [
             String::from("hi"),
             String::from("from"),
             String::from("the"),

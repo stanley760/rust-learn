@@ -7,19 +7,20 @@ struct Developer {
     language: Language,
 }
 #[allow(dead_code)]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 enum Language {
+    #[default]
     Rust,
     TypeScript,
     Elixir,
     Haskell,
 }
 
-impl Default for Language {
-    fn default() -> Self {
-        Language::Rust
-    }
-}
+// impl Default for Language {
+//     fn default() -> Self {
+//         Language::Rust
+//     }
+// }
 #[allow(dead_code)]
 impl Developer {
     fn new(name: &str) -> Self {

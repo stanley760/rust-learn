@@ -31,7 +31,7 @@ pub fn invoke() {
     let ages = [18, 19, 20];
     // zip 是一个迭代器适配器，它的作用就是将两个迭代器的内容压缩到一起，
     // 形成 Iterator<Item=(ValueFromA, ValueFromB)> 这样的新的迭代器
-    let folks: HashMap<_, _> = names.into_iter().zip(ages.into_iter()).collect();
+    let folks: HashMap<_, _> = names.into_iter().zip(ages).collect();
     println!("{:?}", folks);
     let shoes = vec![
         Shoe {

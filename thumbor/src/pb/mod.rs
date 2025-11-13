@@ -27,7 +27,7 @@ impl TryFrom<&str> for ImageSpec {
         Ok(ImageSpec::decode(&data[..])?)
     }
 }
-
+#[allow(clippy::wrong_self_convention)]
 impl filter::Filter {
     pub fn to_str(&self) -> Option<&'static str> {
         match self {

@@ -45,7 +45,7 @@ impl Engine for Photon {
         image_to_buf(self.0, format)
     }
 }
-
+#[allow(clippy::unnecessary_mut_passed)]
 impl SpecTransform<&Crop> for Photon {
     fn transform(&mut self, op: &Crop) {
         let img = transform::crop(&mut self.0, op.x1, op.y1, op.x2, op.y2);
@@ -80,7 +80,7 @@ impl SpecTransform<&Filter> for Photon {
         }
     }
 }
-
+#[allow(clippy::unnecessary_mut_passed)]
 impl SpecTransform<&Resize> for Photon {
     fn transform(&mut self, op: &Resize) {
         let img = match resize::ResizeType::try_from(op.rtype).unwrap() {

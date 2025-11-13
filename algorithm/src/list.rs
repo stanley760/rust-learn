@@ -20,12 +20,12 @@ impl MyList {
 
     /* 获取列表长度（当前元素数量）*/
     pub fn size(&self) -> usize {
-        return self.size;
+        self.size
     }
 
     /* 获取列表容量 */
     pub fn capacity(&self) -> usize {
-        return self.cap;
+        self.cap
     }
 
     /* 访问元素 */
@@ -33,7 +33,7 @@ impl MyList {
         if index >= self.size {
             panic!("索引越界")
         }
-        return self.arr[index];
+        self.arr[index]
     }
 
     pub fn set(&mut self, index: usize, val: i32) {

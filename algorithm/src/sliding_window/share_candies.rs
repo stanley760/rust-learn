@@ -24,7 +24,7 @@ use std::collections::{HashMap, HashSet};
 // 你可以吃各种口味的糖果[2,4,5]。
 // 有3种独特的口味，所以返回3。
 pub struct Solution;
-
+#[allow(clippy::needless_range_loop)]
 impl Solution {
     /// 分析：candies = [1,2,2,3,4,3], k = 3
     /// 1.保证是连续的子数组长度为k,因此得出第一个窗口candies[0,k-1]

@@ -12,7 +12,7 @@ impl Solution {
         vec![left as i32, right as i32]
     }
 
-    fn lower_bound(nums: &Vec<i32>, target: i32) -> usize {
+    fn lower_bound(nums: &[i32], target: i32) -> usize {
         let (mut left, mut right) = (0, nums.len());
         while left < right {
             let mid = left + (right - left) / 2;
@@ -34,7 +34,7 @@ impl Solution {
         vec![left as i32, right as i32]
     }
 
-    fn lower_bound2(nums: &Vec<i32>, target: i32) -> usize {
+    fn lower_bound2(nums: &[i32], target: i32) -> usize {
         // 开区间表示：left = -1, right = n
         let mut left: isize = -1;
         let mut right: isize = nums.len() as isize;

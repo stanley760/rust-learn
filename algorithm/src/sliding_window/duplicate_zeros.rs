@@ -3,7 +3,7 @@ pub struct Solution;
 
 #[allow(unused)]
 impl Solution {
-    pub fn duplicate_zeros(arr: &mut Vec<i32>) {
+    pub fn duplicate_zeros(arr: &mut [i32]) {
         let n = arr.len();
         let (mut i, mut j) = (0, 0);
         while j < n {

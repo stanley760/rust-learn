@@ -8,7 +8,7 @@ impl Solution {
         positive_count.max(negative_count)
     }
 
-    fn lower_bound(nums: &Vec<i32>, target: i32) -> usize {
+    fn lower_bound(nums: &[i32], target: i32) -> usize {
         let (mut left, mut right) = (0, nums.len());
         while left < right {
             let mid = left + (right - left) / 2;

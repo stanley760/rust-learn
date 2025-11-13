@@ -20,17 +20,17 @@ impl Process {
     pub fn run() -> Vec<Self> {
         let output = if cfg!(target_os = "windows") {
             Command::new("cmd")
-                .args(&["/C", "netstat -ano"])
+                .args(["/C", "netstat -ano"])
                 .output()
                 .expect("failed to run cmd")
         } else if cfg!(target_os = "macos") {
             Command::new("sh")
-                .args(&["-c", "netstat -anv"])
+                .args(["-c", "netstat -anv"])
                 .output()
                 .expect("failed to run in mac")
         } else {
             Command::new("sh")
-                .args(&["-c", "netstat -ano"])
+                .args(["-c", "netstat -ano"])
                 .output()
                 .expect("failed to run sh")
         };
@@ -81,21 +81,21 @@ impl Process {
 
         let result = if cfg!(target_os = "windows") {
             Command::new("cmd")
-                .args(&["taskkill", "-PID", &pid.to_string(), "-F"])
+                .args(["taskkill", "-PID", &pid.to_string(), "-F"])
                 .output()
             // "failed to run on sliding_windows."
         } else {
             Command::new("sh")
-                .args(&["-kill", "-9", pid.to_string().as_str()])
+                .args(["-kill", "-9", pid.to_string().as_str()])
                 .output()
             // "failed to run on linux/mac."
         };
         match result {
             Ok(_) => Ok(()),
-            Err(e) => Err(Error::new(
-                ErrorKind::Other,
-                format!("failed to execute the kill process: {}", e),
-            )),
+            Err(e) => Err(Error::other(format!(
+                "failed to execute the kill process: {}",
+                e
+            ))),
         }
     }
 

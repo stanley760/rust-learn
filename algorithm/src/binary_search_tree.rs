@@ -55,10 +55,10 @@ impl<T> TreeNode<T> {
         let mut result = Vec::new();
         result.push(&self.data);
         unsafe {
-            if self.left != std::ptr::null_mut() {
+            if !self.left.is_null() {
                 result.append(&mut (*self.left).preorder_traversal());
             }
-            if self.right != std::ptr::null_mut() {
+            if !self.right.is_null() {
                 result.append(&mut (*self.right).preorder_traversal());
             }
         }
@@ -70,13 +70,13 @@ impl<T> TreeNode<T> {
     pub fn inorder_traversal(&self) -> Vec<&T> {
         let mut result = Vec::new();
         unsafe {
-            if self.left != std::ptr::null_mut() {
+            if !self.left.is_null() {
                 result.append(&mut (*self.left).inorder_traversal());
             }
 
             result.push(&self.data);
 
-            if self.right != std::ptr::null_mut() {
+            if !self.right.is_null() {
                 result.append(&mut (*self.right).inorder_traversal());
             }
         }
@@ -89,11 +89,11 @@ impl<T> TreeNode<T> {
     pub fn postorder_traversal(&self) -> Vec<&T> {
         let mut result = Vec::new();
         unsafe {
-            if self.left != std::ptr::null_mut() {
+            if !self.left.is_null() {
                 result.append(&mut (*self.left).postorder_traversal());
             }
 
-            if self.right != std::ptr::null_mut() {
+            if !self.right.is_null() {
                 result.append(&mut (*self.right).postorder_traversal());
             }
             result.push(&self.data);
@@ -252,6 +252,12 @@ impl<T: Ord> BinarySearchTree<T> {
 
 impl<T> Drop for BinarySearchTree<T> {
     fn drop(&mut self) {}
+}
+
+impl <T: Ord> Default for BinarySearchTree<T> {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]

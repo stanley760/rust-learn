@@ -6,7 +6,7 @@ pub fn invoke() {
     let tx1 = mpsc::Sender::clone(&tx);
 
     thread::spawn(move || {
-        let vals = vec![
+        let vals = [
             String::from("clone: hi"),
             String::from("clone: from"),
             String::from("clone: the"),
@@ -19,7 +19,7 @@ pub fn invoke() {
     });
 
     thread::spawn(move || {
-        let vals = vec![
+        let vals = [
             String::from("hi"),
             String::from("from"),
             String::from("the"),

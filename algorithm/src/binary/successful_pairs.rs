@@ -21,10 +21,10 @@ impl Solution {
             .collect()
     }
 
-    fn lower_bound(nums: &Vec<i32>, target: i32) -> usize {
+    fn lower_bound(nums: &[i32], target: i32) -> usize {
         let (mut left, mut right) = (0, nums.len());
         while left < right {
-            let mid = left + right >> 1;
+            let mid = (left + right) >> 1;
             if nums[mid] <= target {
                 left = mid + 1;
             } else {

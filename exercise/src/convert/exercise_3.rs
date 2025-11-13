@@ -1,9 +1,10 @@
 #[allow(overflowing_literals)]
-
+#[allow(clippy::empty_line_after_outer_attr)]
+#[allow(clippy::eq_op)]
 pub fn invoke() {
-    assert_eq!(1000 as u16, 1000);
+    assert_eq!(1000_u16, 1000);
 
-    assert_eq!(1000 as u8, 232);
+    assert_eq!(1000_u8, 232);
 
     // 事实上，之前说的规则对于正整数而言，就是如下的取模
     println!("1000 mod 256 is : {}", 1000 % 256);

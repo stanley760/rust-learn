@@ -29,7 +29,7 @@ pub struct Msg<T> {
     pub input: MsgInput<T>,
     pub output: oneshot::Sender<MsgOutput<T>>,
 }
-
+#[allow(clippy::map_clone)]
 pub fn multiply<T>(a: &Matrix<T>, b: &Matrix<T>) -> Result<Matrix<T>>
 where
     T: Copy + Add<Output = T> + Mul<Output = T> + AddAssign + Default + Debug + Send + 'static,

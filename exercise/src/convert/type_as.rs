@@ -7,7 +7,7 @@ pub fn invoke() {
     let c1: char = decimal.to_string().chars().next().unwrap();
     let c2 = integer as char;
 
-    assert_eq!(integer, 'a' as u8);
+    assert_eq!(integer, b'a');
     println!("c1: {}, c2: {}", c1, c2);
     println!("Success!");
 
@@ -17,7 +17,7 @@ pub fn invoke() {
     // **请仔细查看相应的编译错误，从中寻找到解决的办法**
     // **不要修改 main 中的任何代码**
 
-    let _v = 1000 as u8;
+    let _v = 1000_u8;
 
     println!("Success!")
 }

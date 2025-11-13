@@ -73,7 +73,7 @@ fn parse_url(s: &str) -> anyhow::Result<String> {
     let _url: Url = s.parse()?;
     Ok(s.into())
 }
-
+#[allow(clippy::needless_question_mark)]
 fn parse_pair(s: &str) -> anyhow::Result<Pair> {
     Ok(s.parse()?)
 }
@@ -112,7 +112,8 @@ async fn post(cli: Client, args: &Post) -> anyhow::Result<()> {
         .json(&body)
         .send()
         .await?;
-    Ok(print_resp(resp).await?)
+    print_resp(resp).await?;
+    Ok(())
 }
 
 async fn print_resp(resp: Response) -> anyhow::Result<()> {
@@ -162,9 +163,9 @@ fn get_content_type(resp: &Response) -> Option<Mime> {
 async fn main() -> anyhow::Result<()> {
     let opts: Opts = Opts::parse();
     let client = Client::new();
-    let res = match opts.methods {
+    match opts.methods {
         Methods::Get(args) => get(client, &args).await?,
         Methods::Post(args) => post(client, &args).await?,
-    };
-    Ok(res)
+    }
+    Ok(())
 }

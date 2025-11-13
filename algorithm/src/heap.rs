@@ -96,7 +96,7 @@ impl<T: Default> Iterator for Heap<T> {
 }
 
 pub struct MinHeap;
-
+#[allow(clippy::new_ret_no_self)]
 impl MinHeap {
     pub fn new<T: Default + Ord>() -> Heap<T> {
         Heap::new(|a, b| a < b)
@@ -104,7 +104,7 @@ impl MinHeap {
 }
 
 pub struct MaxHeap;
-
+#[allow(clippy::new_ret_no_self)]
 impl MaxHeap {
     pub fn new<T: Default + Ord>() -> Heap<T> {
         Heap::new(|a, b| a > b)

@@ -27,6 +27,7 @@ pub struct IterMut<'a, T> {
 }
 
 impl<T> Queue<T> {
+    
     pub fn new() -> Self {
         Queue {
             head: ptr::null_mut(),
@@ -83,7 +84,7 @@ impl<T> Queue<T> {
     pub fn peek_mut(&mut self) -> Option<&mut T> {
         unsafe { self.head.as_mut().map(|node| &mut node.elem) }
     }
-
+    #[allow(clippy::should_implement_trait)]
     pub fn into_iter(self) -> IntoIter<T> {
         IntoIter(self)
     }
@@ -135,8 +136,14 @@ where
 
 impl<T> Drop for Queue<T> {
     fn drop(&mut self) {
-        while let Some(_) = self.pop() {}
+        while self.pop().is_some() {}
     }
+}
+
+impl<T> Default for Queue<T> {
+     fn default() -> Self {
+         Self::new()
+     }
 }
 
 impl<T> Iterator for IntoIter<T> {

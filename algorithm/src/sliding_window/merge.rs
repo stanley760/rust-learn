@@ -3,7 +3,7 @@ struct Solution;
 
 #[allow(unused)]
 impl Solution {
-    pub fn merge(nums1: &mut Vec<i32>, m: i32, nums2: &mut Vec<i32>, n: i32) {
+    pub fn merge(nums1: &mut [i32], m: i32, nums2: &mut [i32], n: i32) {
         let m = m as isize;
         let n = n as isize;
         let (mut i, mut j, mut k) = (m - 1, n - 1, m + n - 1);

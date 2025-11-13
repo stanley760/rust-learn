@@ -38,7 +38,7 @@ impl<T: Clone + PartialEq> ListNode<T> {
     where
         T: Into<T>,
     {
-        let new_node = Rc::new(RefCell::new(ListNode::new(val.into())));
+        let new_node = Rc::new(RefCell::new(ListNode::new(val)));
         new_node.borrow_mut().next = node.next.take();
         node.next = Some(new_node);
     }

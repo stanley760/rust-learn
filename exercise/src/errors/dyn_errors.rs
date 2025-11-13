@@ -3,7 +3,7 @@ use std::{error::Error, fmt::Display};
 #[derive(Debug)]
 #[allow(dead_code)]
 struct CusError;
-
+#[allow(clippy::recursive_format_impl)]
 impl Display for CusError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self)

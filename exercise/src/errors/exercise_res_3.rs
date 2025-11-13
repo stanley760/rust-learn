@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::{self, Read};
+#[allow(clippy::question_mark)]
 fn read_file1() -> Result<String, io::Error> {
     let f = File::open("hello.txt");
     let mut f = match f {

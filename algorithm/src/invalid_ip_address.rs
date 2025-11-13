@@ -5,7 +5,7 @@ impl Solution {
         // address.replace(".", "[.]")
         address
             .as_bytes()
-            .into_iter()
+            .iter()
             .map(|c| match c {
                 b'.' => "[.]".to_string(),
                 _ => (*c as char).to_string(),

@@ -16,9 +16,9 @@ pub fn app() -> Element {
         })
         .collect();
     let mut datas = use_signal(|| init_datas);
-    let mut port_value = use_signal(|| String::new());
-    let mut pid_value = use_signal(|| String::new());
-    let mut error_message = use_signal(|| String::new());
+    let mut port_value = use_signal(String::new);
+    let mut pid_value = use_signal(String::new);
+    let mut error_message = use_signal(String::new);
     // 提供上下文
     use_context_provider(|| error_message);
     rsx!(

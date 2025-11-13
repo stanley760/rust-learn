@@ -3,7 +3,7 @@ struct Solution;
 
 #[allow(unused)]
 impl Solution {
-    pub fn sort_colors(nums: &mut Vec<i32>) {
+    pub fn sort_colors(nums: &mut [i32]) {
         let mut low = 0;
         let mut mid = 0;
         let mut high = nums.len() - 1;
@@ -30,7 +30,7 @@ impl Solution {
         }
     }
 
-    pub fn sort_colors_insert(nums: &mut Vec<i32>) {
+    pub fn sort_colors_insert(nums: &mut [i32]) {
         let mut p0 = 0;
         let mut p1 = 0;
         // [2, 0, 2, 1, 1, 0]

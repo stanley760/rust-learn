@@ -26,7 +26,7 @@ impl Solution {
             .max_by_key(|(_, &value)| value)
             .map(|(index, _)| index)
             .unwrap_or(0);
-        return vec![left as _, r as _];
+        vec![left as _, r as _]
     }
 }
 

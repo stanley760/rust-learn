@@ -243,7 +243,7 @@ pub fn radix_sort(arr: &mut [i32]) {
 
 pub fn counting_sort_by_digit(arr: &mut [i32], exp: i32) {
     let n = arr.len();
-    let mut count = vec![0; 10]; // 基数为10（十进制）
+    let mut count = [0; 10]; // 基数为10（十进制）
 
     // 统计每个数字在当前位上的频率
     for &num in arr.iter() {

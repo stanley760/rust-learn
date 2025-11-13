@@ -42,3 +42,9 @@ impl<T: Copy + PartialEq + Sized> ArrayStack<T> {
         self.data.iter()
     }
 }
+
+impl <T: Copy + PartialEq + Sized> Default for ArrayStack<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}

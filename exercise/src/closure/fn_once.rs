@@ -8,7 +8,7 @@ where
 }
 
 pub fn invoke() {
-    let vec1 = vec![1, 2, 3];
+    let vec1 = [1, 2, 3];
     // 1. FnOnce，该类型的闭包会拿走被捕获变量的所有权,
     //  F 实现了 Copy 特征，调用时使用的将是它的拷贝，所以并没有发生所有权的转移。
     fn_once(|len| len == vec1.len());

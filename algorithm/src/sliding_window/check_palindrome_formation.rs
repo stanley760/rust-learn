@@ -12,7 +12,7 @@ impl Solution {
             left += 1;
             right -= 1;
         }
-        return Self::is_palindrome(&a, left, right) || Self::is_palindrome(&b, left, right);
+        Self::is_palindrome(&a, left, right) || Self::is_palindrome(&b, left, right)
     }
 
     fn is_palindrome(s: &String, mut left: usize, mut right: usize) -> bool {

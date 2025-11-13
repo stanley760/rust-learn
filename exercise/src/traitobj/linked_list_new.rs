@@ -32,7 +32,7 @@ impl<T> Index<isize> for List<T> {
         let len = self.0.len();
 
         let n = (index as usize).checked_rem_euclid(len).unwrap();
-        &self.0.iter().nth(n).unwrap()
+        self.0.iter().nth(n).unwrap()
     }
 }
 

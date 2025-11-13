@@ -15,7 +15,7 @@ pub async fn create(
     let rowid = conn
         .execute(
             "INSERT INTO todo (description, completed) VALUES ($1, FALSE) RETURNING id",
-            &[&input.description],
+            [&input.description],
         )
         .map_err(|e| {
             eprintln!("Error creating todo: {}", e);
@@ -77,7 +77,7 @@ pub async fn delete(State(state): State<AppState>, Json(id): Json<i32>) -> impl 
     tracing::info!("todo list id {} had been deleted", id);
     let conn = state.db.lock().unwrap();
     let id = conn
-        .execute("DELETE FROM todo WHERE id = $1", &[&id])
+        .execute("DELETE FROM todo WHERE id = $1", [&id])
         .map_err(|e| {
             eprintln!("Error deleting todo: {}", e);
             (

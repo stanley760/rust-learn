@@ -55,3 +55,9 @@ impl ArrayHashTable {
         }
     }
 }
+
+impl Default for ArrayHashTable {
+    fn default() -> Self {
+        Self::new()
+    }
+}

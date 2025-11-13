@@ -59,6 +59,11 @@ impl<T: Ord> AVLTree<T> {
         }
     }
 }
+impl <T: Ord> Default for AVLTree<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl<T: Ord> TreeNode<T> {
     fn child(&self, side: Side) -> *mut TreeNode<T> {

@@ -1,7 +1,7 @@
 pub fn invoke() {
     assert_eq!("abc".as_bytes(), [97, 98, 99]);
 
-    let v = vec![1, 2, 3];
+    let v = [1, 2, 3];
     let _ele = v[2];
     let _ele = v.get(2).unwrap();
 
@@ -29,5 +29,5 @@ fn production_rate_per_hour(speed: u8) -> f64 {
 }
 
 pub fn working_items_per_minute(speed: u8) -> u32 {
-    (production_rate_per_hour(speed) / 60 as f64) as u32
+    (production_rate_per_hour(speed) / 60_f64) as u32
 }

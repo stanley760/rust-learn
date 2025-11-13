@@ -6,7 +6,7 @@ struct MyBox<T> {
 
 impl<T> MyBox<T> {
     fn new(x: T) -> MyBox<T> {
-        return MyBox { v: x };
+        MyBox { v: x }
     }
 }
 

@@ -36,7 +36,6 @@ impl Solution {
                 sum[1] -= customers[left as usize];
             }
         }
-        let ans = sum[0] + max_sum_1;
-        ans
+        sum[0] + max_sum_1
     }
 }
