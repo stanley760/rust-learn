@@ -6,6 +6,13 @@ jobs:
   build:
     name: 🐧 Build & Test on Linux
     runs-on: ubuntu-latest
+    
+    # 🔥 增加资源
+    env:
+      RUST_BACKTRACE: 1
+      CARGO_INCREMENTAL: 0  # 在 CI 中禁用增量编译
+      RUSTFLAGS: "-D warnings"  # 将警告转为错误
+
     steps:
       - name: 🔄 Checkout code
         uses: actions/checkout@v4
@@ -14,6 +21,15 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
+          components: rustfmt, clippy
+
+      # 🔥 优化缓存
+      - name: 📦 Cache Cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-target-dir: "true"
+          cache-key: "v1-${{ hashFiles('**/Cargo.lock') }}"
 
       - name: 🚩 Install system deps
         run: |
@@ -27,8 +43,26 @@ jobs:
           libwebkit2gtk-4.1-dev \
           pkg-config
 
+      # 🔥 并行执行多个检查
+      - name: 🧹 Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: 🔍 Run clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      # 🔥 只构建必要的 target
       - name: ⛏️ Build
-        run: cargo build --verbose
+        run: |
+          cargo build --locked --release
+          # 如果有多个 profile，可以并行构建
+          # cargo build --locked --profile ci  # 如果定义了 ci profile
 
       - name: 🧪 Run tests
-        run: cargo test --verbose
+        run: cargo test --locked --release -- --nocapture
+
+      # 🔥 可选：构建覆盖率报告
+      - name: 📊 Code coverage
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cargo install cargo-tarpaulin
+          cargo tarpaulin --out Xml
