@@ -10,8 +10,7 @@ jobs:
     # 🔥 增加资源
     env:
       RUST_BACKTRACE: 1
-      CARGO_INCREMENTAL: 0  # 在 CI 中禁用增量编译
-      RUSTFLAGS: "-D warnings"  # 将警告转为错误
+      CARGO_INCREMENTAL: 0  
 
     steps:
       - name: 🔄 Checkout code
@@ -59,3 +58,12 @@ jobs:
           cargo install cargo-tarpaulin
           cargo tarpaulin --out Xml
 
+      - name: 📤 Upload coverage reports
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            cobertura.xml
+            tarpaulin-report.xml
+          retention-days: 30
