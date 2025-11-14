@@ -21,7 +21,6 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          components: rustfmt, clippy
 
       # 🔥 优化缓存
       - name: 📦 Cache Cargo
