@@ -37,3 +37,9 @@ mod maximum_candies;
 mod min_eating_speed;
 
 mod find_peak_grid;
+
+mod search_rotated_sorted_array;
+
+mod find_peak_element;
+
+mod find_min;
