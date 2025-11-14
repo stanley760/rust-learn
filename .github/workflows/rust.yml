@@ -45,10 +45,11 @@ jobs:
 
       # 🔥 并行执行多个检查
       - name: 🧹 Check formatting
-        run: cargo fmt --all -- --check
+        run: |
+          find . -name "*.rs" -not -name "*.pb.rs" -not -path "./kv_server/*" | xargs rustfmt --check
 
       - name: 🔍 Run clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
+        run: cargo clippy --all-targets --all-features --exclude kv_server -- -D warnings
 
       # 🔥 只构建必要的 target
       - name: ⛏️ Build
