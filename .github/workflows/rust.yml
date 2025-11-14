@@ -51,19 +51,22 @@ jobs:
       - name: 🧪 Run tests
         run: cargo test --locked --release -- --nocapture
 
-      # 🔥 可选：构建覆盖率报告
+      # 🔥 改进覆盖率报告
       - name: 📊 Code coverage
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
         run: |
           cargo install cargo-tarpaulin
-          cargo tarpaulin --out Xml
+          cargo tarpaulin --out Xml --out Html --output-dir ./coverage
 
+      # 🔥 上传多种格式的报告
       - name: 📤 Upload coverage reports
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-reports
           path: |
+            ./coverage/
             cobertura.xml
-            tarpaulin-report.xml
+            tarpaulin-report.html
           retention-days: 30
+
