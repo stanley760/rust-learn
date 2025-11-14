@@ -125,7 +125,7 @@ pub struct Contrast {
     #[prost(float, tag = "1")]
     pub contrast: f32,
 }
-///
+/// filter
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct Filter {
     #[prost(enumeration = "filter::Filter", tag = "1")]
