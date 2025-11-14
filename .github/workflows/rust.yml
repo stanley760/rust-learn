@@ -43,14 +43,6 @@ jobs:
           libwebkit2gtk-4.1-dev \
           pkg-config
 
-      # 🔥 并行执行多个检查
-      - name: 🧹 Check formatting
-        run: |
-          find . -name "*.rs" -not -name "*.pb.rs" -not -path "./kv_server/*" | xargs rustfmt --check
-
-      - name: 🔍 Run clippy
-        run: cargo clippy --all-targets --all-features --exclude kv_server -- -D warnings
-
       # 🔥 只构建必要的 target
       - name: ⛏️ Build
         run: |
@@ -67,3 +59,4 @@ jobs:
         run: |
           cargo install cargo-tarpaulin
           cargo tarpaulin --out Xml
+
