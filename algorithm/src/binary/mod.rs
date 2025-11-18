@@ -43,3 +43,5 @@ mod search_rotated_sorted_array;
 mod find_peak_element;
 
 mod find_min;
+
+mod split_array;
