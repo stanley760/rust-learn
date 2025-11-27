@@ -6,22 +6,17 @@ impl Solution {
         if x == 0 {
             return 0;
         }
-        let s =x as f64;
-        let mut curr = s;
-        // 牛顿迭代：next = (curr + s / curr) / 2
+        let s = x as f64;
+        let mut dizzy = s; // 初始猜测值
+
         loop {
-            let next = (curr + s / curr) / 2.0;
-            if (next - curr).abs() < 1e-12 {
-                curr = next;
-                break;
+            let ans = (dizzy + s / dizzy) / 2.0;
+            // 当变化足够小时停止（避免浮点误差导致无限循环）
+            if (dizzy - ans).abs() < 1e-7 {
+                return ans as i32;
             }
-            curr = next;
+            dizzy = ans;
         }
-        let mut res = curr as i64;
-        let x64 = x as i64;
-        while res * res > x64 { res -= 1; }
-        while (res + 1) * (res + 1) <= x64 { res += 1; }
-        res as i32
     }
 }
 
