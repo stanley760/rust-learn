@@ -51,3 +51,5 @@ mod find_kth_number;
 mod kth_smallest;
 
 mod my_sqrt;
+
+mod search_matrix;
