@@ -1,5 +1,6 @@
+#[allow(dead_code)]
 struct Solution;
-
+#[allow(dead_code)]
 impl Solution {
     pub fn split_array(nums: Vec<i32>, k: i32) -> i32 {
         let mut left = *nums.iter().max().unwrap();

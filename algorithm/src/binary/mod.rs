@@ -45,3 +45,9 @@ mod find_peak_element;
 mod find_min;
 
 mod split_array;
+
+mod find_kth_number;
+
+mod kth_smallest;
+
+mod my_sqrt;
