@@ -18,6 +18,14 @@ impl Solution {
         //  .partition_point(|&i| nums[i] >= nums[nums.len() - 1]);
         //  nums[pos]
     }
+
+    fn find_min_api(nums: Vec<i32>) -> i32 {
+        let n = nums.len();
+        let pos =  (0..n - 1)
+         .collect::<Vec<_>>()
+         .partition_point(|&i| nums[i] >= nums[nums.len() - 1]);
+         nums[pos]
+    }
 }
 
 #[cfg(test)]
@@ -27,12 +35,15 @@ mod tests {
     #[test]
     fn test_normal_case() {
         let nums = vec![3, 4, 5, 1, 2];
-        assert_eq!(Solution::find_min(nums), 1);
+        assert_eq!(Solution::find_min(nums.clone()), 1);
+        assert_eq!(Solution::find_min_api(nums), 1);
 
         let nums = vec![4, 5, 6, 7, 0, 1, 2];
-        assert_eq!(Solution::find_min(nums), 0);
+        assert_eq!(Solution::find_min(nums.clone()), 0);
+        assert_eq!(Solution::find_min_api(nums), 0);
 
         let nums = vec![11, 13, 15, 17];
-        assert_eq!(Solution::find_min(nums), 11);
+        assert_eq!(Solution::find_min(nums.clone()), 11);
+        assert_eq!(Solution::find_min_api(nums), 11);
     }
 }

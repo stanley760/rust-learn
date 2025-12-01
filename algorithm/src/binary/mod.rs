@@ -44,6 +44,8 @@ mod find_peak_element;
 
 mod find_min;
 
+mod find_min_ii;
+
 mod split_array;
 
 mod find_kth_number;
@@ -53,3 +55,7 @@ mod kth_smallest;
 mod my_sqrt;
 
 mod search_matrix;
+
+mod guess_number;
+
+mod peak_index_in_mountain_array;
