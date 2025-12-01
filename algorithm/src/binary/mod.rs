@@ -20,6 +20,8 @@ mod num_smaller_by_frequency;
 
 mod search;
 
+mod search_33;
+
 mod search_insert;
 
 mod search_range;
