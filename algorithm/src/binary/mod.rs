@@ -63,3 +63,5 @@ mod guess_number;
 mod peak_index_in_mountain_array;
 
 mod count_complete_tree_nodes;
+
+mod single_element_in_a_sorted_array;
