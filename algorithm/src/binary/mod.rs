@@ -20,8 +20,6 @@ mod num_smaller_by_frequency;
 
 mod search;
 
-mod search_33;
-
 mod search_insert;
 
 mod search_range;
@@ -42,6 +40,8 @@ mod find_peak_grid;
 
 mod search_rotated_sorted_array;
 
+mod search_rotated_sorted_array_ii;
+
 mod find_peak_element;
 
 mod find_min;
@@ -61,3 +61,5 @@ mod search_matrix;
 mod guess_number;
 
 mod peak_index_in_mountain_array;
+
+mod count_complete_tree_nodes;
