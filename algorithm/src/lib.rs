@@ -21,6 +21,8 @@ pub mod sliding_window;
 pub mod invalid_ip_address;
 pub mod sorting;
 
+pub mod stack_monotonic;
+
 pub use algo_search::binary_search;
 pub use algo_sort::*;
 pub use array::*;
