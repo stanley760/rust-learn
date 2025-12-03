@@ -20,7 +20,9 @@ impl Solution {
                     stack.pop();
                 } 
             }
-            stack.push(x);
+            if index.contains_key(&x) {
+                stack.push(x);
+            }
         }
         
         res
