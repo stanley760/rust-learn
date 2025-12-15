@@ -1,5 +1,7 @@
+#[allow(dead_code)]
 struct Solution;
 
+#[allow(dead_code)]
 impl Solution {
     pub fn maximal_square(matrix: Vec<Vec<char>>) -> i32 {
         let n = matrix[0].len();

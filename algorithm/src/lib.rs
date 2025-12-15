@@ -23,6 +23,8 @@ pub mod sorting;
 
 pub mod stack_monotonic;
 
+pub mod grid;
+
 pub use algo_search::binary_search;
 pub use algo_sort::*;
 pub use array::*;
