@@ -1,5 +1,6 @@
+#[allow(dead_code)]
 struct Solution;
-
+#[allow(dead_code)]
 impl Solution {
     pub fn car_fleet(target: i32, position: Vec<i32>, speed: Vec<i32>) -> i32 {
         let mut ps = position.iter().zip(speed.iter()).collect::<Vec<_>>();
