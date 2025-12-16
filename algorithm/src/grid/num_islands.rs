@@ -1,5 +1,7 @@
+#[allow(dead_code)]
 struct Solution;
 
+#[allow(dead_code)]
 // set a flag that represents to visited.
 impl Solution {
     pub fn num_islands(grid: Vec<Vec<char>>) -> i32 {
