@@ -15,14 +15,21 @@ impl Solution {
             .collect::<Vec<_>>();
 
         fn dfs(grid: &mut Vec<Vec<i32>>, i: usize, j: usize, ch: i32) -> i32 {
-            if i >= grid.len() || j >= grid[0].len() || grid[i][j] == 0 || grid[i][j] > 5 {
+            // exclude cells that are 0 or adjacent to 0.
+            if i >= grid.len() || j >= grid[0].len() || grid[i][j] == 0  {
+                return i32::MIN;
+            }
+            // avoid reprocessing or including zero-valued cells in the result, 
+            // especially since the visited marker is 6
+            if grid[i][j] == 6 {
                 return 0;
             }
             let mut area: i32 = 0;
-            area += 1;
-            grid[i][j] = 6;
+           
             // notice: the condition
             if grid[i][j] == ch {
+                area += 1;
+                grid[i][j] = 6;
                 area += dfs(grid, i, j + 1, ch);
                 area += dfs(grid, i, j.wrapping_sub(1), ch);
                 area += dfs(grid, i + 1, j, ch);
