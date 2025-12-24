@@ -4,45 +4,43 @@ struct Solution;
 #[allow(dead_code)]
 impl Solution {
     pub fn largest_area(grid: Vec<String>) -> i32 {
-        let mut grid = grid
-            .iter()
-            .map(|g| {
-                g.chars()
-                    .into_iter()
-                    .map(|c| (c as u8 - b'0') as i32)
-                    .collect::<Vec<_>>()
-            })
+        let mut grid = grid.iter()
+            .map(|g| g.chars().into_iter().map(|c| (c as u8 - b'0') as i32).collect::<Vec<_>>())
             .collect::<Vec<_>>();
-
-        fn dfs(grid: &mut Vec<Vec<i32>>, i: usize, j: usize, ch: i32) -> i32 {
-            // exclude cells that are 0 or adjacent to 0.
-            if i >= grid.len() || j >= grid[0].len() || grid[i][j] == 0  {
-                return i32::MIN;
+        fn dfs(grid: &mut Vec<Vec<i32>>, i: isize, j: isize, ch: i32) -> i32 {
+            // out of bound
+            if i < 0 || i >= (grid.len() as isize) || j < 0 || j >= (grid[0].len() as isize)  {
+                 return -1111;
             }
-            // avoid reprocessing or including zero-valued cells in the result, 
-            // especially since the visited marker is 6
+            let i = i as usize;
+            let j = j as usize;
+            // water or visited
+            if grid[i][j] == 0 {
+                return -1111;
+            } 
             if grid[i][j] == 6 {
                 return 0;
             }
-            let mut area: i32 = 0;
-           
-            // notice: the condition
+            let mut total = 0;
             if grid[i][j] == ch {
-                area += 1;
+                total += 1;
                 grid[i][j] = 6;
-                area += dfs(grid, i, j + 1, ch);
-                area += dfs(grid, i, j.wrapping_sub(1), ch);
-                area += dfs(grid, i + 1, j, ch);
-                area += dfs(grid, i.wrapping_sub(1), j, ch);
-            }
-            area
+                total += dfs(grid, i as isize + 1 , j as isize, ch);
+                total += dfs(grid, i as isize - 1, j as isize, ch);
+                total += dfs(grid, i as isize, j as isize + 1, ch);
+                total += dfs(grid, i as isize, j as isize - 1 , ch);
+                
+            } 
+            total
+            
         }
-        let mut ans: i32 = 0;
+
+        let mut ans = 0;
         for i in 0..grid.len() {
-            for j in 0..grid[i].len() {
+            for j in 0..grid[0].len() {
                 let ch = grid[i][j];
                 if ch != 0 {
-                    ans = ans.max(dfs(&mut grid, i, j, ch));
+                    ans = ans.max(dfs(&mut grid, i as isize, j as isize, ch));
                 }
             }
         }

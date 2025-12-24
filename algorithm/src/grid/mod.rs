@@ -6,3 +6,4 @@ pub mod largest_area;
 pub mod island_perimeter;
 pub mod find_max_fish;
 pub mod flood_fill;
+pub mod color_border;
