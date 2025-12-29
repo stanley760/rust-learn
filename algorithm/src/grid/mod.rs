@@ -9,3 +9,5 @@ pub mod flood_fill;
 pub mod color_border;
 pub mod num_enclaves;
 pub mod max_moves;
+pub mod solve;
+pub mod closed_island;
