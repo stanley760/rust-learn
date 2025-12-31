@@ -40,7 +40,7 @@ impl Solution {
 
 #[cfg(test)]
 mod tests {
-    use crate::grid::find_max_fish::Solution;
+    use super::*;
 
 
     #[test]

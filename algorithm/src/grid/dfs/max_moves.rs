@@ -34,7 +34,7 @@ impl Solution {
 
 #[cfg(test)]
 mod tests {
-    use crate::grid::max_moves::Solution;
+    use super::Solution;
 
     #[test]
     pub fn test_normal_case() {

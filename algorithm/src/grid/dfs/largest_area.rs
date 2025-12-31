@@ -50,7 +50,7 @@ impl Solution {
 
 #[cfg(test)]
 mod tests {
-    use crate::grid::largest_area::Solution;
+    use super::*;
 
     #[test]
     pub fn test_normal_case() {

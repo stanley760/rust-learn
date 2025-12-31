@@ -45,7 +45,7 @@ impl Solution {
 
 #[cfg(test)]
 mod tests {
-    use crate::grid::color_border::Solution;
+    use super::*;
 
     #[test]
     pub fn test_normal_case() {

@@ -58,7 +58,7 @@ impl Solution {
 
 #[cfg(test)]
 mod tests {
-    use crate::grid::count_islands::Solution;
+    use super::*;
 
     #[test]
     pub fn test_normal_case() {
