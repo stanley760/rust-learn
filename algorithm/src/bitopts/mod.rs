@@ -11,3 +11,7 @@ pub mod has_alternating_bits;
 pub mod find_the_prefix_common_array;
 pub mod insert_bits;
 pub mod is_power_of_two;
+pub mod hamming_weight;
+pub mod count_bits;
+pub mod even_odd_bit;
+pub mod find_final_value;
