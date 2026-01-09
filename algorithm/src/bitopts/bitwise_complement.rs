@@ -1,6 +1,6 @@
-
-
+#[allow(dead_code)]
 struct Solution;
+#[allow(dead_code)]
 impl Solution {
     pub fn bitwise_complement(n: i32) -> i32 {
         let ans = if n == 0 {
