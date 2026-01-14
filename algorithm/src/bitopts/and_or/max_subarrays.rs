@@ -18,6 +18,7 @@ impl Solution {
     }
 }
 
+// cargo test --package algorithm --lib -- bitopts::and_or::max_subarrays::tests --nocapture
 #[cfg(test)]
 mod tests {
     use crate::and_or::max_subarrays::Solution;

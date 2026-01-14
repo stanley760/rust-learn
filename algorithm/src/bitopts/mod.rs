@@ -17,3 +17,4 @@ pub mod count_bits;
 pub mod even_odd_bit;
 pub mod find_final_value;
 pub mod xor;
+pub mod and_or;
