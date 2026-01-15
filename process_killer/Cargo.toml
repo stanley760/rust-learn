@@ -7,3 +7,5 @@ path = "src/lib.rs"
 [dependencies]
 dioxus = { version = "0.7.2", features = ["desktop"] }
 image = "0.25.1"
+sysinfo = "0.37.2"
+tokio = { version = "1", features = ["time"] }
