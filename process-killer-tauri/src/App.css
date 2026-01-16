@@ -1,0 +1,77 @@
+/* 全局样式重置和基础配置 */
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 400;
+
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #141414;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: #141414;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* App 容器样式 - 使用 Flexbox 实现响应式布局 */
+.app-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #141414;
+  padding: 0;
+  position: relative;
+  overflow-y: auto;
+}
+
+/* 确保过渡效果 */
+.app-container * {
+  transition: all 0.3s ease;
+}
+
+/* 响应式布局 - 平板设备 */
+@media (max-width: 1024px) {
+  :root {
+    font-size: 15px;
+  }
+}
+
+/* 响应式布局 - 移动设备 */
+@media (max-width: 768px) {
+  :root {
+    font-size: 14px;
+  }
+  
+  .app-container {
+    padding: 0;
+  }
+}
+
+/* 响应式布局 - 小屏幕移动设备 */
+@media (max-width: 480px) {
+  :root {
+    font-size: 13px;
+  }
+}

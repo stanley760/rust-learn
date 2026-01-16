@@ -1,0 +1,112 @@
+/* ControlPanel 组件样式 */
+.control-panel {
+  border-radius: 8px;
+  padding: 16px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 内联单行布局 */
+.control-row-inline {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* 控制项（标签 + 输入框组合） */
+.control-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 内联标签样式 */
+.control-label-inline {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  white-space: nowrap;
+  margin: 0;
+  padding: 0;
+}
+
+/* 输入框样式 */
+.control-input {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+}
+
+.control-input:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(64, 169, 255, 0.5) !important;
+}
+
+.control-input:focus {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(64, 169, 255, 0.8) !important;
+  box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.2) !important;
+}
+
+.control-input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .control-row-inline {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .control-panel {
+    padding: 12px 16px;
+  }
+
+  .control-row-inline {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .control-item {
+    width: 100%;
+  }
+
+  .control-item .control-input {
+    flex: 1;
+    width: 100% !important;
+  }
+
+  .control-label-inline {
+    min-width: 50px;
+    font-size: 13px;
+  }
+
+  .control-row-inline > button {
+    width: 100%;
+  }
+}
+
+/* 暗色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .control-panel {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .control-input {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .control-input:hover {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border-color: rgba(64, 169, 255, 0.4) !important;
+  }
+
+  .control-input:focus {
+    background: rgba(0, 0, 0, 0.5) !important;
+    border-color: rgba(64, 169, 255, 0.6) !important;
+  }
+}

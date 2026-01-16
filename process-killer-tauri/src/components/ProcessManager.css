@@ -1,0 +1,97 @@
+.process-manager {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.process-manager-header {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.process-manager-header p {
+  font-size: 16px;
+  margin: 0;
+}
+
+.control-panel-container {
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.process-table-container {
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
+}
+
+/* 让表格占据剩余空间 */
+.process-table-container :global(.ant-table-wrapper) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.process-table-container :global(.ant-spin-nested-loading) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.process-table-container :global(.ant-spin-container) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 确保分页器固定在底部 */
+.process-table-container :global(.ant-pagination) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: auto !important;
+  padding-top: 16px;
+}
+
+.process-table-container :global(.ant-pagination-options) {
+  margin-left: 8px;
+}
+
+.error-message {
+  padding: 12px 16px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  color: #ff4d4f;
+  font-size: 14px;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .process-manager {
+    padding: 16px;
+  }
+
+  .process-manager-header h1 {
+    font-size: 24px;
+  }
+
+  .process-manager-header p {
+    font-size: 14px;
+  }
+
+  .process-table-container {
+    padding: 5px;
+  }
+}
