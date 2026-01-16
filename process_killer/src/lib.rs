@@ -4,5 +4,4 @@ pub mod action {
 
 pub mod ui {
     pub mod draw;
-    pub mod message;
 }

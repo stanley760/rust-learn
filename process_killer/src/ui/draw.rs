@@ -1,6 +1,6 @@
 use crate::action::process::Process;
 use dioxus::prelude::*;
-
+static CSS : Asset = asset!("/assets/style.css");
 pub fn app() -> Element {
     let header_txt: [&str; 5] = ["协议", "本地地址", "远程地址", "状态", "PID"];
     let init_datas: Vec<Vec<String>> = Process::run()
@@ -117,9 +117,11 @@ pub fn app() -> Element {
     rsx!(
         title { "Process Killer" }
         body {
-            link { rel: "stylesheet", href: "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"}
-            link { rel: "stylesheet", href: "process_killer/assets/style.css"}
-
+            link {
+                rel: "stylesheet",
+                href: "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap",
+            }
+            document::Stylesheet { href: CSS }
             // 显示错误消息
             if !error_message.read().is_empty() {
                 div { class: "error-message", "{error_message}" }
@@ -130,10 +132,9 @@ pub fn app() -> Element {
                 div { class: "success-message", "{success_message}" }
             }
 
-            div {
-                class: "div-form",
+            div { class: "div-form",
 
-                label { r#for: "port-input", class: "port", "端口:"}
+                label { r#for: "port-input", class: "port", "端口:" }
                 input {
                     id: "port-input",
                     name: "port-input",
@@ -144,28 +145,16 @@ pub fn app() -> Element {
                         error_message.set(String::new());
                         success_message.set(String::new());
                     },
-                    class: "port"
+                    class: "port",
                 }
 
-                button {
-                    class: "btn-search",
-                    onclick: handle_search,
-                    "搜索"
-                }
+                button { class: "btn-search", onclick: handle_search, "搜索" }
 
-                button {
-                    class: "btn-refresh",
-                    onclick: handle_refresh,
-                    "刷新"
-                }
+                button { class: "btn-refresh", onclick: handle_refresh, "刷新" }
 
-                button {
-                    class: "btn-reset",
-                    onclick: handle_reset,
-                    "重置"
-                }
+                button { class: "btn-reset", onclick: handle_reset, "重置" }
 
-                label { r#for: "pid-input", "PID:"}
+                label { r#for: "pid-input", "PID:" }
                 input {
                     id: "pid-input",
                     name: "pid-input",
@@ -176,35 +165,43 @@ pub fn app() -> Element {
                         error_message.set(String::new());
                         success_message.set(String::new());
                     },
-                    class: "pid"
+                    class: "pid",
                 }
 
-                button {
-                    class: "btn-kill",
-                    onclick: handle_kill,
-                    "终止进程"
-                }
+                button { class: "btn-kill", onclick: handle_kill, "终止进程" }
             }
 
             div { class: "table-container",
                 table {
                     thead {
-                        tr {{ header_txt.iter().map(|header_text| rsx!{th { "{header_text}" }}) }}
+                        tr {
+                            {header_txt.iter().map(|header_text| rsx! {
+                                th { "{header_text}" }
+                            })}
+                        }
                     }
 
                     tbody {
-                        {datas.read().iter().enumerate().map(|(idx, data)| {
-                            let pid_data = data.last().cloned().unwrap_or_default();
-                            rsx! {
-                                tr {
-                                    key: "{idx}",
-                                    onclick: move |_| {
-                                        pid_value.set(pid_data.clone());
-                                    },
-                                    {data.iter().map(|x| rsx!{td { "{x}" }})}
-                                }
-                            }
-                        })}
+                        {
+                            datas
+                                .read()
+                                .iter()
+                                .enumerate()
+                                .map(|(idx, data)| {
+                                    let pid_data = data.last().cloned().unwrap_or_default();
+                                    rsx! {
+                                        tr {
+                                            key: "{idx}",
+                                            onclick: move |_| {
+                                                pid_value.set(pid_data.clone());
+                                            },
+                                            {data.iter().map(|x| rsx! {
+                                                td { "{x}" }
+                                            })}
+                                        }
+                                    }
+                                })
+                        }
                     }
                 }
             }
