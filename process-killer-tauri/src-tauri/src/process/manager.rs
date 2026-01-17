@@ -1,6 +1,6 @@
 use super::{NetStatParser, SysInfoWrapper};
 use crate::error::ProcessError;
-use crate::types::ProcessRecord;
+use crate::types::{PageRequest, PageResponse, ProcessRecord};
 
 /// Process Manager
 /// 核心业务逻辑模块，封装进程管理功能
@@ -30,6 +30,27 @@ impl ProcessManager {
         let processes = NetStatParser::parse(&output);
 
         Ok(processes)
+    }
+
+    /// 获取所有网络连接进程（分页）
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - 分页请求参数
+    ///
+    /// # Returns
+    ///
+    /// * `Ok(PageResponse<ProcessRecord>)` - 成功返回分页数据
+    /// * `Err(ProcessError)` - 获取失败返回错误
+    pub fn get_all_processes_paginated(
+        &mut self,
+        request: &PageRequest,
+    ) -> Result<PageResponse<ProcessRecord>, ProcessError> {
+        // 获取所有进程
+        let all_processes = self.get_all_processes()?;
+
+        // 应用分页
+        Ok(Self::paginate(all_processes, request))
     }
 
     /// 按端口号搜索进程
@@ -71,6 +92,57 @@ impl ProcessManager {
         Ok(filtered_processes)
     }
 
+    /// 按端口号搜索进程（分页）
+    ///
+    /// # Arguments
+    ///
+    /// * `port` - 端口号字符串
+    /// * `request` - 分页请求参数
+    ///
+    /// # Returns
+    ///
+    /// * `Ok(PageResponse<ProcessRecord>)` - 成功返回分页数据
+    /// * `Err(ProcessError)` - 搜索失败返回错误
+    pub fn search_by_port_paginated(
+        &mut self,
+        port: &str,
+        request: &PageRequest,
+    ) -> Result<PageResponse<ProcessRecord>, ProcessError> {
+        // 验证端口输入非空
+        if port.trim().is_empty() {
+            return Err(ProcessError::EmptyPort);
+        }
+
+        // 验证端口输入为数字
+        let port_num = port
+            .trim()
+            .parse::<u32>()
+            .map_err(|_| ProcessError::InvalidPort)?;
+
+        // 获取所有进程
+        let all_processes = self.get_all_processes()?;
+
+        // 过滤包含指定端口的进程
+        let filtered_processes: Vec<ProcessRecord> = all_processes
+            .into_iter()
+            .filter(|process| Self::extract_port(&process.local_address) == Some(port_num))
+            .collect();
+
+        // 如果没有找到匹配的进程，返回空分页结果
+        if filtered_processes.is_empty() {
+            return Ok(PageResponse {
+                data: vec![],
+                page: request.page,
+                page_size: request.page_size,
+                total: 0,
+                total_pages: 0,
+            });
+        }
+
+        // 应用分页
+        Ok(Self::paginate(filtered_processes, request))
+    }
+
     /// 从地址字符串中提取端口号
     ///
     /// 支持 IPv4 格式（IP:Port）和 IPv6 格式（[IP]:Port）
@@ -101,6 +173,50 @@ impl ProcessManager {
         }
 
         None
+    }
+
+    /// 对数据进行分页处理
+    ///
+    /// # Arguments
+    ///
+    /// * `data` - 原始数据列表
+    /// * `request` - 分页请求参数
+    ///
+    /// # Returns
+    ///
+    /// * `PageResponse<ProcessRecord>` - 分页响应数据
+    fn paginate(data: Vec<ProcessRecord>, request: &PageRequest) -> PageResponse<ProcessRecord> {
+        let total = data.len();
+        let page_size = request.page_size.max(1); // 确保 page_size 至少为 1
+        let total_pages = (total + page_size - 1) / page_size; // 向上取整
+
+        // 确保页码在有效范围内
+        let page = if request.page < 1 {
+            1
+        } else if request.page > total_pages && total_pages > 0 {
+            total_pages
+        } else {
+            request.page
+        };
+
+        // 计算起始和结束索引
+        let start = (page - 1) * page_size;
+        let end = (start + page_size).min(total);
+
+        // 提取当前页数据
+        let page_data = if start < total {
+            data[start..end].to_vec()
+        } else {
+            vec![]
+        };
+
+        PageResponse {
+            data: page_data,
+            page,
+            page_size,
+            total,
+            total_pages,
+        }
     }
 
     /// 终止指定 PID 的进程

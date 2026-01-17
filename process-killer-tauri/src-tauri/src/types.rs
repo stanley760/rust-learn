@@ -16,6 +16,30 @@ pub struct ProcessRecord {
     pub pid: String,
 }
 
+/// 分页请求参数
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PageRequest {
+    /// 当前页码（从 1 开始）
+    pub page: usize,
+    /// 每页数量
+    pub page_size: usize,
+}
+
+/// 分页响应数据
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PageResponse<T> {
+    /// 当前页数据
+    pub data: Vec<T>,
+    /// 当前页码
+    pub page: usize,
+    /// 每页数量
+    pub page_size: usize,
+    /// 总记录数
+    pub total: usize,
+    /// 总页数
+    pub total_pages: usize,
+}
+
 /// 操作系统类型枚举
 /// 用于识别当前操作系统并提供对应的 netstat 命令
 #[derive(Debug, Clone, Copy)]

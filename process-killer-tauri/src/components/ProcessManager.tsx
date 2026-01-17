@@ -19,9 +19,12 @@ export const ProcessManager: React.FC = () => {
     processes,
     loading,
     error,
+    total,
+    hasMore,
     refreshProcesses,
     searchByPort,
     killProcess,
+    loadMore,
   } = useProcesses();
 
   // 本地状态：PID 输入框的值（用于行点击填充）
@@ -36,7 +39,7 @@ export const ProcessManager: React.FC = () => {
   const handleRowClick = (record: ProcessRecord) => {
     // 设置 PID 值
     setPidValue(record.pid);
-    
+
     // 清空所有错误和成功消息
     message.destroy();
   };
@@ -48,7 +51,7 @@ export const ProcessManager: React.FC = () => {
   const handleRefresh = async () => {
     // 清空 PID 输入框
     setPidValue('');
-    
+
     // 调用刷新进程列表
     await refreshProcesses();
   };
@@ -60,7 +63,7 @@ export const ProcessManager: React.FC = () => {
   const handleReset = () => {
     // 清空 PID 输入框
     setPidValue('');
-    
+
     // 清空所有消息
     message.destroy();
   };
@@ -83,6 +86,9 @@ export const ProcessManager: React.FC = () => {
           data={processes}
           loading={loading}
           onRowClick={handleRowClick}
+          total={total}
+          hasMore={hasMore}
+          onLoadMore={loadMore}
         />
       </div>
 

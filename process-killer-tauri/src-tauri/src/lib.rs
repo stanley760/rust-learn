@@ -4,7 +4,9 @@ pub mod error;
 pub mod process;
 pub mod types;
 
-use commands::{get_processes, kill_process, search_by_port};
+use commands::{
+    get_processes, get_processes_paginated, kill_process, search_by_port, search_by_port_paginated,
+};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -19,7 +21,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             greet,
             get_processes,
+            get_processes_paginated,
             search_by_port,
+            search_by_port_paginated,
             kill_process
         ])
         .run(tauri::generate_context!())

@@ -16,6 +16,23 @@ export interface ProcessRecord {
 }
 
 /**
+ * 分页响应接口
+ * 与后端 Rust PageResponse 结构体保持一致
+ */
+export interface PageResponse<T> {
+  /** 当前页数据 */
+  data: T[];
+  /** 当前页码 */
+  page: number;
+  /** 每页数量 */
+  page_size: number;
+  /** 总记录数 */
+  total: number;
+  /** 总页数 */
+  total_pages: number;
+}
+
+/**
  * API 错误类型
  * 用于表示后端返回的错误信息
  */
