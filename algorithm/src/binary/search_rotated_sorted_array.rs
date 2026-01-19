@@ -40,6 +40,31 @@ impl Solution {
             Self::lower_bound(&nums, i, nums.len(), target) // 左闭右开区间 [i, n)
         }
     }
+
+    pub fn search_v1(nums: Vec<i32>, target: i32) -> i32 {
+        let is_blue = |i| -> bool{
+            if nums[0] <= nums[i] {
+                nums[0] <= target && target <= nums[i]
+            } else {
+                target <= nums[i] || nums[0] <= target
+            }
+        };
+        let mut left = 0;
+        let mut right = nums.len();
+        while left < right {
+            let mid = (left + right) >> 1;
+            if is_blue(mid) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        if left == nums.len() || nums[left] != target {
+            -1
+        } else {
+            left as i32
+        }
+    }
 }
 
 //  cargo test --package algorithm --lib -- binary::search_33::tests --nocapture
@@ -64,6 +89,19 @@ mod tests {
     fn test_search_single_element() {
         let nums = vec![1];
         let target = 0;
+        assert_eq!(Solution::search(nums, target), -1);
+    }
+
+    #[test]
+    fn test_case_v1() {
+         let nums = vec![4, 5, 6, 7, 0, 1, 2];
+        let target = 0;
+        assert_eq!(Solution::search_v1(nums.clone(), target), 4);
+        let nums = vec![4, 5, 6, 7, 0, 1, 2];
+        let target = 3;
+        assert_eq!(Solution::search(nums, target), -1);
+         let nums = vec![4, 5, 6, 7, 0, 1, 2];
+        let target = 3;
         assert_eq!(Solution::search(nums, target), -1);
     }
 }
