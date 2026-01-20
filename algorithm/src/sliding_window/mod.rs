@@ -40,3 +40,5 @@ mod add_spaces;
 mod get_common;
 
 mod merge;
+
+mod find_anagrams;

@@ -26,7 +26,7 @@ pub mod stack_monotonic;
 pub mod grid;
 
 pub mod bitopts;
-
+pub mod data_struct;
 pub use algo_search::binary_search;
 pub use algo_sort::*;
 pub use array::*;
