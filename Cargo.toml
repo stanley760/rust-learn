@@ -1,7 +1,6 @@
 [workspace]
-members = ["algorithm", "concurrency",
-    "exercise", "getinfo",
-    "grep", "halo_web", "httpie", "kv_server", "process_killer", "rcli", "simple-redis", "thumbor", "todolist",
+members = ["algorithm", "concurrency", "exercise", "getinfo", "grep", "halo_web", "httpie", 
+    "kv_server", "process_killer", "rcli", "simple-redis", "thumbor", "todolist", "bert_similarity",
 ]
 resolver = "2"
 

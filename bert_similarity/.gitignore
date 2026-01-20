@@ -1,0 +1,34 @@
+# Rust
+/target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+
+# Model files and checkpoints
+checkpoints/
+models/
+*.safetensors
+*.bin
+
+# Python (for comparison/testing)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db

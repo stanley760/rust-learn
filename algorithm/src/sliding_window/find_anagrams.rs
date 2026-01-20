@@ -1,5 +1,6 @@
+#[allow(dead_code)]
 struct Solution;
-
+#[allow(dead_code)]
 impl Solution {
     pub fn find_anagrams(s: String, p: String) -> Vec<i32> {
         let mut cnt_p = vec![0; 26];
