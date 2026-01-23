@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cargo tree:*)",
+      "Bash(cargo build:*)",
+      "Bash(cargo check:*)",
+      "Bash(cargo test:*)",
+      "Bash(cargo doc:*)",
+      "WebSearch",
+      "mcp__zread__search_doc",
+      "Bash(powershell:*)",
+      "Bash(cargo clippy:*)",
+      "mcp__web-search-prime__webSearchPrime",
+      "mcp__zread__read_file"
+    ]
+  }
+}

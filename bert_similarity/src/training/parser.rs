@@ -145,7 +145,7 @@ pub fn parse_training_data<R: Read>(
     let mut data = String::new();
     reader
         .read_to_string(&mut data)
-        .map_err(|e| AppError::IoError(e))?;
+        .map_err(AppError::IoError)?;
 
     match format {
         DataFormat::Json => parse_json(&data),

@@ -42,7 +42,7 @@ pub fn init_logger(config: &LoggingConfig) -> anyhow::Result<()> {
 
     // Create environment filter
     let env_filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new(format!("rust_semantic_similarity={}", level)));
+        .unwrap_or_else(|_| EnvFilter::new(format!("bert_similarity={}", level)));
 
     // Create console layer with structured format
     let console_layer = fmt::layer()
@@ -81,7 +81,11 @@ pub fn init_logger(config: &LoggingConfig) -> anyhow::Result<()> {
             .with_filter(env_filter);
 
         subscriber.with(file_layer).init();
-        tracing::info!("Logger initialized with level: {} (file: {})", level, file_path);
+        tracing::info!(
+            "Logger initialized with level: {} (file: {})",
+            level,
+            file_path
+        );
     } else {
         subscriber.init();
         tracing::info!("Logger initialized with level: {}", level);

@@ -78,7 +78,7 @@ impl ApiServer {
             .route("/bulk_similarity", post(bulk_similarity_handler))
             // Fine-tuning endpoints
             .route("/finetune", post(finetune_handler))
-            .route("/finetune/status/:job_id", get(finetune_status_handler))
+            .route("/finetune/status/{job_id}", get(finetune_status_handler))
             // Model management endpoints
             .route("/model/load", post(load_model_handler))
             // Add shared state

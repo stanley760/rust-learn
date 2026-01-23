@@ -14,6 +14,7 @@ use crate::api::models::{
     HealthResponse, FinetuneRequest, FinetuneResponse,
     FinetuneStatusResponse, LoadModelRequest,
 };
+use crate::api::service::FinetuneService;
 use crate::model::ModelEngine;
 use crate::utils::AppError;
 
@@ -182,20 +183,20 @@ pub async fn root_handler() -> (StatusCode, Json<serde_json::Value>) {
 }
 
 /// Handler for POST /finetune endpoint
-/// 
+///
 /// Starts a fine-tuning job in the background
-/// 
+///
 /// # Arguments
 /// * `State(state)` - Shared application state
 /// * `Json(request)` - JSON request body with training data and parameters
-/// 
+///
 /// # Returns
 /// * `Result<Json<FinetuneResponse>>` - JSON response with job ID and status
-/// 
+///
 /// # Errors
 /// * Returns 400 Bad Request if training data is invalid
 /// * Returns 500 Internal Server Error if job creation fails
-/// 
+///
 /// Requirements: 6.3, 4.1
 pub async fn finetune_handler(
     State(state): State<AppState>,
@@ -206,11 +207,9 @@ pub async fn finetune_handler(
         request.training_data.len()
     );
 
-    // Validate training data
-    use crate::training::validate_training_data;
-    
-    validate_training_data(&request.training_data)
-        .map_err(|e| AppError::InvalidInput(format!("Training data validation failed: {}", e)))?;
+    // Create service and validate training data
+    let service = FinetuneService::new(state.model_engine.clone());
+    service.validate_training_data(&request.training_data)?;
 
     // Get parameters or use defaults
     let params = request.params.unwrap_or_default();
@@ -228,7 +227,7 @@ pub async fn finetune_handler(
     // Spawn background task for training
     tokio::spawn(async move {
         tracing::info!("Starting fine-tuning job {} in background", job_id_clone);
-        
+
         // Set job to running
         job_manager.set_job_running(&job_id_clone);
 
@@ -383,48 +382,49 @@ pub async fn load_model_handler(
 }
 
 /// Execute a fine-tuning job
-/// 
+///
 /// This is a helper function that runs the actual training process
 async fn execute_finetune_job(
-    _model_engine: Arc<ModelEngine>,
+    model_engine: Arc<ModelEngine>,
     training_data: Vec<crate::api::models::TrainingPair>,
     params: crate::api::models::FinetuneParams,
     job_manager: &crate::api::FinetuneJobManager,
     job_id: &str,
 ) -> Result<(), AppError> {
-    use crate::training::TrainingDataset;
+    // Create service layer
+    let service = FinetuneService::new(model_engine);
 
-    // Convert training data to the format expected by the trainer
-    let dataset = TrainingDataset::new(training_data);
+    // Validate training data using service
+    service.validate_training_data(&training_data)?;
 
-    // Create trainer
-    // Note: In a full implementation, we would need to extract the model from ModelEngine
-    // and wrap it in Arc<Mutex<>> for the trainer. For now, this is a placeholder.
-    // The actual implementation would require refactoring ModelEngine to support
-    // extracting and re-wrapping the model.
-    
+    // Prepare dataset using service
+    let dataset = service.prepare_dataset(training_data);
+
+    // Note: In a full implementation, we would:
+    // 1. Extract the model from ModelEngine
+    // 2. Create a FinetuneTrainer using service.create_trainer()
+    // 3. Call service.execute_training() with the trainer
+    // 4. Update job progress during training
+    // 5. Save the fine-tuned model
+    // 6. Update ModelEngine with the new model
+    //
+    // The service layer is now integrated, but the actual training execution
+    // requires ModelEngine to support model extraction, which is a future enhancement.
+
     tracing::info!("Training with {} samples for {} epochs", dataset.len(), params.num_epochs);
 
     // Simulate training progress updates
-    // In a real implementation, the trainer would call job_manager.update_job_progress
-    // during training
+    // In a real implementation, the service.execute_training() would handle this
     for epoch in 1..=params.num_epochs {
         // Simulate epoch processing
         tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
-        
+
         let simulated_loss = 1.0 / (epoch as f32 + 1.0);
         job_manager.update_job_progress(job_id, epoch, Some(simulated_loss));
-        
+
         tracing::debug!("Job {} - Epoch {}/{} completed", job_id, epoch, params.num_epochs);
     }
 
-    // Note: Full implementation would:
-    // 1. Create a FinetuneTrainer with the model
-    // 2. Call trainer.train() with the dataset
-    // 3. Update job progress during training
-    // 4. Save the fine-tuned model
-    // 5. Update ModelEngine with the new model
-    
     tracing::info!("Fine-tuning job {} training completed", job_id);
 
     Ok(())
