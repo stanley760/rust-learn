@@ -8,12 +8,45 @@ max_connections = 100
 
 [model]
 # Model configuration
+#
+# RECOMMENDED MODELS FOR CHINESE SEMANTIC SIMILARITY:
+#
+# 1. shibing624/text2vec-base-chinese
+#    - Specialized for Chinese semantic similarity
+#    - Trained on 120M+ Chinese sentence pairs
+#    - Model size: ~100MB | Hidden size: 768 | Sequence length: 512
+#    - BEST FOR: General Chinese semantic similarity, paraphrase detection
+#
+# 2. shibing624/text2vec-base-chinese-paraphrase
+#    - Chinese paraphrase detection model
+#    - Trained specifically for paraphrase identification
+#    - Model size: ~100MB | Hidden size: 768 | Sequence length: 256
+#    - BEST FOR: Detecting paraphrases, rephrased sentences like "站在风口的猪都会飞" vs "他赶上了机遇，事业成功了"
+#
+# 3. moka-ai/m3e-base
+#    - Multi-task Chinese embedding model
+#    - Trained on diverse Chinese NLP tasks
+#    - Model size: ~400MB | Hidden size: 768 | Sequence length: 512
+#    - BEST FOR: General purpose Chinese embeddings, good balance of performance and speed
+#
+# 4. sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 (current)
+#    - Multilingual paraphrase model
+#    - Supports 100+ languages including Chinese
+#    - Model size: ~470MB | Hidden size: 384 | Sequence length: 512
+#    - BEST FOR: Multilingual applications, decent Chinese performance
+#
+# RECOMMENDATION: Use "shibing624/text2vec-base-chinese-paraphrase" for best Chinese paraphrase detection
 model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-# Optional: specify custom model path
+
+# Optional: specify custom model path instead of Hugging Face model
 # model_path = "/path/to/custom/model"
+
 # Device selection: "auto", "cuda", "metal", "cpu"
 device = "auto"
-max_sequence_length = 128
+
+# Maximum sequence length (increase for longer sentences)
+# Note: text2vec models support up to 512, paraphrase models typically 256
+max_sequence_length = 256
 
 [logging]
 # Logging configuration

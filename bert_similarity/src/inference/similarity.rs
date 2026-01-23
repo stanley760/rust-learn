@@ -1,6 +1,7 @@
 // Similarity calculator for computing cosine similarity between embeddings
 
 use crate::inference::opposition::OppositionDetector;
+use crate::inference::semantic::SemanticEquivalenceDetector;
 use crate::utils::AppError;
 
 /// SimilarityCalculator provides methods for computing cosine similarity
@@ -12,16 +13,21 @@ impl SimilarityCalculator {
     ///
     /// This function uses intelligent opposition detection that doesn't rely on hardcoded antonym lists.
     /// It combines multiple strategies:
-    /// 1. Embedding-based opposition (negative cosine similarity)
-    /// 2. Structural similarity with semantic distance
+    /// 1. Embedding-based opposition (negative cosine similarity + distance)
+    /// 2. Structural similarity with semantic distance (high repetition + different keywords)
     /// 3. Negation pattern detection
     /// 4. Sentiment polarity detection
+    ///
+    /// Also applies semantic equivalence bonus for low-overlap but semantically similar sentences:
+    /// - Topic keyword overlap
+    /// - Semantic pattern matching
+    /// - Figurative language detection
     ///
     /// # Arguments
     /// * `vec1` - First embedding vector
     /// * `vec2` - Second embedding vector
-    /// * `text1` - First text (for semantic opposition detection)
-    /// * `text2` - Second text (for semantic opposition detection)
+    /// * `text1` - First text (for semantic opposition/equivalence detection)
+    /// * `text2` - Second text (for semantic opposition/equivalence detection)
     ///
     /// # Returns
     /// * `Result<f32>` - Adjusted cosine similarity score in range [0.0, 1.0]
@@ -37,16 +43,37 @@ impl SimilarityCalculator {
         // Use intelligent opposition detector
         let opposition_score = OppositionDetector::detect_opposition(text1, text2, vec1, vec2)?;
 
-        // Adjust similarity based on opposition
-        // If opposition is detected (score > 0.5), reduce similarity
+        // Check for semantic equivalence (bonus for low-overlap but similar meaning)
+        let semantic_bonus = SemanticEquivalenceDetector::detect_semantic_bonus(
+            text1,
+            text2,
+            base_similarity,
+        ).unwrap_or(0.0);
+
+        // Apply stronger penalty for high opposition scores
+        // Use a graduated curve that increases more sharply at higher opposition levels
         let adjusted_similarity = if opposition_score > 0.5 {
-            let reduction_factor = opposition_score * 0.5; // Max 50% reduction
-            (base_similarity * (1.0 - reduction_factor)).max(0.0)
+            // Very strong opposition: 50-100% reduction
+            let normalized = (opposition_score - 0.5) / 0.5; // 0 to 1
+            let reduction_factor = 0.4 + normalized * 0.5; // 40% to 90% reduction
+            base_similarity * (1.0 - reduction_factor)
+        } else if opposition_score > 0.25 {
+            // Moderate opposition: 10-40% reduction
+            let normalized = (opposition_score - 0.25) / 0.25; // 0 to 1
+            let reduction_factor = 0.1 + normalized * 0.3; // 10% to 40% reduction
+            base_similarity * (1.0 - reduction_factor)
         } else {
             base_similarity
         };
 
-        Ok(adjusted_similarity)
+        // Apply semantic equivalence bonus if detected
+        let final_similarity = if semantic_bonus > 0.0 {
+            (adjusted_similarity + semantic_bonus).min(1.0)
+        } else {
+            adjusted_similarity
+        };
+
+        Ok(final_similarity.max(0.0))
     }
 
     /// Compute cosine similarity between two embedding vectors

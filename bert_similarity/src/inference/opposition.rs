@@ -4,6 +4,21 @@
 use crate::utils::AppError;
 use std::collections::HashMap;
 
+/// Check if a character is a Chinese character (CJK Unified Ideographs)
+fn is_chinese_char(c: char) -> bool {
+    match c {
+        // CJK Unified Ideographs block: U+4E00 to U+9FFF
+        '\u{4E00}'..='\u{9FFF}' => true,
+        // CJK Extension A: U+3400 to U+4DBF
+        '\u{3400}'..='\u{4DBF}' => true,
+        // CJK Extension B: U+20000 to U+2A6DF (needs surrogate handling in UTF-16, but Rust handles UTF-8)
+        // CJK Extension C-F: U+2A700 to U+2B81F
+        // CJK Compatibility Ideographs: U+F900 to U+FAFF
+        '\u{F900}'..='\u{FAFF}' => true,
+        _ => false,
+    }
+}
+
 /// Opposition detector using multiple strategies
 pub struct OppositionDetector;
 
@@ -11,6 +26,12 @@ impl OppositionDetector {
     /// Detect semantic opposition using multiple strategies
     ///
     /// Returns a score from 0.0 to 1.0 indicating likelihood of opposition
+    ///
+    /// Weight distribution:
+    /// - Structural (50%): Most effective for "high repetition, opposite semantics" cases
+    /// - Embedding (25%): Detects opposite directions in embedding space
+    /// - Negation (15%): Catches explicit negation patterns
+    /// - Sentiment (10%): Detects sentiment polarity differences
     pub fn detect_opposition(
         text1: &str,
         text2: &str,
@@ -21,19 +42,20 @@ impl OppositionDetector {
 
         // Strategy 1: Embedding-based opposition detection
         let embedding_opposition = Self::detect_from_embeddings(embedding1, embedding2)?;
-        opposition_scores.push(("embedding", embedding_opposition, 0.4)); // 40% weight
+        opposition_scores.push(("embedding", embedding_opposition, 0.25)); // 25% weight
 
         // Strategy 2: Structural similarity with semantic distance
+        // Increased to 50% as it's most effective for "high repetition, opposite semantics" cases
         let structural_opposition = Self::detect_from_structure(text1, text2)?;
-        opposition_scores.push(("structural", structural_opposition, 0.3)); // 30% weight
+        opposition_scores.push(("structural", structural_opposition, 0.50)); // 50% weight
 
         // Strategy 3: Negation pattern detection
         let negation_opposition = Self::detect_negation_patterns(text1, text2)?;
-        opposition_scores.push(("negation", negation_opposition, 0.2)); // 20% weight
+        opposition_scores.push(("negation", negation_opposition, 0.15)); // 15% weight
 
         // Strategy 4: Sentiment polarity detection
         let sentiment_opposition = Self::detect_sentiment_opposition(text1, text2)?;
-        opposition_scores.push(("sentiment", sentiment_opposition, 0.1)); // 10% weight
+        opposition_scores.push(("sentiment", sentiment_opposition, 0.10)); // 10% weight
 
         // Combine scores with weights
         let total_opposition: f32 = opposition_scores
@@ -47,7 +69,9 @@ impl OppositionDetector {
     /// Strategy 1: Detect opposition from embeddings
     ///
     /// If two texts have high character overlap but embeddings point in opposite directions,
-    /// they likely have opposite semantics
+    /// they likely have opposite semantics.
+    ///
+    /// Also detects medium similarity range (0.3-0.6) which may indicate partial opposition.
     fn detect_from_embeddings(embedding1: &[f32], embedding2: &[f32]) -> Result<f32, AppError> {
         if embedding1.is_empty() || embedding2.is_empty() {
             return Ok(0.0);
@@ -69,23 +93,50 @@ impl OppositionDetector {
 
         let cosine_sim = dot_product / (mag1 * mag2);
 
-        // If cosine similarity is negative, embeddings point in opposite directions
-        // This indicates semantic opposition
-        if cosine_sim < 0.0 {
-            // Strong opposition: -1.0 becomes 1.0, -0.5 becomes 0.5
-            Ok((-cosine_sim).min(1.0))
-        } else if cosine_sim < 0.3 {
-            // Weak opposition: low similarity might indicate opposition
-            Ok((0.3 - cosine_sim) * 0.3)
+        // Calculate embedding distance (Euclidean distance as additional signal)
+        let dist_squared: f32 = embedding1
+            .iter()
+            .zip(embedding2.iter())
+            .map(|(a, b)| (a - b).powi(2))
+            .sum();
+        let distance = dist_squared.sqrt();
+
+        // Normalize distance by vector magnitude
+        let avg_mag = (mag1 + mag2) / 2.0;
+        let normalized_distance = if avg_mag > 0.0 {
+            distance / avg_mag
         } else {
-            Ok(0.0)
-        }
+            0.0
+        };
+
+        // Opposition detection based on multiple signals:
+        // 1. Negative cosine similarity = strong opposition
+        // 2. Low cosine similarity (0.3-0.6) + high distance = potential opposition
+        let opposition_score = if cosine_sim < 0.0 {
+            // Strong opposition: -1.0 becomes 1.0, -0.5 becomes 0.5
+            (-cosine_sim).min(1.0)
+        } else if cosine_sim < 0.4 {
+            // Medium to low similarity might indicate opposition
+            // Combine with distance signal for more robust detection
+            let sim_score = (0.4 - cosine_sim) / 0.4; // 0 to 1
+            let dist_score = normalized_distance.min(1.0);
+            (sim_score * 0.5 + dist_score * 0.5).min(0.7) // Max 0.7 for this range
+        } else if cosine_sim < 0.7 {
+            // For 0.4-0.7 range, use distance as primary signal
+            // High distance with moderate similarity suggests different semantics
+            let dist_factor = (normalized_distance - 0.5).max(0.0) / 0.5; // 0 to 1 for distance > 0.5
+            dist_factor * 0.4 // Max 0.4
+        } else {
+            0.0
+        };
+
+        Ok(opposition_score)
     }
 
     /// Strategy 2: Structural similarity with semantic distance
     ///
     /// High structural similarity (same words) but low semantic similarity (different embeddings)
-    /// indicates opposition
+    /// indicates opposition. This is effective for detecting cases where only a few keywords differ.
     fn detect_from_structure(text1: &str, text2: &str) -> Result<f32, AppError> {
         let norm1 = Self::normalize_text(text1);
         let norm2 = Self::normalize_text(text2);
@@ -93,29 +144,85 @@ impl OppositionDetector {
         // Calculate character-level similarity
         let char_sim = Self::calculate_char_similarity(&norm1, &norm2);
 
-        // Calculate word-level overlap
-        let words1: Vec<&str> = norm1.split_whitespace().collect();
-        let words2: Vec<&str> = norm2.split_whitespace().collect();
+        // Detect if text contains Chinese characters (CJK Unified Ideographs block)
+        let has_chinese = norm1.chars().any(|c| is_chinese_char(c)) || norm2.chars().any(|c| is_chinese_char(c));
 
-        let common_words = words1.iter().filter(|w| words2.contains(w)).count();
+        // For Chinese text, use character-level comparison instead of word-level
+        // since Chinese doesn't use spaces between words
+        let (word_overlap, diff_ratio) = if has_chinese {
+            // For Chinese, compare character n-grams (bigrams)
+            let bigrams1: Vec<String> = norm1.chars().collect::<Vec<_>>().windows(2)
+                .map(|w| w.iter().collect())
+                .collect();
+            let bigrams2: Vec<String> = norm2.chars().collect::<Vec<_>>().windows(2)
+                .map(|w| w.iter().collect())
+                .collect();
 
-        let total_unique_words = words1.len() + words2.len() - common_words;
-        let word_overlap = if total_unique_words > 0 {
-            common_words as f32 / total_unique_words as f32
+            let common_bigrams = bigrams1.iter().filter(|w| bigrams2.contains(w)).count();
+            let total_unique_bigrams = bigrams1.len() + bigrams2.len() - common_bigrams;
+            let bigram_overlap = if total_unique_bigrams > 0 {
+                common_bigrams as f32 / total_unique_bigrams as f32
+            } else {
+                0.0
+            };
+
+            // Calculate character-level difference
+            let chars1: std::collections::HashSet<char> = norm1.chars().collect();
+            let chars2: std::collections::HashSet<char> = norm2.chars().collect();
+            let char_diff_count = chars1.symmetric_difference(&chars2).count();
+            let total_chars = chars1.len() + chars2.len();
+            let char_diff_ratio = if total_chars > 0 {
+                char_diff_count as f32 / total_chars as f32
+            } else {
+                0.0
+            };
+
+            (bigram_overlap, char_diff_ratio)
+        } else {
+            // For non-Chinese text, use word-level comparison
+            let words1: Vec<&str> = norm1.split_whitespace().collect();
+            let words2: Vec<&str> = norm2.split_whitespace().collect();
+
+            let common_words = words1.iter().filter(|w| words2.contains(w)).count();
+            let total_unique_words = words1.len() + words2.len() - common_words;
+            let word_overlap = if total_unique_words > 0 {
+                common_words as f32 / total_unique_words as f32
+            } else {
+                0.0
+            };
+
+            // Calculate the difference in word count (indicates how many words changed)
+            let words1_set: std::collections::HashSet<&str> = words1.iter().cloned().collect();
+            let words2_set: std::collections::HashSet<&str> = words2.iter().cloned().collect();
+            let symmetric_diff_count = words1_set.symmetric_difference(&words2_set).count();
+            let diff_ratio = if words1.len() + words2.len() > 0 {
+                symmetric_diff_count as f32 / (words1.len() + words2.len()) as f32
+            } else {
+                0.0
+            };
+
+            (word_overlap, diff_ratio)
+        };
+
+        // High structural similarity (char + word/bigram overlap) suggests opposition
+        // if combined with small number of differing words/characters
+        let structural_score = char_sim * 0.5 + word_overlap * 0.3 + (1.0 - diff_ratio) * 0.2;
+
+        // Lower the threshold to catch more cases
+        // Increase the weight when structural similarity is very high (> 0.7)
+        let opposition_score = if structural_score > 0.85 {
+            structural_score * 0.9 // Max 90% from extremely high structural similarity
+        } else if structural_score > 0.75 {
+            structural_score * 0.8 // Max 80% from very high structural similarity
+        } else if structural_score > 0.6 {
+            structural_score * 0.6 // Max 60% from high structural similarity
+        } else if structural_score > 0.4 {
+            structural_score * 0.4 // Max 40% from moderate structural similarity
         } else {
             0.0
         };
 
-        // High structural similarity (char + word overlap) suggests opposition
-        // if combined with semantic distance
-        let structural_score = (char_sim + word_overlap) / 2.0;
-
-        // Only return opposition if structural similarity is high (> 0.6)
-        if structural_score > 0.6 {
-            Ok(structural_score * 0.5) // Max 50% from structure alone
-        } else {
-            Ok(0.0)
-        }
+        Ok(opposition_score)
     }
 
     /// Strategy 3: Detect negation patterns
@@ -385,5 +492,82 @@ mod tests {
 
         let opposition = OppositionDetector::detect_from_embeddings(&emb1, &emb2).unwrap();
         assert!(opposition < 0.1);
+    }
+
+    #[test]
+    fn test_high_repetition_opposite_semantics() {
+        // Test case: "这项措施能够有效促进当地经济发展" vs "这项措施能够有效阻碍当地经济发展"
+        let text1 = "这项措施能够有效促进当地经济发展";
+        let text2 = "这项措施能够有效阻碍当地经济发展";
+
+        // Create mock embeddings with moderate similarity (like BERT would produce for these)
+        let emb1: Vec<f32> = (0..100).map(|i| (i as f32 * 0.01).sin()).collect();
+        let emb2: Vec<f32> = (0..100).map(|i| (i as f32 * 0.01 + 0.2).sin()).collect();
+
+        // Debug: Check individual scores
+        let norm1 = OppositionDetector::normalize_text(text1);
+        let norm2 = OppositionDetector::normalize_text(text2);
+        println!("norm1: {}", norm1);
+        println!("norm2: {}", norm2);
+
+        let char_sim = OppositionDetector::calculate_char_similarity(&norm1, &norm2);
+        println!("char_sim: {}", char_sim);
+
+        let words1: Vec<&str> = norm1.split_whitespace().collect();
+        let words2: Vec<&str> = norm2.split_whitespace().collect();
+        println!("words1: {:?}", words1);
+        println!("words2: {:?}", words2);
+
+        let common_words = words1.iter().filter(|w| words2.contains(w)).count();
+        let total_unique_words = words1.len() + words2.len() - common_words;
+        let word_overlap = if total_unique_words > 0 {
+            common_words as f32 / total_unique_words as f32
+        } else {
+            0.0
+        };
+        println!("common_words: {}, total_unique: {}, word_overlap: {}", common_words, total_unique_words, word_overlap);
+
+        let structural = OppositionDetector::detect_from_structure(text1, text2).unwrap();
+        println!("structural_opposition: {}", structural);
+
+        let embedding_opp = OppositionDetector::detect_from_embeddings(&emb1, &emb2).unwrap();
+        println!("embedding_opposition: {}", embedding_opp);
+
+        let opposition = OppositionDetector::detect_opposition(text1, text2, &emb1, &emb2).unwrap();
+        println!("total_opposition: {}", opposition);
+
+        // Should detect significant opposition due to high structural similarity
+        assert!(opposition > 0.3, "Expected opposition > 0.3, got {}", opposition);
+
+        // Test structural detection specifically
+        assert!(structural > 0.5, "Expected structural opposition > 0.5, got {}", structural);
+    }
+
+    #[test]
+    fn test_chinese_antonym_like_patterns() {
+        // Test various Chinese antonym-like patterns
+        // For shorter sentences, detection is harder, so we use longer sentences
+        let test_cases = vec![
+            ("这项措施能够有效促进经济发展", "这项措施能够有效阻碍经济发展"),
+            ("这项政策可以增加居民收入", "这项政策可以减少居民收入"),
+            ("这个方法能够显著提高工作效率", "这个方法能够显著降低工作效率"),
+            ("我们完全支持这个观点和建议", "我们完全反对这个观点和建议"),
+            ("很多用户非常喜欢这个产品", "很多用户非常讨厌这个产品"),
+        ];
+
+        for (text1, text2) in test_cases {
+            let emb1 = vec![0.5, 0.3, 0.8, 0.2];
+            let emb2 = vec![0.5, 0.3, 0.8, 0.2]; // Same structure, different meaning
+
+            let _opposition = OppositionDetector::detect_opposition(text1, text2, &emb1, &emb2).unwrap();
+
+            // At minimum, structural detection should trigger for longer sentences
+            let structural = OppositionDetector::detect_from_structure(text1, text2).unwrap();
+            assert!(
+                structural > 0.35,
+                "Structural opposition too low for '{}' vs '{}': {}",
+                text1, text2, structural
+            );
+        }
     }
 }
