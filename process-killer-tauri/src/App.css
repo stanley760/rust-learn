@@ -1,12 +1,13 @@
-/* 全局样式重置和基础配置 */
+/* 苹果风格 Liquid Glass 全局样式 - 浅色主题 */
+
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display',
+               'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;
-  line-height: 24px;
+  line-height: 1.6;
   font-weight: 400;
 
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #141414;
+  color-scheme: light;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -21,57 +22,364 @@
   box-sizing: border-box;
 }
 
+html {
+  height: 100%;
+  overflow: hidden;
+  /* 支持窗口透明度 */
+  background: transparent;
+}
+
 body {
   margin: 0;
   padding: 0;
-  min-height: 100vh;
-  overflow-x: hidden;
-  background-color: #141414;
+  height: 100vh;
+  overflow: hidden;
+  /* macOS Big Sur 风格渐变背景 - 玻璃透明窗口 */
+  background: linear-gradient(135deg, #e8eaf0 0%, #f0f2f5 50%, #e5e7eb 100%);
+  background-attachment: fixed;
+  position: relative;
+  color: #1d1d1f;
+  /* 确保窗口背景透明时背景渐变可见 */
+  -webkit-app-region: no-drag;
+}
+
+/* macOS 风格动态背景光晕效果 */
+body::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0, 122, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(88, 86, 214, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(255, 45, 85, 0.05) 0%, transparent 40%);
+  animation: floatingOrbs 25s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes floatingOrbs {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(5%, 5%) scale(1.05);
+  }
+  66% {
+    transform: translate(-5%, -5%) scale(0.95);
+  }
 }
 
 #root {
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
 }
 
-/* App 容器样式 - 使用 Flexbox 实现响应式布局 */
+/* App 容器样式 */
 .app-container {
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
   display: flex;
   flex-direction: column;
-  background-color: #141414;
-  padding: 0;
+  padding: 16px;
   position: relative;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
-/* 确保过渡效果 */
+/* macOS Liquid Glass 基础效果 - 透明窗口优化 */
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(50px) saturate(200%) brightness(1.05);
+  -webkit-backdrop-filter: blur(50px) saturate(200%) brightness(1.05);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+  position: relative;
+}
+
+/* 添加顶部高光效果 */
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
+}
+
+/* 柔和的过渡效果 */
 .app-container * {
-  transition: all 0.3s ease;
+  transition:
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 响应式布局 - 平板设备 */
+/* 滚动条样式 - 苹果风格浅色 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  border: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* 响应式布局 */
 @media (max-width: 1024px) {
   :root {
     font-size: 15px;
   }
+
+  .app-container {
+    padding: 12px;
+  }
 }
 
-/* 响应式布局 - 移动设备 */
 @media (max-width: 768px) {
   :root {
     font-size: 14px;
   }
-  
+
   .app-container {
-    padding: 0;
+    padding: 10px;
   }
 }
 
-/* 响应式布局 - 小屏幕移动设备 */
 @media (max-width: 480px) {
   :root {
     font-size: 13px;
   }
+
+  .app-container {
+    padding: 8px;
+  }
+}
+
+/* Ant Design macOS Liquid Glass 风格 - 透明窗口优化 */
+.ant-btn {
+  backdrop-filter: blur(30px) saturate(200%) brightness(1.05);
+  -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.05);
+  border-radius: 12px !important;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  background: rgba(255, 255, 255, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  color: #1d1d1f !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-btn:hover {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.7) !important;
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.ant-btn:active {
+  transform: translateY(0);
+  background: rgba(245, 245, 245, 0.8) !important;
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, #007aff 0%, #5856d6 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 4px 16px rgba(0, 122, 255, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, #007aff 0%, #5856d6 100%) !important;
+  box-shadow:
+    0 6px 20px rgba(0, 122, 255, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.ant-btn-danger {
+  background: linear-gradient(135deg, #ff3b30 0%, #ff2d55 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 4px 16px rgba(255, 59, 48, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.ant-btn-danger:hover {
+  background: linear-gradient(135deg, #ff3b30 0%, #ff2d55 100%) !important;
+  box-shadow:
+    0 6px 20px rgba(255, 59, 48, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.ant-input {
+  backdrop-filter: blur(30px) saturate(200%) brightness(1.05) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.05) !important;
+  background: rgba(255, 255, 255, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border-radius: 12px !important;
+  color: #1d1d1f !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.ant-input:hover {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.7) !important;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.ant-input:focus {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(0, 122, 255, 0.5) !important;
+  box-shadow:
+    0 0 0 4px rgba(0, 122, 255, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.ant-input::placeholder {
+  color: rgba(0, 0, 0, 0.4) !important;
+}
+
+/* 表格样式覆盖 - macOS Liquid Glass */
+.ant-table {
+  background: transparent !important;
+  color: #1d1d1f !important;
+}
+
+.ant-table-thead > tr > th {
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(30px) saturate(200%) brightness(1.05);
+  -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  color: #1d1d1f !important;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.ant-table-tbody > tr > td {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03) !important;
+  color: #1d1d1f !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: rgba(0, 122, 255, 0.04) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+.ant-table-tbody > tr.ant-table-row-selected > td {
+  background: rgba(0, 122, 255, 0.1) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+.ant-table-container {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.ant-table-wrapper {
+  max-width: 100%;
+}
+
+.ant-table-thead > tr > th {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  color: #1d1d1f !important;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.ant-table-tbody > tr > td {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+  color: #1d1d1f !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: rgba(0, 0, 0, 0.02) !important;
+  backdrop-filter: blur(20px) saturate(200%) brightness(1.05);
+  -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.05);
+}
+
+.ant-table-tbody > tr.ant-table-row-selected > td {
+  background: rgba(0, 122, 255, 0.08) !important;
+}
+
+/* Table Footer macOS Liquid Glass - 透明窗口优化 */
+.ant-table-footer {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(30px) saturate(200%) brightness(1.05);
+  -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.05);
+  border: none !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 -2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Spin 组件样式 */
+.ant-spin-dot-item {
+  background-color: #007aff !important;
+}
+
+/* Message 样式 - 浅色 - 透明窗口优化 */
+.ant-message-notice-content {
+  backdrop-filter: blur(30px) saturate(200%) brightness(1.05) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.05) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+  color: #1d1d1f !important;
 }

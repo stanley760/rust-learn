@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "process-killer-tauri",
+        "title": "process-killer",
         "width": 800,
         "height": 600
       }

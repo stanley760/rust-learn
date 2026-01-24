@@ -1,14 +1,74 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri + React + Typescript</title>
+    <meta name="description" content="Process Killer - 优雅的进程管理工具，采用苹果风格的 Liquid Glass 设计" />
+    <meta name="theme-color" content="#e8eaf0" />
+    <title>Process Killer - Liquid Glass Edition</title>
+    <style>
+      /* 页面加载时的初始样式，防止闪烁 - 透明窗口支持 */
+      html {
+        background: transparent;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #e8eaf0 0%, #f0f2f5 50%, #e5e7eb 100%);
+        background-attachment: fixed;
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+        -webkit-app-region: no-drag;
+      }
+
+      #loading {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #1d1d1f;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      #loading::before {
+        content: '';
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        border-top-color: #007aff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
   </head>
 
   <body>
+    <div id="loading">Loading...</div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // 页面加载完成后移除 loading
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const loading = document.getElementById('loading');
+          if (loading) {
+            loading.style.opacity = '0';
+            loading.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => loading.remove(), 300);
+          }
+        }, 500);
+      });
+    </script>
   </body>
 </html>

@@ -46,37 +46,46 @@ export const ProcessTable: React.FC<ProcessTableProps> = ({
       title: '协议',
       dataIndex: 'protocol',
       key: 'protocol',
-      width: 80,
+      width: 70,
       align: 'center',
     },
     {
       title: '本地地址',
       dataIndex: 'local_address',
       key: 'local_address',
-      width: 200,
-      ellipsis: true,
-      align: 'center',
+      width: 180,
+      ellipsis: { showTitle: false },
+      render: (text: string) => (
+        <div style={{ fontSize: '12px', fontFamily: 'monospace' }} title={text}>
+          {text}
+        </div>
+      ),
     },
     {
       title: '远程地址',
       dataIndex: 'remote_address',
       key: 'remote_address',
-      width: 200,
-      ellipsis: true,
-      align: 'center',
+      width: 180,
+      ellipsis: { showTitle: false },
+      render: (text: string) => (
+        <div style={{ fontSize: '12px', fontFamily: 'monospace' }} title={text}>
+          {text}
+        </div>
+      ),
     },
     {
       title: '状态',
       dataIndex: 'state',
       key: 'state',
-      width: 120,
+      width: 100,
+      ellipsis: true,
       align: 'center',
     },
     {
       title: 'PID',
       dataIndex: 'pid',
       key: 'pid',
-      width: 100,
+      width: 80,
       align: 'center',
     },
   ];
@@ -195,14 +204,25 @@ export const ProcessTable: React.FC<ProcessTableProps> = ({
         })}
         rowKey={(record) => `${record.pid}-${record.local_address}-${record.remote_address}`}
         pagination={false}
-        scroll={{ y: 'calc(100vh - 250px)' }}
+        scroll={{ y: 'calc(100vh - 200px)' }}
         size="small"
         footer={() => (
-          <div style={{ textAlign: 'center', padding: '8px 0' }}>
+          <div style={{
+            textAlign: 'center',
+            padding: '8px 16px',
+            marginBottom: '-4px',
+            background: '#ffffff',
+            border: 'none',
+            borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+            boxShadow: 'none',
+            color: 'rgba(0, 0, 0, 0.65)',
+            fontSize: '13px',
+            borderRadius: '0 0 16px 16px'
+          }}>
             {loading && data.length > 0 && (
               <Spin size="small" style={{ marginRight: 8 }} />
             )}
-            <span style={{ color: '#999' }}>
+            <span>
               已加载 {data.length} / {total} 条记录
               {hasMore && !loading && ' - 向下滚动加载更多'}
               {!hasMore && data.length > 0 && ' - 已加载全部数据'}

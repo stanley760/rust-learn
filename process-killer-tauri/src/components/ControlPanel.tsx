@@ -55,7 +55,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         <div className="control-item">
           <label className="control-label-inline">PORT:</label>
           <Input
-            placeholder="PID:"
+            placeholder="请输入端口"
             value={portValue}
             onChange={(e) => setPortValue(e.target.value)}
             onPressEnter={() => onSearch(portValue)}
