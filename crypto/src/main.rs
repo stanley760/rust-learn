@@ -1,6 +1,6 @@
 mod secp256k1;
 
-use secp256k1::{Secp256k1Error, Secp256k1Signer, Secp256k1Verifier};
+use secp256k1::{Secp256k1Signer, Secp256k1Verifier};
 use std::io;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -44,7 +44,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("   导出的公钥长度: {} 字节", keypair.public_key.len());
 
     // 从字节重建
-    let restored_signer = Secp256k1Signer::from_bytes(&keypair.private_key)?;
     let restored_verifier = Secp256k1Verifier::from_bytes(&keypair.public_key)?;
     let is_valid = restored_verifier.verify(message.as_bytes(), &signature)?;
     println!("   重建后验证结果: {}", if is_valid { "有效 ✓" } else { "无效 ✗" });
@@ -53,7 +52,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 6. 带恢复 ID 的签名
     println!("6. 带恢复 ID 的签名演示...");
     let (sig, recovery_id) = signer.sign_recoverable(message.as_bytes());
-    println!("   恢复 ID: {}", recovery_id);
+    println!("   恢复 ID: {:?}", recovery_id);
 
     let recovered_key =
         Secp256k1Verifier::recover_from_signature(message.as_bytes(), &sig, recovery_id)?;
@@ -85,11 +84,4 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("\n=== 演示完成 ===");
     Ok(())
-}
-
-// 为 Box<dyn std::error::Error> 实现 From<Secp256k1Error>
-impl From<Secp256k1Error> for Box<dyn std::error::Error> {
-    fn from(err: Secp256k1Error) -> Self {
-        Box::new(err) as Box<dyn std::error::Error>
-    }
 }

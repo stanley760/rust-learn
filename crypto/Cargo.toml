@@ -4,8 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-k256 = { version = "0.13", features = ["ecdsa", "sha256", "hmac"] }
-rand_core = "0.6"
+hex = "0.4"
+hmac = "0.12"
+k256 = { version = "0.13", features = ["ecdsa"] }
+rand = "0.8"
 thiserror = "2.0"
 
 [dev-dependencies]

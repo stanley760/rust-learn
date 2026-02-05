@@ -7,8 +7,7 @@ use k256::ecdsa::{
     RecoveryId, Signature, SigningKey, VerifyingKey,
 };
 use k256::sha2::{Digest, Sha256};
-use k256::SecretKey;
-use rand_core::OsRng;
+use rand::rngs::OsRng;
 use std::fs;
 
 /// Secp256k1 签名器
@@ -33,7 +32,7 @@ pub struct KeyPair {
 impl Secp256k1Signer {
     /// 从私钥字节创建签名器
     pub fn from_bytes(private_key: &[u8]) -> Result<Self, Secp256k1Error> {
-        let signing_key = SigningKey::from_bytes(private_key.try_into()?)
+        let signing_key = SigningKey::from_slice(private_key)
             .map_err(|_| Secp256k1Error::InvalidPrivateKey)?;
         Ok(Self { signing_key })
     }
@@ -47,24 +46,25 @@ impl Secp256k1Signer {
 
     /// 对数据进行签名（先计算 SHA256 哈希）
     pub fn sign(&self, data: &[u8]) -> Signature {
-        let hasher = Sha256::new_with_prefix(data);
-        self.signing_key.sign(hasher)
+        let hash = Sha256::digest(data);
+        self.signing_key.sign(&hash)
     }
 
     /// 对预计算的哈希值进行签名
     pub fn sign_hash(&self, hash: [u8; 32]) -> Signature {
-        self.signing_key.sign(hash)
+        self.signing_key.sign(&hash)
     }
 
     /// 创建带恢复 ID 的签名（用于公钥恢复）
     pub fn sign_recoverable(&self, data: &[u8]) -> (Signature, RecoveryId) {
-        let hasher = Sha256::new_with_prefix(data);
-        self.signing_key.sign_recoverable(hasher)
+        self.signing_key
+            .sign_recoverable(data)
+            .expect("sign_recoverable failed")
     }
 
     /// 获取私钥字节
     pub fn to_bytes(&self) -> [u8; 32] {
-        self.signing_key.to_bytes()
+        self.signing_key.to_bytes().into()
     }
 
     /// 获取公钥
@@ -127,13 +127,13 @@ impl Secp256k1Verifier {
 
     /// 验证签名（先计算 SHA256 哈希）
     pub fn verify(&self, data: &[u8], signature: &Signature) -> Result<bool, Secp256k1Error> {
-        let hasher = Sha256::new_with_prefix(data);
-        Ok(self.verifying_key.verify(hasher, signature).is_ok())
+        let hash = Sha256::digest(data);
+        Ok(self.verifying_key.verify(hash.as_ref(), signature).is_ok())
     }
 
     /// 验证预计算哈希的签名
     pub fn verify_hash(&self, hash: [u8; 32], signature: &Signature) -> Result<bool, Secp256k1Error> {
-        Ok(self.verifying_key.verify(hash, signature).is_ok())
+        Ok(self.verifying_key.verify(&hash, signature).is_ok())
     }
 
     /// 使用恢复 ID 从签名恢复公钥
@@ -142,9 +142,8 @@ impl Secp256k1Verifier {
         signature: &Signature,
         recovery_id: RecoveryId,
     ) -> Result<VerifyingKey, Secp256k1Error> {
-        let hasher = Sha256::new_with_prefix(data);
-        let hash = hasher.finalize();
-        VerifyingKey::recover_from_prehash(&hash, signature, recovery_id)
+        let hash = Sha256::digest(data);
+        VerifyingKey::recover_from_prehash(hash.as_ref(), signature, recovery_id)
             .map_err(|_| Secp256k1Error::RecoveryFailed)
     }
 
@@ -205,15 +204,13 @@ impl KeyDerivation {
         index: u32,
     ) -> Result<SigningKey, Secp256k1Error> {
         // 简化实现：使用 HMAC-SHA256 派生
-        use k256::elliptic_curve::sec1::ToEncodedPoint;
-        use k256::sha2::Sha256;
-        use k256::Hmac;
-        use k256::Mac;
+        use hmac::Mac;
+        use hmac::Hmac;
 
         let parent_bytes = parent_key.to_bytes();
         let chain_code = [0u8; 32]; // 实际应用中应有真实的链码
 
-        let mut hmac = Hmac::new_from_slice(&chain_code).unwrap();
+        let mut hmac = Hmac::<Sha256>::new_from_slice(&chain_code).unwrap();
         hmac.update(&parent_bytes);
         hmac.update(&index.to_be_bytes());
         let result = hmac.finalize();
