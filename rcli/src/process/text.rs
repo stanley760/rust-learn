@@ -2,9 +2,7 @@ use crate::{read_file, TextSignFormat};
 use anyhow::{Ok, Result};
 use base64::{prelude::BASE64_URL_SAFE_NO_PAD, Engine};
 use ed25519_dalek::{Signature as EdSignature, Signer, SigningKey as EdSigningKey, Verifier, VerifyingKey as EdVerifyingKey};
-use k256::ecdsa::signature::{Signer as K256Signer, Verifier as K256Verifier};
 use k256::ecdsa::{Signature, SigningKey, VerifyingKey};
-use k256::sha2::{Digest, Sha256};
 use rand_core::OsRng;
 use std::{fs, io::Read};
 
@@ -103,8 +101,8 @@ impl TextSign for Secp256k1Signer {
     fn sign(&self, reader: &mut dyn Read) -> Result<Vec<u8>> {
         let mut buf = Vec::new();
         reader.read_to_end(&mut buf)?;
-        let hasher = Sha256::new_with_prefix(&buf);
-        Ok(self.key.sign(hasher).to_bytes().to_vec())
+        let signature: Signature = self.key.sign(&buf);
+        Ok(signature.to_bytes().to_vec())
     }
 }
 
@@ -112,9 +110,8 @@ impl TextVerify for Secp256k1Verifier {
     fn verify(&self, mut data: impl Read, sig: &[u8]) -> Result<bool> {
         let mut buf = Vec::new();
         data.read_to_end(&mut buf)?;
-        let hasher = Sha256::new_with_prefix(&buf);
-        let sig = Signature::from_bytes(sig.try_into()?);
-        Ok(self.key.verify(hasher, &sig).is_ok())
+        let sig = Signature::from_bytes(sig.try_into()?)?;
+        Ok(self.key.verify(&buf, &sig).is_ok())
     }
 }
 
@@ -216,10 +213,10 @@ impl Secp256k1Signer {
     }
 
     pub fn try_new(key: &[u8]) -> Result<Self> {
-        let key = SigningKey::from_bytes(key.try_into()?);
+        let key = SigningKey::from_bytes(key.try_into()?)?;
         Ok(Secp256k1Signer::new(key))
     }
-
+    #[allow(unused)]
     pub fn generate() -> Self {
         Self {
             key: SigningKey::random(&mut OsRng),
