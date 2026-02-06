@@ -47,7 +47,6 @@ pub struct TextVerifyOpts {
 pub enum TextSignFormat {
     Blake3,
     Ed25519,
-    Secp256k1,
 }
 
 fn parse_format(format: &str) -> Result<TextSignFormat, anyhow::Error> {
@@ -59,7 +58,6 @@ impl From<TextSignFormat> for &'static str {
         match value {
             TextSignFormat::Blake3 => "blake3",
             TextSignFormat::Ed25519 => "ed25519",
-            TextSignFormat::Secp256k1 => "secp256k1",
         }
     }
 }
@@ -71,7 +69,6 @@ impl FromStr for TextSignFormat {
         match s {
             "blake3" => Ok(TextSignFormat::Blake3),
             "ed25519" => Ok(TextSignFormat::Ed25519),
-            "secp256k1" => Ok(TextSignFormat::Secp256k1),
             _ => anyhow::bail!("Invalid format"),
         }
     }

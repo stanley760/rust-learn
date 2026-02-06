@@ -28,7 +28,7 @@ pub struct KeyPair {
     pub private_key: Vec<u8>,
     pub public_key: Vec<u8>,
 }
-
+#[allow(unused)]
 impl Secp256k1Signer {
     /// 从私钥字节创建签名器
     pub fn from_bytes(private_key: &[u8]) -> Result<Self, Secp256k1Error> {
@@ -109,7 +109,7 @@ impl Secp256k1Signer {
         Self { signing_key }
     }
 }
-
+#[allow(unused)]
 impl Secp256k1Verifier {
     /// 从公钥字节创建验证器（支持压缩和未压缩格式）
     pub fn from_bytes(public_key: &[u8]) -> Result<Self, Secp256k1Error> {
@@ -164,7 +164,7 @@ impl Secp256k1Verifier {
         Ok(())
     }
 }
-
+#[allow(unused)]
 /// Secp256k1 错误类型
 #[derive(Debug, thiserror::Error)]
 pub enum Secp256k1Error {
@@ -192,10 +192,10 @@ impl From<k256::ecdsa::Error> for Secp256k1Error {
         Secp256k1Error::VerificationFailed
     }
 }
-
+#[allow(unused)]
 /// 密钥衍生函数（简化版 HD 钱包功能）
 pub struct KeyDerivation;
-
+#[allow(unused)]
 impl KeyDerivation {
     /// 从父私钥派生子私钥（简化实现）
     /// 注意：实际应用应使用 BIP-32 标准
