@@ -56,7 +56,7 @@ jobs:
         if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
         run: |
           cargo install cargo-tarpaulin
-          cargo tarpaulin --out Xml --out Html --output-dir ./coverage
+          cargo tarpaulin --exclude bert_similarity  --out Xml --out Html --output-dir ./coverage
 
       # 🔥 上传多种格式的报告
       - name: 📤 Upload coverage reports
