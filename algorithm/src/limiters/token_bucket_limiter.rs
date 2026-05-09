@@ -12,7 +12,7 @@ pub struct TokenBucketLimiter {
 }
 
 impl TokenBucketLimiter {
-    fn new(rate: f64, capacity: i32) -> Self {
+    pub fn new(rate: f64, capacity: i32) -> Self {
         Self {
             rate,
             capacity,
@@ -23,7 +23,7 @@ impl TokenBucketLimiter {
         }
     }
 
-    fn allow_request(&self) -> bool {
+    pub fn allow_request(&self) -> bool {
         let mut stat = self.state.lock().unwrap();
         let last_time_sec = stat.last_time.elapsed().as_secs_f64();
         let token_count = (last_time_sec * self.rate) as i32;

@@ -12,7 +12,7 @@ pub struct LeakyBucketLimiter {
 }
 
 impl LeakyBucketLimiter {
-    fn new(rate: f64, capacity: i32) -> Self {
+    pub fn new(rate: f64, capacity: i32) -> Self {
         Self { 
             rate, 
             capacity, 
@@ -22,7 +22,7 @@ impl LeakyBucketLimiter {
         }
     }
 
-    fn allow_request(&self) -> bool {
+    pub fn allow_request(&self) -> bool {
         let mut stat = self.state.lock().unwrap();
         
         let elapsed_secs = stat.last_time.elapsed().as_secs_f64();
