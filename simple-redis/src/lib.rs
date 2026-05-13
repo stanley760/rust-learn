@@ -1,5 +1,5 @@
 mod cmd;
 
-mod objects;
+pub mod objects;
 
 mod tcp;
