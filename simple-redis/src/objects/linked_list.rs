@@ -248,5 +248,6 @@ mod tests {
         list.rotate_head_to_tail();
         assert_eq!(list.front(), Some(&1));
         assert_eq!(list.back(), Some(&3));
+        list.iter().for_each(|f| println!("{}", f));
     }
 }
