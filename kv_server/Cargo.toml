@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bytes = "1.10.0"
+bytes = "1.11"
 dashmap = { version = "6.1.0", features = ["inline"] }
 http = "1.2.0"
 prost = "0.10.4"

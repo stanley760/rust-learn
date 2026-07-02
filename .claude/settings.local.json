@@ -12,7 +12,11 @@
       "Bash(cargo clippy:*)",
       "mcp__web-search-prime__webSearchPrime",
       "mcp__zread__read_file",
-      "mcp__zai-mcp-server__analyze_image"
+      "mcp__zai-mcp-server__analyze_image",
+      "Bash(rm -f Cargo.lock)",
+      "Bash(cargo generate-lockfile *)",
+      "Bash(cargo check *)",
+      "WebFetch(domain:openrouter.ai)"
     ]
   }
 }
