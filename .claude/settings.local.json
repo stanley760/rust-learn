@@ -16,7 +16,13 @@
       "Bash(rm -f Cargo.lock)",
       "Bash(cargo generate-lockfile *)",
       "Bash(cargo check *)",
-      "WebFetch(domain:openrouter.ai)"
+      "WebFetch(domain:openrouter.ai)",
+      "Bash(find \"$HOME/.cargo/registry/src\" -path \"*/async-openai-0.41*\" -name \"*.rs\" 2>/dev/null | head -20)",
+      "Read(//c/Users/sakura/.cargo/registry/src/**)",
+      "Bash(grep -rl \"ChatCompletionTool\\\\|FunctionTool\\\\|CustomTool\" /c/Users/sakura/.cargo/registry/src/rsproxy.cn-e3de039b2554c837/async-openai-0.41.1/src/ 2>/dev/null | head -10)",
+      "Read(//c/Users/sakura/.cargo/registry/src/rsproxy.cn-e3de039b2554c837/async-openai-0.41.1/src//**)",
+      "Bash(grep -rn \"pub struct FunctionObject\" /c/Users/sakura/.cargo/registry/src/rsproxy.cn-e3de039b2554c837/async-openai-0.41.1/src/ 2>/dev/null)",
+      "Bash(grep -rn \"pub struct CreateChatCompletionRequestArgs\" /c/Users/sakura/.cargo/registry/src/rsproxy.cn-e3de039b2554c837/async-openai-0.41.1/src/ 2>/dev/null)"
     ]
   }
 }
