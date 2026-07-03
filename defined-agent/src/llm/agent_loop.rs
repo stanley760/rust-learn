@@ -134,15 +134,14 @@ async fn execute_tool_calls(
 }
 
 async fn run_one_turn(state: &mut LoopState) -> anyhow::Result<bool> {
-    let mut message = state.context.clone();
-     message.push(ChatCompletionRequestSystemMessageArgs::default()
+    state.context.push(ChatCompletionRequestSystemMessageArgs::default()
                 .content(SYSTEM)
                 .build()?
                 .into()
             );
     let request = CreateChatCompletionRequestArgs::default()
         .model(get_model()?)
-        .messages(message)
+        .messages(state.context.clone())
         .max_completion_tokens(8000u32)
         .tools(get_tools())
         .build()?;
