@@ -1,9 +1,8 @@
 use defined_agent::llm::complete;
-use futures::StreamExt;
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
 
-const CHAT_GPT_120: &'static str = "openai/gpt-oss-120b:free";
+const CHAT_GPT_120B: &'static str = "openai/gpt-oss-120b:free";
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv()?;
@@ -14,26 +13,14 @@ async fn main() -> anyhow::Result<()> {
         .finish();
     tracing::subscriber::set_global_default(subscriber)?;
 
-    let result = complete::chat_complete_structed(
-        CHAT_GPT_120,
-        Some("你是一个天文学家"),
-        "请你帮我写一篇关于黑洞的科普文章，要求内容通俗易懂，适合大众阅读。",
-    );
+    let res = complete::chat_stream_with_retry(CHAT_GPT_120B,
+            Some("你是一个诗人"),
+            "请你帮我取一个人名，要求高雅，但是不能与大多数人名重复，可以从诗经等经典名著中取字").await;
 
-    futures::pin_mut!(result);
-    let mut output = String::new();
-    while let Some(item) = result.next().await {
-        match item {
-            Result::Ok(plan) => {
-                output.push_str(&plan);
-                print!("{}", plan);
-            }
-            Err(e) => {
-                eprintln!("Error receiving streaming: {:?}", e);
-                return Err(e);
-            }
-        }
+    println!("\n--------------------------------");
+    match res {
+        Ok(result) => {println!("{result:#?}");},
+        Err(e) => {eprintln!("exception:{}", e);}
     }
-    println!("--------------------------------");
     Ok(())
 }
