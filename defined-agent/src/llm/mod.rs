@@ -1,2 +1,5 @@
 pub mod complete;
-pub mod agent_loop;
+
+mod agent_loop;
+
+pub use agent_loop::execute_tool_calls;

@@ -7,7 +7,7 @@ use async_openai::types::chat::{
     ChatCompletionRequestUserMessageArgs,
 };
 use async_openai::{Client, config::OpenAIConfig};
-use defined_agent::{llm::agent_loop, structure::loop_state::LoopState};
+use defined_agent::structure::{LoopState, agent_loop};
 use dialoguer::Input;
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
@@ -80,7 +80,7 @@ async fn main() -> anyhow::Result<()> {
         );
 
         // 运行 agent loop
-        agent_loop::agent_loop(&mut state).await?;
+        agent_loop(&mut state).await?;
 
         // 提取并打印最终回复
         let final_text = extract_last_text(&state.context);
