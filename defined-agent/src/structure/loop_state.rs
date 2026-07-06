@@ -1,8 +1,10 @@
 use anyhow::Context;
-use async_openai:: {Client, config::OpenAIConfig};
+use async_openai::{Client, config::OpenAIConfig};
 
-use async_openai::types::chat::{ 
-    ChatCompletionRequestAssistantMessage, ChatCompletionRequestAssistantMessageContent, ChatCompletionRequestMessage, ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestToolMessage, ChatCompletionRequestToolMessageContent, ChatCompletionTool, ChatCompletionTools, CreateChatCompletionRequestArgs, FinishReason, FunctionObjectArgs,
+use async_openai::types::chat::{
+    ChatCompletionRequestAssistantMessage, ChatCompletionRequestAssistantMessageContent,
+    ChatCompletionRequestMessage, ChatCompletionRequestSystemMessageArgs, ChatCompletionTool,
+    ChatCompletionTools, CreateChatCompletionRequestArgs, FinishReason, FunctionObjectArgs,
 };
 
 use crate::llm::execute_tool_calls;
@@ -12,9 +14,19 @@ fn get_model() -> anyhow::Result<String> {
     std::env::var("OPENAI_MODEL").context("OPENAI_MODEL is not set")
 }
 
-const SYSTEM: &str = r#"You are a coding agent.
+const SYSTEM: &str = if cfg!(target_os = "windows") {
+    r#"You are a coding agent.
+Use cmd.exe to inspect and change the workspace. Act first, then report clearly.
+IMPORTANT: You are on Windows. Use Windows commands only:
+- Use `dir` instead of `ls`, `type` instead of `cat`, `findstr` instead of `grep`.
+- Use backslashes in paths or forward slashes (both work).
+- Do NOT use Unix-only commands like ls, cat, grep, rm, chmod, etc.
+"#
+} else {
+    r#"You are a coding agent.
 Use bash to inspect and change the workspace. Act first, then report clearly.
-"#;
+"#
+};
 
 pub struct LoopState {
     client: Client<OpenAIConfig>,
@@ -35,10 +47,15 @@ impl LoopState {
 }
 
 fn get_tools() -> Vec<ChatCompletionTools> {
+    let shell_hint = if cfg!(target_os = "windows") {
+        "Run a cmd.exe command on Windows. Use dir/type/findstr instead of ls/cat/grep."
+    } else {
+        "Run a shell command in the current workspace (sh on Unix)."
+    };
     vec![ChatCompletionTools::Function(ChatCompletionTool {
         function: FunctionObjectArgs::default()
             .name("bash")
-            .description("Run a shell command in the current workspace.")
+            .description(shell_hint)
             .parameters(serde_json::json!({
                 "type": "object",
                 "properties": {
@@ -54,11 +71,12 @@ fn get_tools() -> Vec<ChatCompletionTools> {
 }
 
 async fn run_one_turn(state: &mut LoopState) -> anyhow::Result<bool> {
-    state.context.push(ChatCompletionRequestSystemMessageArgs::default()
-                .content(SYSTEM)
-                .build()?
-                .into()
-            );
+    state.context.push(
+        ChatCompletionRequestSystemMessageArgs::default()
+            .content(SYSTEM)
+            .build()?
+            .into(),
+    );
     let request = CreateChatCompletionRequestArgs::default()
         .model(get_model()?)
         .messages(state.context.clone())
@@ -79,7 +97,9 @@ async fn run_one_turn(state: &mut LoopState) -> anyhow::Result<bool> {
     // Push assistant message (with tool_calls if any) into context
     state.context.push(ChatCompletionRequestMessage::Assistant(
         ChatCompletionRequestAssistantMessage {
-            content: msg.content.map(ChatCompletionRequestAssistantMessageContent::Text),
+            content: msg
+                .content
+                .map(ChatCompletionRequestAssistantMessageContent::Text),
             refusal: msg.refusal,
             name: None,
             audio: None,
