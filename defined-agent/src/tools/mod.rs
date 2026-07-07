@@ -77,13 +77,37 @@ pub fn tool_registry() -> HashMap<String, Box<dyn Tool>> {
     }).collect()
 }
 
-fn safe_path(path: &str) -> anyhow::Result<std::path::PathBuf> {
+/// Validate and resolve a path, ensuring it stays within the workspace.
+///
+/// If `must_exist` is true (e.g. for read operations), the path is canonicalized
+/// which requires the file/directory to already exist.
+/// If `must_exist` is false (e.g. for write operations), the parent directory
+/// is canonicalized instead, and the filename is appended — this allows writing
+/// to files that don't yet exist while still preventing path traversal.
+fn safe_path(path: &str, must_exist: bool) -> anyhow::Result<std::path::PathBuf> {
     let cwd = std::env::current_dir()?;
-    let full = cwd.join(path).canonicalize()?;
+    let full = cwd.join(path);
 
-    if !full.starts_with(&cwd) {
-        return Err(anyhow::anyhow!("Path escapes workspace"));
+    if must_exist {
+        let canonical = full.canonicalize()?;
+        if !canonical.starts_with(&cwd) {
+            return Err(anyhow::anyhow!("Path escapes workspace"));
+        }
+        Ok(canonical)
+    } else {
+        // For write operations: canonicalize the parent (which must exist),
+        // then append the filename. This allows writing to new files while
+        // still preventing path traversal attacks.
+        let parent = full.parent().ok_or_else(|| anyhow::anyhow!("Path has no parent directory"))?;
+        let canonical_parent = if parent.as_os_str().is_empty() {
+            cwd.clone()
+        } else {
+            parent.canonicalize()?
+        };
+        if !canonical_parent.starts_with(&cwd) {
+            return Err(anyhow::anyhow!("Path escapes workspace"));
+        }
+        let file_name = full.file_name().ok_or_else(|| anyhow::anyhow!("Path has no filename"))?;
+        Ok(canonical_parent.join(file_name))
     }
-
-    Ok(full)
 }

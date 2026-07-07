@@ -15,7 +15,7 @@ impl Tool for EditFileTool {
         let path = input.get("path")
             .and_then(|v| v.as_str())
             .context("Invalid path")?;
-        let path = safe_path(path)?;
+        let path = safe_path(path, true)?;
 
         let old_text = input
             .get("old_text")

@@ -15,7 +15,7 @@ impl Tool for ReadFileTool {
         let path = input.get("path")
             .and_then(|v| v.as_str())
             .context("Invalid path")?;
-        let path = safe_path(path)?;
+        let path = safe_path(path, true)?;
 
         let limit = input.get("limit").and_then(|v| v.as_u64());
 

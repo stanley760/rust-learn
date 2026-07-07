@@ -1,4 +1,4 @@
-use std::{borrow::Cow};
+use std::borrow::Cow;
 
 use anyhow::Context;
 use async_trait::async_trait;
@@ -11,13 +11,12 @@ pub struct WriteFileTool;
 
 #[async_trait]
 impl Tool for WriteFileTool {
-
-     async fn invoke(&self, input: &Value) -> anyhow::Result<String>  {
+    async fn invoke(&self, input: &Value) -> anyhow::Result<String> {
         let path = input
             .get("path")
             .and_then(|v| v.as_str())
             .context("Invalid path")?;
-        let path = safe_path(path)?;
+        let path = safe_path(path, false)?;
 
         let content = input
             .get("content")
@@ -31,18 +30,22 @@ impl Tool for WriteFileTool {
         let _ = fs::write(&path, content)
             .await
             .map_err(|e| anyhow::anyhow!("Error:write content error {}", e));
-    
-        Ok(format!("wrote {} bytes to {}", content.len(), path.display()))
+
+        Ok(format!(
+            "wrote {} bytes to {}",
+            content.len(),
+            path.display()
+        ))
     }
 
-    fn name(&self) -> Cow<'_,str>  {
+    fn name(&self) -> Cow<'_, str> {
         "write_file".into()
     }
 
     fn tool_spec(&self) -> ToolSpec {
-        ToolSpec { 
+        ToolSpec {
             name: "write_file".to_string(),
-            description: Some("Write content to file".to_string()), 
+            description: Some("Write content to file".to_string()),
             input_schema: serde_json::json!({
                 "type": "object",
                 "properties": {
@@ -50,7 +53,7 @@ impl Tool for WriteFileTool {
                     "content": { "type": "string" },
                 },
                 "required": ["path", "content"]
-            }) 
+            }),
         }
     }
 }
