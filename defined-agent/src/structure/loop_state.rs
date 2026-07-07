@@ -2,7 +2,7 @@ use anyhow::Context;
 use async_openai::{Client, config::OpenAIConfig};
 
 use async_openai::types::chat::{
-    ChatCompletionMessageToolCalls, ChatCompletionRequestAssistantMessage, ChatCompletionRequestAssistantMessageContent, ChatCompletionRequestMessage, ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestToolMessage, ChatCompletionRequestToolMessageContent, CreateChatCompletionRequestArgs, FinishReason,
+    ChatCompletionMessageToolCalls, ChatCompletionRequestAssistantMessage, ChatCompletionRequestAssistantMessageContent, ChatCompletionRequestMessage, ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestToolMessage, ChatCompletionRequestToolMessageContent, ChatCompletionRequestUserMessageArgs, CreateChatCompletionRequestArgs, FinishReason,
 };
 use std::collections::HashMap;
 use crate::tools::{Tool, all_tools};
@@ -26,10 +26,13 @@ Use bash to inspect and change the workspace. Act first, then report clearly.
 "#
 };
 
+const PLAN_REMINDER_INTERVAL: usize = 3;
+
 pub struct LoopState {
     client: Client<OpenAIConfig>,
     pub context: Vec<ChatCompletionRequestMessage>,
     tools: HashMap<String, Box<dyn Tool>>,
+    todo_rounds_since_update: usize
 }
 
 impl LoopState {
@@ -38,6 +41,7 @@ impl LoopState {
             client,
             context: Vec::new(),
             tools,
+            todo_rounds_since_update: 0,
         }
     }
 
@@ -58,8 +62,9 @@ impl LoopState {
         }
     }
 
-    async fn execute_tool_calls(&mut self, tool_calls: &[ChatCompletionMessageToolCalls]) -> Vec<ChatCompletionRequestMessage> {
+    async fn execute_tool_calls(&mut self, tool_calls: &[ChatCompletionMessageToolCalls]) -> anyhow::Result<Vec<ChatCompletionRequestMessage>> {
         let mut results = Vec::new();
+        let mut used_todo = false;
         for tc in tool_calls.iter() {
             let ChatCompletionMessageToolCalls::Function(f) = tc else {
                 continue;
@@ -80,10 +85,38 @@ impl LoopState {
                 content: ChatCompletionRequestToolMessageContent::Text(output_str),
                 tool_call_id: id,
             }));
+            if name == "todo" {
+                used_todo = true;
+            }
         }
-        results
+        if used_todo {
+            self.todo_rounds_since_update = 0;
+        } else {
+            self.note_round_without_update();
+            if let Some(reminder) = self.reminder() {
+                results.insert(0, ChatCompletionRequestUserMessageArgs::default()
+                    .content(reminder)
+                    .build()?
+                    .into());
+            }
+        }
+        Ok(results)
+    }
+
+    pub fn reminder(&mut self) -> Option<String> {
+        if self.todo_rounds_since_update >= PLAN_REMINDER_INTERVAL {
+            Some("<reminder>Refresh your current plan before continuing.</reminder>".into())
+        } else {
+            None
+        }
+    }
+
+    pub fn note_round_without_update(&mut self) {
+        self.todo_rounds_since_update += 1;
     }
 }
+
+
 
 pub async fn agent_loop(state: &mut LoopState) -> anyhow::Result<()> {
     state.context.push(
@@ -138,7 +171,7 @@ pub async fn agent_loop(state: &mut LoopState) -> anyhow::Result<()> {
             return Ok(());
         }
 
-        let tool_results = state.execute_tool_calls(&tool_calls).await;
+        let tool_results = state.execute_tool_calls(&tool_calls).await?;
         state.context.extend(tool_results);
     }
 }

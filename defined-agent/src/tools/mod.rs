@@ -11,6 +11,7 @@ mod bash;
 mod write_file;
 mod edit_file;
 mod read_file;
+mod todo;
 
 /// Provider-agnostic tool specification.
 ///
@@ -46,7 +47,7 @@ impl From<ToolSpec> for FunctionObject {
 
 #[async_trait]
 pub trait Tool: Send + Sync {
-    async fn invoke(&self, input: &Value) -> anyhow::Result<String>;
+    async fn invoke(&mut self, input: &Value) -> anyhow::Result<String>;
     fn name(&self) -> Cow<'_, str>;
     fn tool_spec(&self) -> ToolSpec;
 }
@@ -58,6 +59,7 @@ pub fn all_tools() -> Vec<ChatCompletionTools> {
         Box::new(edit_file::EditFileTool),
         Box::new(write_file::WriteFileTool), 
         Box::new(read_file::ReadFileTool),
+        todo::todo_tool(),
     ];
     tools.into_iter().map(|t| t.tool_spec().into_openai_tool()).collect()
 }
@@ -69,6 +71,7 @@ pub fn tool_registry() -> HashMap<String, Box<dyn Tool>> {
         Box::new(edit_file::EditFileTool),
         Box::new(write_file::WriteFileTool),
         Box::new(read_file::ReadFileTool),
+        todo::todo_tool(),
     ];
 
     tools.into_iter().map(|t| {

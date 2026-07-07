@@ -11,7 +11,7 @@ pub struct ReadFileTool;
 
 #[async_trait]
 impl Tool for ReadFileTool {
-    async fn invoke(&self, input: &Value) -> anyhow::Result<String> {
+    async fn invoke(&mut self, input: &Value) -> anyhow::Result<String> {
         let path = input.get("path")
             .and_then(|v| v.as_str())
             .context("Invalid path")?;

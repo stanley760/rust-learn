@@ -10,7 +10,7 @@ pub struct BashTool;
 
 #[async_trait]
 impl Tool for BashTool {
-    async fn invoke(&self, input: &Value) -> anyhow::Result<String> {
+    async fn invoke(&mut self, input: &Value) -> anyhow::Result<String> {
         let command = input["command"]
             .as_str()
             .ok_or_else(|| anyhow::anyhow!("missing 'command' field"))?;
