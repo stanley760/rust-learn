@@ -4,7 +4,8 @@ use defined_agent::{structure::{LoopState, agent_loop}, tools};
 use dialoguer::Input;
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
-
+/// tool-todo: 帮我查看当前目录的文件，然后读取 README.md 的内容，再列出src 目录的结构
+/// 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv()?;
