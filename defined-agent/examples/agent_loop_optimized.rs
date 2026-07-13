@@ -1,14 +1,50 @@
 use anyhow::Context;
-use async_openai::{Client, config::OpenAIConfig, types::chat::{ChatCompletionRequestAssistantMessageContent, ChatCompletionRequestMessage, ChatCompletionRequestUserMessageArgs}};
-use defined_agent::{structure::{LoopState, agent_loop}, tools};
+use async_openai::{
+    types::chat::{
+        ChatCompletionRequestAssistantMessageContent, 
+        ChatCompletionRequestMessage, 
+        ChatCompletionRequestUserMessageArgs
+    }
+};
+use defined_agent::{
+    structure::get_llm_client, 
+    structure::LoopState, 
+    tools::agent_tools
+};
 use dialoguer::Input;
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
-/// tool-todo: 帮我查看当前目录的文件，然后读取 README.md 的内容，再列出src 目录的结构
-/// 
+
+
+const SYSTEM: &str = if cfg!(target_os = "windows") {
+    r#"You are a coding agent.
+Use cmd.exe to inspect and change the workspace. Act first, then report clearly.
+IMPORTANT: You are on Windows. Use Windows commands only:
+- Use `dir` instead of `ls`, `type` instead of `cat`, `findstr` instead of `grep`.
+- Use backslashes in paths or forward slashes (both work).
+- Do NOT use Unix-only commands like ls, cat, grep, rm, chmod, etc.
+
+You have a `task` tool that spawns a sub-agent with fresh context. Use it when:
+- The user asks you to investigate, explore, or analyze something independently.
+- A task is complex enough to benefit from isolated execution.
+- You want to delegate a self-contained sub-task (e.g., "find all TODOs", "summarize a module").
+Call the task tool with a clear prompt describing what the sub-agent should do.
+"#
+} else {
+    r#"You are a coding agent.
+Use bash to inspect and change the workspace. Act first, then report clearly.
+
+You have a `task` tool that spawns a sub-agent with fresh context. Use it when:
+- The user asks you to investigate, explore, or analyze something independently.
+- A task is complex enough to benefit from isolated execution.
+- You want to delegate a self-contained sub-task (e.g., "find all TODOs", "summarize a module").
+Call the task tool with a clear prompt describing what the sub-agent should do.
+"#
+};
+
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    dotenvy::dotenv()?;
 
     // 初始化日志
     let subscriber = FmtSubscriber::builder()
@@ -16,10 +52,10 @@ async fn main() -> anyhow::Result<()> {
         .finish();
     tracing::subscriber::set_global_default(subscriber)?;
     // get tools from the tool registry
-    let tools = tools::tool_registry();
+    let tools = agent_tools();
     // 创建 OpenAI client
-    let client = Client::with_config(OpenAIConfig::default());
-    let mut state = LoopState::new(client, tools);
+    let client = get_llm_client()?;
+    let mut state = LoopState::new(client, tools, SYSTEM, 30);
 
     loop {
         let query: String = Input::new()
@@ -41,7 +77,7 @@ async fn main() -> anyhow::Result<()> {
         );
 
         // 运行 agent loop
-        agent_loop(&mut state).await?;
+        state.agent_loop().await?;
 
         // 提取并打印最终回复（从最后一条 Assistant 消息提取文本）
         let text = state.context.last().and_then(|msg| match msg {

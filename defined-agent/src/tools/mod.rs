@@ -7,11 +7,20 @@ use async_openai::types::chat::{
 use async_trait::async_trait;
 use serde_json::Value;
 
+use crate::tools::{
+    bash::bash_tool, 
+    edit_file::edit_file_tool, 
+    read_file::read_file_tool, 
+    sub_agent::sub_agent_tool, 
+    write_file::write_file_tool
+};
+
 mod bash;
 mod write_file;
 mod edit_file;
 mod read_file;
 mod todo;
+mod sub_agent;
 
 /// Provider-agnostic tool specification.
 ///
@@ -45,6 +54,25 @@ impl From<ToolSpec> for FunctionObject {
     }
 }
 
+pub fn agent_tools() -> HashMap<String, Box<dyn Tool>> {
+    HashMap::from([
+        ("bash".to_string(), bash_tool()),
+        ("read_file".to_string(), read_file_tool()),
+        ("write_file".to_string(), write_file_tool()),
+        ("edit_file".to_string(), edit_file_tool()),
+        ("task".to_string(), sub_agent_tool()),
+    ])
+}
+
+pub fn subagent_tools() -> HashMap<String, Box<dyn Tool>> {
+    HashMap::from([
+        ("bash".to_string(), bash_tool()),
+        ("read_file".to_string(), read_file_tool()),
+        ("write_file".to_string(), write_file_tool()),
+        ("edit_file".to_string(), edit_file_tool()),
+    ])
+}
+
 #[async_trait]
 pub trait Tool: Send + Sync {
     async fn invoke(&mut self, input: &Value) -> anyhow::Result<String>;
@@ -53,32 +81,32 @@ pub trait Tool: Send + Sync {
 }
 
 /// Return all registered tools as OpenAI-compatible `ChatCompletionTools`.
-pub fn all_tools() -> Vec<ChatCompletionTools> {
-    let tools: Vec<Box<dyn Tool>> = vec![
-        Box::new(bash::BashTool),
-        Box::new(edit_file::EditFileTool),
-        Box::new(write_file::WriteFileTool), 
-        Box::new(read_file::ReadFileTool),
-        todo::todo_tool(),
-    ];
-    tools.into_iter().map(|t| t.tool_spec().into_openai_tool()).collect()
-}
+// pub fn all_tools() -> Vec<ChatCompletionTools> {
+//     let tools: Vec<Box<dyn Tool>> = vec![
+//         Box::new(bash::BashTool),
+//         Box::new(edit_file::EditFileTool),
+//         Box::new(write_file::WriteFileTool), 
+//         Box::new(read_file::ReadFileTool),
+//         todo::todo_tool(),
+//     ];
+//     tools.into_iter().map(|t| t.tool_spec().into_openai_tool()).collect()
+// }
 
 /// Return a name → tool registry for dispatching tool calls.
-pub fn tool_registry() -> HashMap<String, Box<dyn Tool>> {
-    let tools: Vec<Box<dyn Tool>> = vec![
-        Box::new(bash::BashTool),
-        Box::new(edit_file::EditFileTool),
-        Box::new(write_file::WriteFileTool),
-        Box::new(read_file::ReadFileTool),
-        todo::todo_tool(),
-    ];
+// pub fn tool_registry() -> HashMap<String, Box<dyn Tool>> {
+//     let tools: Vec<Box<dyn Tool>> = vec![
+//         Box::new(bash::BashTool),
+//         Box::new(edit_file::EditFileTool),
+//         Box::new(write_file::WriteFileTool),
+//         Box::new(read_file::ReadFileTool),
+//         todo::todo_tool(),
+//     ];
 
-    tools.into_iter().map(|t| {
-        let name = t.name().into_owned();
-        (name, t)
-    }).collect()
-}
+//     tools.into_iter().map(|t| {
+//         let name = t.name().into_owned();
+//         (name, t)
+//     }).collect()
+// }
 
 /// Validate and resolve a path, ensuring it stays within the workspace.
 ///

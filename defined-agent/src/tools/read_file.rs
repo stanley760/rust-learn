@@ -9,6 +9,10 @@ use crate::tools::{Tool, ToolSpec, safe_path};
 
 pub struct ReadFileTool;
 
+pub fn read_file_tool() -> Box<dyn Tool> {
+    Box::new(ReadFileTool {}) as Box<dyn Tool>
+}
+
 #[async_trait]
 impl Tool for ReadFileTool {
     async fn invoke(&mut self, input: &Value) -> anyhow::Result<String> {

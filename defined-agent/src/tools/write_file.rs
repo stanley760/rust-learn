@@ -9,6 +9,9 @@ use crate::tools::{Tool, ToolSpec, safe_path};
 
 pub struct WriteFileTool;
 
+pub fn write_file_tool() -> Box<dyn Tool> {
+    Box::new(WriteFileTool {}) as Box<dyn Tool>
+}
 #[async_trait]
 impl Tool for WriteFileTool {
     async fn invoke(&mut self, input: &Value) -> anyhow::Result<String> {

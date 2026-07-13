@@ -8,6 +8,10 @@ use super::{Tool, ToolSpec};
 
 pub struct BashTool;
 
+pub fn bash_tool() -> Box<dyn Tool> {
+    Box::new(BashTool {}) as Box<dyn Tool>
+}
+
 #[async_trait]
 impl Tool for BashTool {
     async fn invoke(&mut self, input: &Value) -> anyhow::Result<String> {

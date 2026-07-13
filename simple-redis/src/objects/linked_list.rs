@@ -26,7 +26,8 @@ impl<T> Node<T> {
         self.ele
     }
 }
-
+/// todo deal the field of tail why not to use it.
+#[allow(dead_code)]
 pub struct Iter<'a, T: 'a> {
     head: Option<*mut Node<T>>,
     tail: Option<*mut Node<T>>,

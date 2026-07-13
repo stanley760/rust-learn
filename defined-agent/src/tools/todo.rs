@@ -8,6 +8,8 @@ use strum::EnumProperty as _;
 use strum_macros::EnumProperty;
 
 use crate::tools::{Tool, ToolSpec};
+
+#[allow(unused)]
 #[derive(EnumProperty, PartialEq, Eq, Clone, Debug, Hash, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum PlanItemStatus {
@@ -18,13 +20,13 @@ pub enum PlanItemStatus {
     #[strum(props(marker = "[√]"))]
     Completed,
 }
-
+#[allow(unused)]
 impl PlanItemStatus {
     pub fn marker(&self) -> &'static str {
         self.get_str("marker").unwrap()
     }
 }
-
+#[allow(unused)]
 #[derive(Clone, Debug, Deserialize)]
 pub struct PlanItem {
     content: String,
@@ -44,17 +46,17 @@ impl std::fmt::Display for PlanItem {
     }
 }
 
-
+#[allow(unused)]
 pub fn todo_tool() -> Box<dyn Tool> {
     Box::new(TodoManager::new()) as Box<dyn Tool>
 }
-
+#[allow(unused)]
 #[derive(Default)]
 pub struct TodoManager {
     items: Vec<PlanItem>
 }
 
-
+#[allow(unused)]
 impl TodoManager {
     pub fn new() -> Self {
         Self { items: Vec::new() }
