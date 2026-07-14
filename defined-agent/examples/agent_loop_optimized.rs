@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use anyhow::Context;
 use async_openai::{
     types::chat::{
@@ -7,42 +9,14 @@ use async_openai::{
     }
 };
 use defined_agent::{
-    structure::get_llm_client, 
-    structure::LoopState, 
-    tools::agent_tools
+    skills::get_skill_registry, structure::{LoopState, get_llm_client}, tools::toolset
 };
 use dialoguer::Input;
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
 
 
-const SYSTEM: &str = if cfg!(target_os = "windows") {
-    r#"You are a coding agent.
-Use cmd.exe to inspect and change the workspace. Act first, then report clearly.
-IMPORTANT: You are on Windows. Use Windows commands only:
-- Use `dir` instead of `ls`, `type` instead of `cat`, `findstr` instead of `grep`.
-- Use backslashes in paths or forward slashes (both work).
-- Do NOT use Unix-only commands like ls, cat, grep, rm, chmod, etc.
-
-You have a `task` tool that spawns a sub-agent with fresh context. Use it when:
-- The user asks you to investigate, explore, or analyze something independently.
-- A task is complex enough to benefit from isolated execution.
-- You want to delegate a self-contained sub-task (e.g., "find all TODOs", "summarize a module").
-Call the task tool with a clear prompt describing what the sub-agent should do.
-"#
-} else {
-    r#"You are a coding agent.
-Use bash to inspect and change the workspace. Act first, then report clearly.
-
-You have a `task` tool that spawns a sub-agent with fresh context. Use it when:
-- The user asks you to investigate, explore, or analyze something independently.
-- A task is complex enough to benefit from isolated execution.
-- You want to delegate a self-contained sub-task (e.g., "find all TODOs", "summarize a module").
-Call the task tool with a clear prompt describing what the sub-agent should do.
-"#
-};
-
-
+const SKILLS_DIR: &str = "skills";
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
 
@@ -52,10 +26,15 @@ async fn main() -> anyhow::Result<()> {
         .finish();
     tracing::subscriber::set_global_default(subscriber)?;
     // get tools from the tool registry
-    let tools = agent_tools();
+    // let tools = agent_tools();
+    // skill path : /User/xxxx/rust-learn/defined-agent/skills
+    let skills_dir = std::env::current_dir()?.join(SKILLS_DIR);
+    let registry = Arc::new(get_skill_registry(skills_dir)?);
+
+    let tools = toolset(registry.clone());
     // 创建 OpenAI client
     let client = get_llm_client()?;
-    let mut state = LoopState::new(client, tools, SYSTEM, 30);
+    let mut state = LoopState::new(client, tools, registry);
 
     loop {
         let query: String = Input::new()

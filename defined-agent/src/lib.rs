@@ -3,6 +3,7 @@ use async_openai::types::chat::{ChatCompletionRequestAssistantMessageContent, Ch
 pub mod llm;
 pub mod structure;
 pub mod tools;
+pub mod skills;
 
 pub fn extract_text(content: &ChatCompletionRequestAssistantMessageContent) -> String {
     match content {

@@ -14,6 +14,8 @@ use async_openai::types::chat::{
     FinishReason,
 };
 use std::collections::HashMap;
+use std::sync::Arc;
+use crate::skills::SkillRegistry;
 use crate::tools::Tool;
 
 fn get_model() -> anyhow::Result<String> {
@@ -32,21 +34,18 @@ pub struct LoopState {
     client: Client<OpenAIConfig>,
     pub context: Vec<ChatCompletionRequestMessage>,
     tools: HashMap<String, Box<dyn Tool>>,
-    pub system_prompt: String,
-    pub max_round: usize,
+    pub skill_registry: Arc<SkillRegistry>,
 }
 
 impl LoopState {
     pub fn new(client: Client<OpenAIConfig>,
         tools: HashMap<String, Box<dyn Tool>>,
-        system_prompt: impl Into<String>,
-        max_round: usize,) -> Self {
+        skill_registry: Arc<SkillRegistry>) -> Self {
         Self {
             client,
             tools,
             context: Vec::new(),
-            system_prompt: system_prompt.into(),
-            max_round
+            skill_registry,
         }
     }
 
@@ -67,13 +66,21 @@ impl LoopState {
         }
     }
     pub async fn agent_loop(&mut self) -> anyhow::Result<()> {
+        let system = format!(
+            r#"You are a coding agent at {}.
+            Use load_skill when a task needs specialized instructions before you act.
+            Skills available:{}
+            "#,
+            std::env::current_dir()?.display(),
+            self.skill_registry.describe_available()
+        );
         self.context.push(
             ChatCompletionRequestSystemMessageArgs::default()
-                .content(self.system_prompt.clone())
+                .content(system)
                 .build()?
                 .into(),
         );
-        for _ in 0..self.max_round {
+        loop {
             let tool_vec :Vec<ChatCompletionTools> = self.tools.values().map(|t| t.tool_spec().into_openai_tool()).collect();
             let request = CreateChatCompletionRequestArgs::default()
                 .model(get_model()?)
@@ -122,8 +129,6 @@ impl LoopState {
             let tool_results = self.execute_tool_calls(&tool_calls).await?;
             self.context.extend(tool_results);
         }
-
-        Ok(())
     }
 
 

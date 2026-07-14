@@ -1,17 +1,12 @@
 use std::borrow::Cow;
 
 use anyhow::Context;
-use async_openai::types::chat::{
-    ChatCompletionRequestMessage,
-    ChatCompletionRequestUserMessageArgs
-};
+
 use async_trait::async_trait;
 use serde_json::{Value, json};
 
 use crate::{
-    extract_text, 
-    structure::{LoopState, get_llm_client}, 
-    tools::{Tool, ToolSpec, subagent_tools}
+    tools::{Tool, ToolSpec}
 };
 
 pub struct SubAgentTool;
@@ -22,33 +17,34 @@ pub fn sub_agent_tool() -> Box<dyn Tool> {
 
 async fn sub_agent_loop(prompt: &str, description: Option<&str>) -> anyhow::Result<String> {
     println!("> task ----- ({}): {}", description.unwrap_or_default(), prompt);
-    let client = get_llm_client()?;
-    let tools = subagent_tools();
-    let system_prompt = format!(
-        "You are a coding subagent at {}. Complete the given task, then summarize your findings.",
-        std::env::current_dir()?.display()
-    );
-    let mut state = LoopState::new(client, tools, system_prompt, 30);
-    state.context.push(
-        ChatCompletionRequestUserMessageArgs::default()
-            .content(prompt)
-            .build()?
-            .into(),
-    );
+    // let client = get_llm_client()?;
+    // let tools = subagent_tools();
+    // let system_prompt = format!(
+    //     "You are a coding subagent at {}. Complete the given task, then summarize your findings.",
+    //     std::env::current_dir()?.display()
+    // );
+    // let mut state = LoopState::new(client, tools, system_prompt, 30);
+    // state.context.push(
+    //     ChatCompletionRequestUserMessageArgs::default()
+    //         .content(prompt)
+    //         .build()?
+    //         .into(),
+    // );
 
-    state.agent_loop().await?;
+    // state.agent_loop().await?;
 
-    let summary = state
-        .context
-        .iter()
-        .rev()
-        .find(|message| matches!(message, ChatCompletionRequestMessage::Assistant(_)))
-        .and_then(|message| if let ChatCompletionRequestMessage::Assistant(m) = message { m.content.as_ref() } else { None })
-        .map(extract_text)
-        .filter(|text| !text.is_empty())
-        .unwrap_or_else(|| "(no summary)".to_string());
+    // let summary = state
+    //     .context
+    //     .iter()
+    //     .rev()
+    //     .find(|message| matches!(message, ChatCompletionRequestMessage::Assistant(_)))
+    //     .and_then(|message| if let ChatCompletionRequestMessage::Assistant(m) = message { m.content.as_ref() } else { None })
+    //     .map(extract_text)
+    //     .filter(|text| !text.is_empty())
+    //     .unwrap_or_else(|| "(no summary)".to_string());
 
-    Ok(summary)
+    // Ok(summary)
+    todo!("LoopState new() parameters changes.")
 }
 
 #[async_trait]

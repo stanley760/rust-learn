@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, sync::Arc};
 use std::collections::HashMap;
 
 use async_openai::types::chat::{
@@ -7,13 +7,15 @@ use async_openai::types::chat::{
 use async_trait::async_trait;
 use serde_json::Value;
 
-use crate::tools::{
+use crate::{skills::SkillRegistry, tools::{
     bash::bash_tool, 
     edit_file::edit_file_tool, 
     read_file::read_file_tool, 
     sub_agent::sub_agent_tool, 
     write_file::write_file_tool
-};
+}};
+
+use crate::skills::load_skills_tool;
 
 mod bash;
 mod write_file;
@@ -52,6 +54,16 @@ impl From<ToolSpec> for FunctionObject {
         args.parameters(spec.input_schema);
         args.build().expect("Failed to build FunctionObject from ToolSpec")
     }
+}
+
+pub fn toolset(registry: Arc<SkillRegistry>) -> HashMap<String, Box<dyn Tool>> {
+    HashMap::from([
+        ("bash".to_string(), bash_tool()),
+        ("read_file".to_string(), read_file_tool()),
+        ("write_file".to_string(), write_file_tool()),
+        ("edit_file".to_string(), edit_file_tool()),
+        ("load_skill".to_string(), load_skills_tool(registry)),
+    ])
 }
 
 pub fn agent_tools() -> HashMap<String, Box<dyn Tool>> {
