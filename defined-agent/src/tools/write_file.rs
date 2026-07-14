@@ -27,12 +27,14 @@ impl Tool for WriteFileTool {
             .context("Invalid content")?;
 
         if let Some(parent_path) = path.parent() {
-            fs::create_dir_all(parent_path).await.ok();
+            fs::create_dir_all(parent_path)
+                .await
+                .map_err(|e| anyhow::anyhow!("Error: create parent dir {}: {}", parent_path.display(), e))?;
         }
 
-        let _ = fs::write(&path, content)
+        fs::write(&path, content)
             .await
-            .map_err(|e| anyhow::anyhow!("Error:write content error {}", e));
+            .map_err(|e| anyhow::anyhow!("Error: write content to {}: {}", path.display(), e))?;
 
         Ok(format!(
             "wrote {} bytes to {}",
