@@ -1,24 +1,23 @@
-use anyhow::Context;
+﻿use anyhow::Context;
 use async_openai::{Client, config::OpenAIConfig};
 
+use crate::context::{CompactState, estimate_context_size, micro_compact, persist_large_output};
+use crate::tools::Tool;
 use async_openai::types::chat::{
-    ChatCompletionMessageToolCalls, 
-    ChatCompletionRequestAssistantMessage, 
-    ChatCompletionRequestAssistantMessageContent, 
-    ChatCompletionRequestMessage, 
-    ChatCompletionRequestSystemMessageArgs, 
-    ChatCompletionRequestToolMessage, 
-    ChatCompletionRequestToolMessageContent, 
-    ChatCompletionTools, 
-    CreateChatCompletionRequestArgs, 
-    FinishReason,
+    ChatCompletionMessageToolCalls, ChatCompletionRequestAssistantMessage,
+    ChatCompletionRequestAssistantMessageContent, ChatCompletionRequestAssistantMessageContentPart,
+    ChatCompletionRequestMessage, ChatCompletionRequestSystemMessage,
+    ChatCompletionRequestSystemMessageContent, ChatCompletionRequestSystemMessageContentPart,
+    ChatCompletionRequestToolMessage, ChatCompletionRequestToolMessageContent,
+    ChatCompletionRequestToolMessageContentPart,
+    ChatCompletionRequestUserMessageContent, ChatCompletionRequestUserMessageContentPart,
+    ChatCompletionTools, CreateChatCompletionRequest, FinishReason,
 };
 use std::collections::HashMap;
-use std::sync::Arc;
-use crate::skills::SkillRegistry;
-use crate::tools::Tool;
 
-fn get_model() -> anyhow::Result<String> {
+const CONTEXT_LIMIT: usize = 50000;
+
+pub fn get_model() -> anyhow::Result<String> {
     dotenvy::dotenv()?;
     std::env::var("OPENAI_MODEL").context("OPENAI_MODEL is not set")
 }
@@ -29,65 +28,73 @@ pub fn get_llm_client() -> anyhow::Result<Client<OpenAIConfig>> {
     Ok(client)
 }
 
+pub fn system_message(content: impl Into<String>) -> ChatCompletionRequestMessage {
+    ChatCompletionRequestMessage::System(ChatCompletionRequestSystemMessage {
+        content: ChatCompletionRequestSystemMessageContent::Text(content.into()),
+        name: None,
+    })
+}
+
+pub fn tool_result_message(
+    tool_call_id: impl Into<String>,
+    content: impl Into<String>,
+) -> ChatCompletionRequestMessage {
+    ChatCompletionRequestMessage::Tool(ChatCompletionRequestToolMessage {
+        content: ChatCompletionRequestToolMessageContent::Text(content.into()),
+        tool_call_id: tool_call_id.into(),
+    })
+}
 
 pub struct LoopState {
-    client: Client<OpenAIConfig>,
+    pub client: Client<OpenAIConfig>,
     pub context: Vec<ChatCompletionRequestMessage>,
     tools: HashMap<String, Box<dyn Tool>>,
-    pub skill_registry: Arc<SkillRegistry>,
+    pub compact_state: CompactState,
 }
 
 impl LoopState {
-    pub fn new(client: Client<OpenAIConfig>,
-        tools: HashMap<String, Box<dyn Tool>>,
-        skill_registry: Arc<SkillRegistry>) -> Self {
+    pub fn new(client: Client<OpenAIConfig>, tools: HashMap<String, Box<dyn Tool>>) -> Self {
         Self {
             client,
-            tools,
             context: Vec::new(),
-            skill_registry,
+            tools,
+            compact_state: CompactState::default(),
         }
     }
 
-    async fn execute(&mut self, name: &str, input: &serde_json::Value) -> anyhow::Result<String> {
-        let Some(tool) = self.tools.get_mut(name) else {
-            return Err(anyhow::anyhow!("Unknown tool: {name}"));
-        };
-
-        match tool.invoke(input).await {
-            Ok(output) => {
-                println!("Command:{}\n arg:{}\n output:\n{}\n", name, input, output);
-                Ok(output)
-            }
-            Err(e) => {
-                println!("Error invoking tool {}: {}", name, e);
-                Err(anyhow::anyhow!("Error invoking tool {}: {}", name, e))
-            }
-        }
-    }
     pub async fn agent_loop(&mut self) -> anyhow::Result<()> {
         let system = format!(
             r#"You are a coding agent at {}.
-            Use load_skill when a task needs specialized instructions before you act.
-            Skills available:{}
-            "#,
+Keep working step by step, and use compact if the conversation gets too long.
+"#,
             std::env::current_dir()?.display(),
-            self.skill_registry.describe_available()
         );
-        self.context.push(
-            ChatCompletionRequestSystemMessageArgs::default()
-                .content(system)
-                .build()?
-                .into(),
-        );
+
         loop {
-            let tool_vec :Vec<ChatCompletionTools> = self.tools.values().map(|t| t.tool_spec().into_openai_tool()).collect();
-            let request = CreateChatCompletionRequestArgs::default()
-                .model(get_model()?)
-                .messages(self.context.clone())
-                .max_completion_tokens(8000u32)
-                .tools(tool_vec)
-                .build()?;
+            micro_compact(&mut self.context);
+
+            if estimate_context_size(&self.context) > CONTEXT_LIMIT {
+                println!("[auto compact]");
+                self.compact_history(None).await?;
+            }
+
+            // 构造请求：system message 放在 messages 开头
+            let mut messages = vec![system_message(&system)];
+            messages.extend(self.context.clone());
+
+            let tool_vec: Vec<ChatCompletionTools> = self
+                .tools
+                .values()
+                .map(|t| t.tool_spec().into_openai_tool())
+                .collect();
+
+            let request = CreateChatCompletionRequest {
+                messages,
+                model: get_model()?,
+                tools: Some(tool_vec),
+                max_completion_tokens: Some(8000),
+                ..Default::default()
+            };
 
             let response = self.client.chat().create(request).await?;
 
@@ -95,10 +102,11 @@ impl LoopState {
                 .choices
                 .into_iter()
                 .next()
-                .ok_or_else(|| anyhow::anyhow!("No response choice"))?;
+                .context("no response choice")?;
 
             let msg = choice.message;
 
+            // 把 assistant 回复加入上下文
             self.context.push(ChatCompletionRequestMessage::Assistant(
                 ChatCompletionRequestAssistantMessage {
                     content: msg
@@ -113,52 +121,156 @@ impl LoopState {
                 },
             ));
 
-            match choice.finish_reason {
-                Some(FinishReason::ToolCalls) => {}
-                _ => return Ok(()),
-            }
-
-            let Some(tool_calls) = msg.tool_calls else {
-                return Ok(());
-            };
-
-            if tool_calls.is_empty() {
+            // 判断是否需要继续调用工具
+            if !matches!(choice.finish_reason, Some(FinishReason::ToolCalls)) {
                 return Ok(());
             }
 
-            let tool_results = self.execute_tool_calls(&tool_calls).await?;
-            self.context.extend(tool_results);
+            self.execute_tool_call(&msg.tool_calls).await?;
         }
     }
 
+    pub async fn execute_tool_call(
+        &mut self,
+        tool_calls: &Option<Vec<ChatCompletionMessageToolCalls>>,
+    ) -> anyhow::Result<()> {
+        let Some(calls) = tool_calls else {
+            return Ok(());
+        };
 
-    async fn execute_tool_calls(&mut self, tool_calls: &[ChatCompletionMessageToolCalls]) -> anyhow::Result<Vec<ChatCompletionRequestMessage>> {
-        let mut results = Vec::new();
-        for tc in tool_calls.iter() {
-            let ChatCompletionMessageToolCalls::Function(f) = tc else {
-                continue;
+        let mut manual_compact = false;
+        let mut compact_focus: Option<String> = None;
+
+        for call in calls {
+            let (id, name, arguments) = match call {
+                ChatCompletionMessageToolCalls::Function(f) => {
+                    (&f.id, f.function.name.clone(), f.function.arguments.clone())
+                }
+                ChatCompletionMessageToolCalls::Custom(c) => (
+                    &c.id,
+                    c.custom_tool.name.clone(),
+                    c.custom_tool.input.clone(),
+                ),
             };
 
-            let id = f.id.clone();
-            let name = f.function.name.clone();
-            let cmd = serde_json::from_str::<serde_json::Value>(&f.function.arguments)
-                .unwrap_or_default();
+            let input: serde_json::Value = serde_json::from_str(&arguments).unwrap_or_default();
 
-            let output_str = self.execute(&name, &cmd)
-                .await
-                .map_or_else(|e| format!("Error: {}", e), |s| s);
+// [CLIPPY-WARNING] needless_borrow: id (line 158)
+            let output: String = self.execute(&id, &name, &input).await;
 
-            println!("Command '{}' output: {}", cmd, output_str);
+            // OpenAI: 每个 tool result 是一条独立的 Tool role message
+            self.context.push(tool_result_message(id, &output));
+// [CLIPPY-WARNING] collapsible_if (line 163)
 
-            results.push(ChatCompletionRequestMessage::Tool(ChatCompletionRequestToolMessage {
-                content: ChatCompletionRequestToolMessageContent::Text(output_str),
-                tool_call_id: id,
-            }));
-            
+            if name == "read_file" {
+                if let Some(path) = input.get("path").and_then(|v| v.as_str()) {
+                    self.remember_recent_file(path);
+                }
+            }
+            if name == "compact" {
+                println!("[manual compact]");
+                manual_compact = true;
+                compact_focus = input
+                    .get("focus")
+                    .and_then(|v| v.as_str())
+                    .map(String::from);
+            }
         }
-        Ok(results)
+
+        if manual_compact {
+            self.compact_history(compact_focus.as_deref())
+                .await
+                .context("manual compact failed")?;
+        }
+        Ok(())
+    }
+
+    async fn execute(
+        &mut self,
+        tool_call_id: &str,
+        name: &str,
+        input: &serde_json::Value,
+    ) -> String {
+        let Some(tool) = self.tools.get_mut(name) else {
+            return format!("Unknown tool: {name}");
+        };
+
+        match tool.invoke(input).await {
+            Ok(output) => {
+                let output = if name == "bash" {
+                    match persist_large_output(tool_call_id, &output) {
+                        Ok(compacted) => compacted,
+                        Err(e) => format!("Error persisting large output: {}", e),
+                    }
+                } else {
+                    output
+                };
+
+                println!(
+                    "Command:{}\n arg:{}\n output:\n{}\n",
+                    name,
+                    input,
+                    output.chars().take(200).collect::<String>()
+                );
+                output
+            }
+            Err(e) => {
+                println!("Error invoking tool {}: {}", name, e);
+                format!("Error invoking tool {}: {}", name, e)
+            }
+        }
     }
 }
 
-
-
+pub fn extract_text(message: &ChatCompletionRequestMessage) -> String {
+    match message {
+        ChatCompletionRequestMessage::User(m) => match &m.content {
+            ChatCompletionRequestUserMessageContent::Text(t) => t.clone(),
+            ChatCompletionRequestUserMessageContent::Array(parts) => parts
+                .iter()
+                .filter_map(|p| match p {
+                    ChatCompletionRequestUserMessageContentPart::Text(t) => Some(t.text.as_str()),
+                    _ => None,
+                })
+                .collect::<Vec<_>>()
+                .join("\n"),
+        },
+        ChatCompletionRequestMessage::Assistant(m) => match &m.content {
+            Some(ChatCompletionRequestAssistantMessageContent::Text(t)) => t.clone(),
+            Some(ChatCompletionRequestAssistantMessageContent::Array(parts)) => parts
+                .iter()
+                .filter_map(|p| match p {
+                    ChatCompletionRequestAssistantMessageContentPart::Text(t) => {
+                        Some(t.text.as_str())
+                    }
+                    _ => None,
+                })
+                .collect::<Vec<_>>()
+                .join("\n"),
+            None => String::new(),
+        },
+        ChatCompletionRequestMessage::Tool(m) => match &m.content {
+            ChatCompletionRequestToolMessageContent::Text(t) => t.clone(),
+// [CLIPPY-WARNING] unnecessary_filter_map (line 254)
+            ChatCompletionRequestToolMessageContent::Array(parts) => parts
+                .iter()
+                .filter_map(|p| match p {
+                    ChatCompletionRequestToolMessageContentPart::Text(t) => Some(t.text.as_str()),
+                })
+                .collect::<Vec<_>>()
+                .join("\n"),
+        },
+        ChatCompletionRequestMessage::System(m) => match &m.content {
+// [CLIPPY-WARNING] unnecessary_filter_map (line 264)
+            ChatCompletionRequestSystemMessageContent::Text(t) => t.clone(),
+            ChatCompletionRequestSystemMessageContent::Array(parts) => parts
+                .iter()
+                .filter_map(|p| match p {
+                    ChatCompletionRequestSystemMessageContentPart::Text(t) => Some(t.text.as_str()),
+                })
+                .collect::<Vec<_>>()
+                .join("\n"),
+        },
+        _ => String::new(),
+    }
+}

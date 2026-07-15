@@ -1,7 +1,8 @@
-use defined_agent::llm::complete;
+﻿use defined_agent::llm::complete;
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
 
+// [CLIPPY-WARNING] redundant_static_lifetimes: static str (line 5)
 const CHAT_GPT_120B: &'static str = "openai/gpt-oss-120b:free";
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

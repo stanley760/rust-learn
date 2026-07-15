@@ -1,25 +1,14 @@
-use std::sync::Arc;
-
 use anyhow::Context;
-use async_openai::{
-    types::chat::{
-        ChatCompletionRequestAssistantMessageContent, 
-        ChatCompletionRequestMessage, 
-        ChatCompletionRequestUserMessageArgs
-    }
-};
+use async_openai::types::chat::ChatCompletionRequestUserMessageArgs;
 use defined_agent::{
-    skills::get_skill_registry, structure::{LoopState, get_llm_client}, tools::toolset
+    structure::{LoopState, extract_text, get_llm_client}, tools::toolset_compact,
 };
 use dialoguer::Input;
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
 
-
-const SKILLS_DIR: &str = "skills";
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-
     // 初始化日志
     let subscriber = FmtSubscriber::builder()
         .with_max_level(Level::INFO)
@@ -28,13 +17,13 @@ async fn main() -> anyhow::Result<()> {
     // get tools from the tool registry
     // let tools = agent_tools();
     // skill path : /User/xxxx/rust-learn/defined-agent/skills
-    let skills_dir = std::env::current_dir()?.join(SKILLS_DIR);
-    let registry = Arc::new(get_skill_registry(skills_dir)?);
+    // let skills_dir = std::env::current_dir()?.join(SKILLS_DIR);
+    // let registry = Arc::new(get_skill_registry(skills_dir)?);
 
-    let tools = toolset(registry.clone());
+    let tools = toolset_compact();
     // 创建 OpenAI client
     let client = get_llm_client()?;
-    let mut state = LoopState::new(client, tools, registry);
+    let mut state = LoopState::new(client, tools);
 
     loop {
         let query: String = Input::new()
@@ -59,16 +48,10 @@ async fn main() -> anyhow::Result<()> {
         state.agent_loop().await?;
 
         // 提取并打印最终回复（从最后一条 Assistant 消息提取文本）
-        let text = state.context.last().and_then(|msg| match msg {
-            ChatCompletionRequestMessage::Assistant(m) => m.content.as_ref().and_then(|c| match c {
-                ChatCompletionRequestAssistantMessageContent::Text(t) => Some(t.clone()),
-                _ => None,
-            }),
-            _ => None,
-        });
-        if let Some(text) = text {
-            println!("--- Final response:\n{}", text);
-        }
+        let Some(final_msg) = state.context.last() else {
+            continue;
+        };
+        println!("--- Final response:\n{}", extract_text(final_msg));
     }
 
     Ok(())

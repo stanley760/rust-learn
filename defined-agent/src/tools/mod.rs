@@ -1,4 +1,4 @@
-use std::{borrow::Cow, sync::Arc};
+﻿use std::{borrow::Cow, sync::Arc};
 use std::collections::HashMap;
 
 use async_openai::types::chat::{
@@ -7,6 +7,7 @@ use async_openai::types::chat::{
 use async_trait::async_trait;
 use serde_json::Value;
 
+use crate::tools::compact::compact_tool;
 use crate::{skills::SkillRegistry, tools::{
     bash::bash_tool, 
     edit_file::edit_file_tool, 
@@ -23,6 +24,7 @@ mod edit_file;
 mod read_file;
 mod todo;
 mod sub_agent;
+mod compact;
 
 /// Provider-agnostic tool specification.
 ///
@@ -54,6 +56,17 @@ impl From<ToolSpec> for FunctionObject {
         args.parameters(spec.input_schema);
         args.build().expect("Failed to build FunctionObject from ToolSpec")
     }
+}
+
+
+pub fn toolset_compact() -> HashMap<String, Box<dyn Tool>> {
+    HashMap::from([
+        ("bash".to_string(), bash_tool()),
+        ("read_file".to_string(), read_file_tool()),
+        ("write_file".to_string(), write_file_tool()),
+        ("edit_file".to_string(), edit_file_tool()),
+        ("compact".to_string(), compact_tool()),
+    ])
 }
 
 pub fn toolset(registry: Arc<SkillRegistry>) -> HashMap<String, Box<dyn Tool>> {
@@ -92,6 +105,7 @@ pub trait Tool: Send + Sync {
     fn tool_spec(&self) -> ToolSpec;
 }
 
+// [CLIPPY-WARNING] empty_line_after_doc_comments (line 108)
 /// Return all registered tools as OpenAI-compatible `ChatCompletionTools`.
 // pub fn all_tools() -> Vec<ChatCompletionTools> {
 //     let tools: Vec<Box<dyn Tool>> = vec![
