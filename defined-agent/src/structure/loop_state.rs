@@ -156,16 +156,15 @@ Keep working step by step, and use compact if the conversation gets too long.
             let input: serde_json::Value = serde_json::from_str(&arguments).unwrap_or_default();
 
 // [CLIPPY-WARNING] needless_borrow: id (line 158)
-            let output: String = self.execute(&id, &name, &input).await;
+            let output: String = self.execute(id, &name, &input).await;
 
             // OpenAI: 每个 tool result 是一条独立的 Tool role message
             self.context.push(tool_result_message(id, &output));
 // [CLIPPY-WARNING] collapsible_if (line 163)
 
-            if name == "read_file" {
-                if let Some(path) = input.get("path").and_then(|v| v.as_str()) {
-                    self.remember_recent_file(path);
-                }
+            if name == "read_file" 
+                && let Some(path) = input.get("path").and_then(|v| v.as_str()) {
+                self.remember_recent_file(path);
             }
             if name == "compact" {
                 println!("[manual compact]");
@@ -254,8 +253,8 @@ pub fn extract_text(message: &ChatCompletionRequestMessage) -> String {
 // [CLIPPY-WARNING] unnecessary_filter_map (line 254)
             ChatCompletionRequestToolMessageContent::Array(parts) => parts
                 .iter()
-                .filter_map(|p| match p {
-                    ChatCompletionRequestToolMessageContentPart::Text(t) => Some(t.text.as_str()),
+                .map(|p| match p {
+                    ChatCompletionRequestToolMessageContentPart::Text(t) => t.text.as_str(),
                 })
                 .collect::<Vec<_>>()
                 .join("\n"),
@@ -265,8 +264,8 @@ pub fn extract_text(message: &ChatCompletionRequestMessage) -> String {
             ChatCompletionRequestSystemMessageContent::Text(t) => t.clone(),
             ChatCompletionRequestSystemMessageContent::Array(parts) => parts
                 .iter()
-                .filter_map(|p| match p {
-                    ChatCompletionRequestSystemMessageContentPart::Text(t) => Some(t.text.as_str()),
+                .map(|p| match p {
+                    ChatCompletionRequestSystemMessageContentPart::Text(t) => t.text.as_str(),
                 })
                 .collect::<Vec<_>>()
                 .join("\n"),

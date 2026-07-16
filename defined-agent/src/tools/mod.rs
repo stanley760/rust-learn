@@ -105,34 +105,6 @@ pub trait Tool: Send + Sync {
     fn tool_spec(&self) -> ToolSpec;
 }
 
-// [CLIPPY-WARNING] empty_line_after_doc_comments (line 108)
-/// Return all registered tools as OpenAI-compatible `ChatCompletionTools`.
-// pub fn all_tools() -> Vec<ChatCompletionTools> {
-//     let tools: Vec<Box<dyn Tool>> = vec![
-//         Box::new(bash::BashTool),
-//         Box::new(edit_file::EditFileTool),
-//         Box::new(write_file::WriteFileTool), 
-//         Box::new(read_file::ReadFileTool),
-//         todo::todo_tool(),
-//     ];
-//     tools.into_iter().map(|t| t.tool_spec().into_openai_tool()).collect()
-// }
-
-/// Return a name → tool registry for dispatching tool calls.
-// pub fn tool_registry() -> HashMap<String, Box<dyn Tool>> {
-//     let tools: Vec<Box<dyn Tool>> = vec![
-//         Box::new(bash::BashTool),
-//         Box::new(edit_file::EditFileTool),
-//         Box::new(write_file::WriteFileTool),
-//         Box::new(read_file::ReadFileTool),
-//         todo::todo_tool(),
-//     ];
-
-//     tools.into_iter().map(|t| {
-//         let name = t.name().into_owned();
-//         (name, t)
-//     }).collect()
-// }
 
 /// Validate and resolve a path, ensuring it stays within the workspace.
 ///

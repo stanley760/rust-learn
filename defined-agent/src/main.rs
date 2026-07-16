@@ -3,7 +3,7 @@ use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
 
 // [CLIPPY-WARNING] redundant_static_lifetimes: static str (line 5)
-const CHAT_GPT_120B: &'static str = "openai/gpt-oss-120b:free";
+const CHAT_GPT_120B: &str = "openai/gpt-oss-120b:free";
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv()?;

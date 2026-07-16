@@ -112,7 +112,7 @@ pub async fn execute_tool_calls(
 // [CLIPPY-WARNING] unnecessary_result_map_or_else (line 112)
             let output_str = run_bash(&cmd)
                 .await
-                .map_or_else(|e| format!("Error: {}", e), |s| s);
+                .unwrap_or_else(|e| format!("Error: {}", e));
 
             println!("Command '{}' output: {}", cmd, output_str);
 
