@@ -1,10 +1,10 @@
 use anyhow::Context;
 use async_openai::types::chat::ChatCompletionRequestUserMessageArgs;
 use defined_agent::{
-    structure::{LoopState, extract_text, get_llm_client}, tools::toolset_compact,
+    permission::{PermissionManager, PermissionMode}, structure::{LoopState, extract_text, get_llm_client}, tools::toolset_compact,
 };
-use dialoguer::Input;
-use tracing::Level;
+use inquire::{Select, Text};
+use tracing::{Level, info};
 use tracing_subscriber::FmtSubscriber;
 
 #[tokio::main]
@@ -21,19 +21,47 @@ async fn main() -> anyhow::Result<()> {
     // let registry = Arc::new(get_skill_registry(skills_dir)?);
 
     let tools = toolset_compact();
+
+    let mode = Select::new(
+        "Permission mode:",
+        vec![
+            PermissionMode::Default,
+            PermissionMode::Plan,
+            PermissionMode::Auto,
+        ],
+    )
+    .prompt()
+    .context("An error happened or user cancelled the input.")?;
+
+    let manager = PermissionManager::try_new(mode)?;
+    info!("[Permission mode: {}]", manager.mode());
+    
     // 创建 OpenAI client
     let client = get_llm_client()?;
-    let mut state = LoopState::new(client, tools);
+    let mut state = LoopState::new(client, tools, manager);
 
     loop {
-        let query: String = Input::new()
-            .with_prompt("--- How can I help you?")
-            .interact_text()
+        let query = Text::new("--- How can I help you?")
+            .prompt()
             .context("An error happened or user cancelled the input.")?;
 
         // 输入 exit() 退出循环
         if query.trim() == "exit()" {
             break;
+        }
+
+        if query.trim() == "/rules" {
+            for (index, rule) in state.manager.rules().iter().enumerate() {
+                println!("  {index}: {rule}");
+            }
+            continue;
+        }
+
+        if query.trim().starts_with("/mode") {
+            state
+                .handle_mode_command(&query)
+                .context("failed to switch permission mode")?;
+            continue;
         }
 
         // 将用户输入作为 User message 推入上下文

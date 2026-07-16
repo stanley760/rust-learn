@@ -1,7 +1,8 @@
 ﻿use anyhow::Context;
 use async_openai::{Client, config::OpenAIConfig};
-
+use inquire::Select;
 use crate::context::{CompactState, estimate_context_size, micro_compact, persist_large_output};
+use crate::permission::{PermissionBehavior, PermissionDecision, PermissionManager, PermissionMode};
 use crate::tools::Tool;
 use async_openai::types::chat::{
     ChatCompletionMessageToolCalls, ChatCompletionRequestAssistantMessage,
@@ -50,15 +51,17 @@ pub struct LoopState {
     pub context: Vec<ChatCompletionRequestMessage>,
     tools: HashMap<String, Box<dyn Tool>>,
     pub compact_state: CompactState,
+    pub manager: PermissionManager,
 }
 
 impl LoopState {
-    pub fn new(client: Client<OpenAIConfig>, tools: HashMap<String, Box<dyn Tool>>) -> Self {
+    pub fn new(client: Client<OpenAIConfig>, tools: HashMap<String, Box<dyn Tool>>, manager: PermissionManager) -> Self {
         Self {
             client,
             context: Vec::new(),
             tools,
             compact_state: CompactState::default(),
+            manager,
         }
     }
 
@@ -155,12 +158,35 @@ Keep working step by step, and use compact if the conversation gets too long.
 
             let input: serde_json::Value = serde_json::from_str(&arguments).unwrap_or_default();
 
-// [CLIPPY-WARNING] needless_borrow: id (line 158)
-            let output: String = self.execute(id, &name, &input).await;
+            // Permission check
+            let decision = self.manager.check(&name, &input);
+            let output = match decision {
+                PermissionDecision {
+                    behavior: PermissionBehavior::Deny,
+                    reason,
+                } => {
+                    println!("  [DENIED] {}: {}", name, reason);
+                    format!("Permission denied: {}", reason)
+                }
+                PermissionDecision {
+                    behavior: PermissionBehavior::Allow,
+                    reason: _,
+                } => self.execute(id, &name, &input).await,
+                PermissionDecision {
+                    behavior: PermissionBehavior::Ask,
+                    reason: _reason,
+                } => {
+                    if self.manager.ask_user(&name, &input)? {
+                        self.execute(id, &name, &input).await
+                    } else {
+                        println!("  [USER DENIED] {name}");
+                        format!("Permission denied by user for {name}")
+                    }
+                }
+            };
 
             // OpenAI: 每个 tool result 是一条独立的 Tool role message
             self.context.push(tool_result_message(id, &output));
-// [CLIPPY-WARNING] collapsible_if (line 163)
 
             if name == "read_file" 
                 && let Some(path) = input.get("path").and_then(|v| v.as_str()) {
@@ -183,6 +209,36 @@ Keep working step by step, and use compact if the conversation gets too long.
         }
         Ok(())
     }
+
+    pub fn handle_mode_command(&mut self, query: &str) -> anyhow::Result<()> {
+        let parts: Vec<&str> = query.split_whitespace().collect::<Vec<_>>();
+
+        let mode = if parts.len() == 2 {
+            parts[1].parse::<PermissionMode>().with_context(|| {
+                format!(
+                    "unknown mode: {}. Usage: /mode <default|plan|auto>",
+                    parts[1]
+                )
+            })?
+        } else {
+            Select::new(
+                "Switch permission mode:",
+                vec![
+                    PermissionMode::Default,
+                    PermissionMode::Plan,
+                    PermissionMode::Auto,
+                ],
+            )
+            .prompt()
+            .context("An error happened or user cancelled the input.")?
+        };
+
+        self.manager.set_mode(mode);
+        println!("[Switched to {}]", self.manager.mode());
+
+        Ok(())
+    }
+
 
     async fn execute(
         &mut self,
