@@ -1,7 +1,10 @@
 ﻿use anyhow::Context;
 use async_openai::{Client, config::OpenAIConfig};
 use inquire::Select;
+use tracing::{error, info};
 use crate::context::{CompactState, estimate_context_size, micro_compact, persist_large_output};
+use crate::hook::{self, Hook, HookControl, HookTypes, PostToolUseFn, PreToolUseFn, SessionStartFn, ToolResult, ToolUse};
+use crate::invoke_hooks;
 use crate::permission::{PermissionBehavior, PermissionDecision, PermissionManager, PermissionMode};
 use crate::tools::Tool;
 use async_openai::types::chat::{
@@ -52,6 +55,7 @@ pub struct LoopState {
     tools: HashMap<String, Box<dyn Tool>>,
     pub compact_state: CompactState,
     pub manager: PermissionManager,
+    pub hooks: Vec<Hook>,
 }
 
 impl LoopState {
@@ -62,6 +66,7 @@ impl LoopState {
             tools,
             compact_state: CompactState::default(),
             manager,
+            hooks: Vec::new(),
         }
     }
 
@@ -145,6 +150,7 @@ Keep working step by step, and use compact if the conversation gets too long.
         let mut compact_focus: Option<String> = None;
 
         for call in calls {
+            let mut result = Vec::new();
             let (id, name, arguments) = match call {
                 ChatCompletionMessageToolCalls::Function(f) => {
                     (&f.id, f.function.name.clone(), f.function.arguments.clone())
@@ -157,15 +163,30 @@ Keep working step by step, and use compact if the conversation gets too long.
             };
 
             let input: serde_json::Value = serde_json::from_str(&arguments).unwrap_or_default();
+            let mut tool_use = ToolUse {
+                id: id.clone(),
+                name: name.clone(),
+                input: input.clone(),
+            };
 
+            if let HookControl::Block(reason) = invoke_hooks!(PreToolUse, self,&mut tool_use)? {
+               
+                result.push(ChatCompletionRequestMessage::Tool(
+                    ChatCompletionRequestToolMessage {
+                        tool_call_id: tool_use.id.clone(),
+                        content: ChatCompletionRequestToolMessageContent::Text(format!("Tool blocked by PreToolUse hook: {reason}")),
+                    },
+                ));
+                continue;
+            }
             // Permission check
-            let decision = self.manager.check(&name, &input);
+            let decision = self.manager.check(&tool_use.name, &tool_use.input);
             let output = match decision {
                 PermissionDecision {
                     behavior: PermissionBehavior::Deny,
                     reason,
                 } => {
-                    println!("  [DENIED] {}: {}", name, reason);
+                    info!("  [DENIED] {}: {}", name, reason);
                     format!("Permission denied: {}", reason)
                 }
                 PermissionDecision {
@@ -184,9 +205,17 @@ Keep working step by step, and use compact if the conversation gets too long.
                     }
                 }
             };
-
+            let mut tool_result = ToolResult {
+                tool_use_id: tool_use.id.clone(),
+                content: output,
+            };
+            if let hook::HookControl::Block(reason) =
+                invoke_hooks!(PostToolUse, self, &tool_use, &mut tool_result)?
+            {
+                tool_result.content = format!("Tool blocked by PostToolUse hook: {reason}");
+            }
             // OpenAI: 每个 tool result 是一条独立的 Tool role message
-            self.context.push(tool_result_message(id, &output));
+            self.context.push(tool_result_message(tool_result.tool_use_id, tool_result.content));
 
             if name == "read_file" 
                 && let Some(path) = input.get("path").and_then(|v| v.as_str()) {
@@ -261,7 +290,7 @@ Keep working step by step, and use compact if the conversation gets too long.
                     output
                 };
 
-                println!(
+                info!(
                     "Command:{}\n arg:{}\n output:\n{}\n",
                     name,
                     input,
@@ -270,10 +299,29 @@ Keep working step by step, and use compact if the conversation gets too long.
                 output
             }
             Err(e) => {
-                println!("Error invoking tool {}: {}", name, e);
+                error!("Error invoking tool {}: {}", name, e);
                 format!("Error invoking tool {}: {}", name, e)
             }
         }
+    }
+
+    pub fn session_start(&mut self, hook: impl SessionStartFn + 'static) {
+        self.hooks.push(Hook::SessionStart(Box::new(hook)));
+    }
+
+    pub fn pre_tool(&mut self, hook: impl PreToolUseFn + 'static) {
+        self.hooks.push(Hook::PreToolUse(Box::new(hook)));
+    }
+
+    pub fn post_tool(&mut self, hook: impl PostToolUseFn + 'static) {
+        self.hooks.push(Hook::PostToolUse(Box::new(hook)));
+    }
+
+    pub fn hook_by_type(&self, hook_type: HookTypes) -> Vec<&Hook> {
+        self.hooks
+            .iter()
+            .filter(|hook| hook_type == (*hook).into())
+            .collect()
     }
 }
 
@@ -328,4 +376,5 @@ pub fn extract_text(message: &ChatCompletionRequestMessage) -> String {
         },
         _ => String::new(),
     }
+
 }

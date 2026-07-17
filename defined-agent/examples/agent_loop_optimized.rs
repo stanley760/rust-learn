@@ -1,7 +1,7 @@
-use anyhow::Context;
+use anyhow::{Context, Ok};
 use async_openai::types::chat::ChatCompletionRequestUserMessageArgs;
 use defined_agent::{
-    permission::{PermissionManager, PermissionMode}, structure::{LoopState, extract_text, get_llm_client}, tools::toolset_compact,
+    hook::HookControl, invoke_hooks, permission::{PermissionManager, PermissionMode}, structure::{LoopState, extract_text, get_llm_client}, tools::toolset_compact,
 };
 use inquire::{Select, Text};
 use tracing::{Level, info};
@@ -39,6 +39,29 @@ async fn main() -> anyhow::Result<()> {
     // 创建 OpenAI client
     let client = get_llm_client()?;
     let mut state = LoopState::new(client, tools, manager);
+
+
+    state.session_start(|_| {
+        Box::pin(async {
+            info!("--- Initializing hooks...");  
+            Ok(HookControl::Continue)
+        })
+    });
+
+    state.pre_tool(|_,tool_use |{
+        info!("--- Before tool call: {:?}", tool_use);
+        Box::pin(async move { Ok(HookControl::Continue) })
+    });
+
+    state.post_tool(|_, tool_use, tool_result| {
+        info!("--- After tool call: {:?}, result: {:?}", tool_use, tool_result);
+        Box::pin(async move { Ok(HookControl::Continue)})
+    });
+
+    if let HookControl::Block(reason) = invoke_hooks!(SessionStart, &state)? {
+        println!("--- Session blocked: {}", reason);
+        return Ok(());
+    }
 
     loop {
         let query = Text::new("--- How can I help you?")
