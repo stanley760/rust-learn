@@ -1,23 +1,30 @@
-﻿use anyhow::Context;
-use async_openai::{Client, config::OpenAIConfig};
-use inquire::Select;
-use tracing::{error, info};
-use crate::context::{CompactState, estimate_context_size, micro_compact, persist_large_output};
-use crate::hook::{self, Hook, HookControl, HookTypes, PostToolUseFn, PreToolUseFn, SessionStartFn, ToolResult, ToolUse};
+﻿use crate::context::{CompactState, estimate_context_size, micro_compact, persist_large_output};
+use crate::hook::{
+    self, Hook, HookControl, HookTypes, PostToolUseFn, PreToolUseFn, SessionStartFn, ToolResult,
+    ToolUse,
+};
 use crate::invoke_hooks;
-use crate::permission::{PermissionBehavior, PermissionDecision, PermissionManager, PermissionMode};
+use crate::memory::{MEMORY_GUIDANCE, Manager};
+use crate::permission::{
+    PermissionBehavior, PermissionDecision, PermissionManager, PermissionMode,
+};
 use crate::tools::Tool;
+use anyhow::Context;
 use async_openai::types::chat::{
     ChatCompletionMessageToolCalls, ChatCompletionRequestAssistantMessage,
     ChatCompletionRequestAssistantMessageContent, ChatCompletionRequestAssistantMessageContentPart,
     ChatCompletionRequestMessage, ChatCompletionRequestSystemMessage,
     ChatCompletionRequestSystemMessageContent, ChatCompletionRequestSystemMessageContentPart,
     ChatCompletionRequestToolMessage, ChatCompletionRequestToolMessageContent,
-    ChatCompletionRequestToolMessageContentPart,
-    ChatCompletionRequestUserMessageContent, ChatCompletionRequestUserMessageContentPart,
-    ChatCompletionTools, CreateChatCompletionRequest, FinishReason,
+    ChatCompletionRequestToolMessageContentPart, ChatCompletionRequestUserMessageContent,
+    ChatCompletionRequestUserMessageContentPart, ChatCompletionTools, CreateChatCompletionRequest,
+    FinishReason,
 };
+use async_openai::{Client, config::OpenAIConfig};
+use inquire::Select;
 use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+use tracing::{error, info};
 
 const CONTEXT_LIMIT: usize = 50000;
 
@@ -56,10 +63,16 @@ pub struct LoopState {
     pub compact_state: CompactState,
     pub manager: PermissionManager,
     pub hooks: Vec<Hook>,
+    pub memory_manager: Arc<Mutex<Manager>>,
 }
 
 impl LoopState {
-    pub fn new(client: Client<OpenAIConfig>, tools: HashMap<String, Box<dyn Tool>>, manager: PermissionManager) -> Self {
+    pub fn new(
+        client: Client<OpenAIConfig>,
+        tools: HashMap<String, Box<dyn Tool>>,
+        manager: PermissionManager,
+        memory_manager: Arc<Mutex<Manager>>,
+    ) -> Self {
         Self {
             client,
             context: Vec::new(),
@@ -67,18 +80,38 @@ impl LoopState {
             compact_state: CompactState::default(),
             manager,
             hooks: Vec::new(),
+            memory_manager,
         }
     }
 
+    fn build_system_prompt(&self) -> anyhow::Result<String> {
+        let cwd = std::env::current_dir()
+            .unwrap_or_else(|_| std::path::PathBuf::from("."));
+        let mut parts = vec![format!(
+            "You are a coding agent at {}. Use tools to solve tasks.",
+            cwd.display(),
+        )];
+
+        let memory_prompt = self
+            .memory_manager
+            .lock()
+            .map_err(|_| anyhow::anyhow!("memory manager lock poisoned"))?
+            .load_memory_prompt();
+
+        if !memory_prompt.is_empty() {
+            parts.push(memory_prompt);
+        }
+        parts.push(MEMORY_GUIDANCE.trim().to_string());
+
+        Ok(parts.join("\n\n"))
+
+    }
+
     pub async fn agent_loop(&mut self) -> anyhow::Result<()> {
-        let system = format!(
-            r#"You are a coding agent at {}.
-Keep working step by step, and use compact if the conversation gets too long.
-"#,
-            std::env::current_dir()?.display(),
-        );
+        
 
         loop {
+            let system = self.build_system_prompt()?;
             micro_compact(&mut self.context);
 
             if estimate_context_size(&self.context) > CONTEXT_LIMIT {
@@ -169,12 +202,13 @@ Keep working step by step, and use compact if the conversation gets too long.
                 input: input.clone(),
             };
 
-            if let HookControl::Block(reason) = invoke_hooks!(PreToolUse, self,&mut tool_use)? {
-               
+            if let HookControl::Block(reason) = invoke_hooks!(PreToolUse, self, &mut tool_use)? {
                 result.push(ChatCompletionRequestMessage::Tool(
                     ChatCompletionRequestToolMessage {
                         tool_call_id: tool_use.id.clone(),
-                        content: ChatCompletionRequestToolMessageContent::Text(format!("Tool blocked by PreToolUse hook: {reason}")),
+                        content: ChatCompletionRequestToolMessageContent::Text(format!(
+                            "Tool blocked by PreToolUse hook: {reason}"
+                        )),
                     },
                 ));
                 continue;
@@ -215,10 +249,14 @@ Keep working step by step, and use compact if the conversation gets too long.
                 tool_result.content = format!("Tool blocked by PostToolUse hook: {reason}");
             }
             // OpenAI: 每个 tool result 是一条独立的 Tool role message
-            self.context.push(tool_result_message(tool_result.tool_use_id, tool_result.content));
+            self.context.push(tool_result_message(
+                tool_result.tool_use_id,
+                tool_result.content,
+            ));
 
-            if name == "read_file" 
-                && let Some(path) = input.get("path").and_then(|v| v.as_str()) {
+            if name == "read_file"
+                && let Some(path) = input.get("path").and_then(|v| v.as_str())
+            {
                 self.remember_recent_file(path);
             }
             if name == "compact" {
@@ -267,7 +305,6 @@ Keep working step by step, and use compact if the conversation gets too long.
 
         Ok(())
     }
-
 
     async fn execute(
         &mut self,
@@ -354,7 +391,7 @@ pub fn extract_text(message: &ChatCompletionRequestMessage) -> String {
         },
         ChatCompletionRequestMessage::Tool(m) => match &m.content {
             ChatCompletionRequestToolMessageContent::Text(t) => t.clone(),
-// [CLIPPY-WARNING] unnecessary_filter_map (line 254)
+            // [CLIPPY-WARNING] unnecessary_filter_map (line 254)
             ChatCompletionRequestToolMessageContent::Array(parts) => parts
                 .iter()
                 .map(|p| match p {
@@ -364,7 +401,7 @@ pub fn extract_text(message: &ChatCompletionRequestMessage) -> String {
                 .join("\n"),
         },
         ChatCompletionRequestMessage::System(m) => match &m.content {
-// [CLIPPY-WARNING] unnecessary_filter_map (line 264)
+            // [CLIPPY-WARNING] unnecessary_filter_map (line 264)
             ChatCompletionRequestSystemMessageContent::Text(t) => t.clone(),
             ChatCompletionRequestSystemMessageContent::Array(parts) => parts
                 .iter()
@@ -376,5 +413,4 @@ pub fn extract_text(message: &ChatCompletionRequestMessage) -> String {
         },
         _ => String::new(),
     }
-
 }

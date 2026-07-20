@@ -1,4 +1,5 @@
-﻿use std::{borrow::Cow, sync::Arc};
+﻿use std::sync::Mutex;
+use std::{borrow::Cow, sync::Arc};
 use std::collections::HashMap;
 
 use async_openai::types::chat::{
@@ -7,7 +8,9 @@ use async_openai::types::chat::{
 use async_trait::async_trait;
 use serde_json::Value;
 
+use crate::memory::Manager;
 use crate::tools::compact::compact_tool;
+use crate::tools::memory::save_memory_tool;
 use crate::{skills::SkillRegistry, tools::{
     bash::bash_tool, 
     edit_file::edit_file_tool, 
@@ -25,7 +28,7 @@ mod read_file;
 mod todo;
 mod sub_agent;
 mod compact;
-
+mod memory;
 /// Provider-agnostic tool specification.
 ///
 /// Mirrors Anthropic's `ToolSpec` (name, description, input_schema)
@@ -59,13 +62,14 @@ impl From<ToolSpec> for FunctionObject {
 }
 
 
-pub fn toolset_compact() -> HashMap<String, Box<dyn Tool>> {
+pub fn toolset_compact(memory_manager: Arc<Mutex<Manager>>) -> HashMap<String, Box<dyn Tool>> {
     HashMap::from([
         ("bash".to_string(), bash_tool()),
         ("read_file".to_string(), read_file_tool()),
         ("write_file".to_string(), write_file_tool()),
         ("edit_file".to_string(), edit_file_tool()),
         ("compact".to_string(), compact_tool()),
+        ("save_memory".to_string(), save_memory_tool(memory_manager)),
     ])
 }
 
@@ -114,7 +118,7 @@ pub trait Tool: Send + Sync {
 /// is canonicalized instead, and the filename is appended — this allows writing
 /// to files that don't yet exist while still preventing path traversal.
 fn safe_path(path: &str, must_exist: bool) -> anyhow::Result<std::path::PathBuf> {
-    let cwd = std::env::current_dir()?;
+    let cwd = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
     let full = cwd.join(path);
 
     if must_exist {

@@ -1,7 +1,9 @@
+use std::sync::{Arc, Mutex};
+
 use anyhow::{Context, Ok};
 use async_openai::types::chat::ChatCompletionRequestUserMessageArgs;
 use defined_agent::{
-    hook::HookControl, invoke_hooks, permission::{PermissionManager, PermissionMode}, structure::{LoopState, extract_text, get_llm_client}, tools::toolset_compact,
+    hook::HookControl, invoke_hooks, memory::get_memory_manager, permission::{PermissionManager, PermissionMode}, structure::{LoopState, extract_text, get_llm_client}, tools::toolset_compact,
 };
 use inquire::{Select, Text};
 use tracing::{Level, info};
@@ -19,8 +21,11 @@ async fn main() -> anyhow::Result<()> {
     // skill path : /User/xxxx/rust-learn/defined-agent/skills
     // let skills_dir = std::env::current_dir()?.join(SKILLS_DIR);
     // let registry = Arc::new(get_skill_registry(skills_dir)?);
-
-    let tools = toolset_compact();
+    let memory_dir = std::env::current_dir()
+        .unwrap_or_else(|_| std::path::PathBuf::from("."))
+        .join(".memory");
+    let memory_manager = Arc::new(Mutex::new(get_memory_manager(memory_dir)?));
+    let tools = toolset_compact(memory_manager.clone());
 
     let mode = Select::new(
         "Permission mode:",
@@ -38,7 +43,8 @@ async fn main() -> anyhow::Result<()> {
     
     // 创建 OpenAI client
     let client = get_llm_client()?;
-    let mut state = LoopState::new(client, tools, manager);
+
+    let mut state: LoopState = LoopState::new(client, tools, manager, memory_manager);
 
 
     state.session_start(|_| {
@@ -69,7 +75,7 @@ async fn main() -> anyhow::Result<()> {
             .context("An error happened or user cancelled the input.")?;
 
         // 输入 exit() 退出循环
-        if query.trim() == "exit()" {
+        if matches!(query.trim(), "exit()" | "exit") {
             break;
         }
 
