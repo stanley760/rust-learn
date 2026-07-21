@@ -3,6 +3,7 @@ use std::{fs::{self, File}, io::{BufWriter, Write}, path::PathBuf, time::{System
 
 use anyhow::{Context, Ok};
 use async_openai::types::chat::{ChatCompletionMessageToolCalls, ChatCompletionRequestAssistantMessageContent, ChatCompletionRequestAssistantMessageContentPart, ChatCompletionRequestMessage, ChatCompletionRequestSystemMessageContent, ChatCompletionRequestSystemMessageContentPart, ChatCompletionRequestToolMessageContent, ChatCompletionRequestToolMessageContentPart, ChatCompletionRequestUserMessage, ChatCompletionRequestUserMessageContent, ChatCompletionRequestUserMessageContentPart, CreateChatCompletionRequest};
+use tracing::info;
 
 
 
@@ -190,7 +191,7 @@ impl LoopState {
     pub async fn compact_history(&mut self, focus: Option<&str>) -> anyhow::Result<()> {
         let transcript_path =
             write_transcript(&self.context).context("failed to write transcript")?;
-        println!("[transcript saved: {}]", transcript_path.display());
+        info!("[transcript saved: {}]", transcript_path.display());
 
         let mut summary = self
             .summarize_history()
@@ -250,7 +251,7 @@ impl LoopState {
                     name: None,
                 },
             )],
-            max_completion_tokens: Some(2000),
+            max_completion_tokens: Some(4000),
             ..Default::default()
         };
 

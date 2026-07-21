@@ -7,3 +7,4 @@ pub mod permission;
 pub mod hook;
 pub mod memory;
 pub mod system;
+pub mod recovery;

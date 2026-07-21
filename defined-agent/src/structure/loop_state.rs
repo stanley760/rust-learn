@@ -8,27 +8,32 @@ use crate::memory::{MEMORY_GUIDANCE, Manager};
 use crate::permission::{
     PermissionBehavior, PermissionDecision, PermissionManager, PermissionMode,
 };
+use crate::recovery::RecoveryState;
 use crate::skills::SkillRegistry;
+use crate::structure::{BACKOFF_BASE_DELAY_SECS, BACKOFF_MAX_DELAY_SECS, CONTEXT_THRESHOLD_CHARS, CONTINUATION_MESSAGE, MAX_RECOVERY_ATTEMPTS};
 use crate::system::SystemPrompt;
 use crate::tools::Tool;
 
-use chrono::Utc;
 use anyhow::Context;
+use async_openai::error::OpenAIError;
 use async_openai::types::chat::{
     ChatCompletionMessageToolCalls, ChatCompletionRequestAssistantMessage,
     ChatCompletionRequestAssistantMessageContent, ChatCompletionRequestAssistantMessageContentPart,
     ChatCompletionRequestMessage, ChatCompletionRequestSystemMessage,
     ChatCompletionRequestSystemMessageContent, ChatCompletionRequestSystemMessageContentPart,
     ChatCompletionRequestToolMessage, ChatCompletionRequestToolMessageContent,
-    ChatCompletionRequestToolMessageContentPart, ChatCompletionRequestUserMessageContent,
-    ChatCompletionRequestUserMessageContentPart, ChatCompletionTools, CreateChatCompletionRequest,
-    FinishReason,
+    ChatCompletionRequestToolMessageContentPart, ChatCompletionRequestUserMessage,
+    ChatCompletionRequestUserMessageContent, ChatCompletionRequestUserMessageContentPart,
+    ChatCompletionTools, CreateChatCompletionRequest, FinishReason,
 };
 use async_openai::{Client, config::OpenAIConfig};
+use chrono::Utc;
 use inquire::Select;
 use std::collections::HashMap;
 use std::path::Path;
 use std::sync::{Arc, Mutex};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::thread;
 use tracing::{error, info};
 
 const CONTEXT_LIMIT: usize = 50000;
@@ -59,6 +64,12 @@ pub fn tool_result_message(
         content: ChatCompletionRequestToolMessageContent::Text(content.into()),
         tool_call_id: tool_call_id.into(),
     })
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum LoopControl {
+    Continue,
+    Stop,
 }
 
 pub struct LoopState {
@@ -93,8 +104,7 @@ impl LoopState {
     }
 
     fn build_system_prompt(&self) -> anyhow::Result<String> {
-        let workdir = std::env::current_dir()
-            .unwrap_or_else(|_| std::path::PathBuf::from("."));
+        let workdir = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
         let prompt = SystemPrompt::builder()
             .role(format!( "You are a coding agent operating in {}.",
                 workdir.display()))
@@ -114,19 +124,17 @@ impl LoopState {
             .memory_guidance(MEMORY_GUIDANCE.trim())
             .build()?;
 
-
         prompt
             .to_prompt()
             .render()
             .context("failed to render system prompt")
-
     }
 
     fn load_memory_prompt(&self) -> anyhow::Result<String> {
         self.memory_manager
             .lock()
             .map_err(|_| anyhow::anyhow!("memory manager lock poisoned"))
-            .map(|manager|manager.load_memory_prompt())
+            .map(|manager| manager.load_memory_prompt())
     }
 
     fn load_claude_md_prompt(&self, workdir: &Path) -> String {
@@ -194,6 +202,7 @@ impl LoopState {
 
     pub async fn agent_loop(&mut self) -> anyhow::Result<()> {
         let system = self.build_system_prompt()?;
+        let mut recovery = RecoveryState::default();
 
         loop {
             micro_compact(&mut self.context);
@@ -221,7 +230,25 @@ impl LoopState {
                 ..Default::default()
             };
 
-            let response = self.client.chat().create(request).await?;
+            let Some(response) = (match self.client.chat().create(request).await {
+                Result::Ok(response) => {
+                    recovery.transport_attempts = 0;
+                    Some(response)
+                }
+                Err(error) => {
+                    match self
+                        .handle_request_error_recovery(error, &mut recovery)
+                        .await?
+                    {
+                        LoopControl::Continue => {
+                            continue;
+                        }
+                        LoopControl::Stop => None,
+                    }
+                }
+            }) else {
+                return Ok(());
+            };
 
             let choice = response
                 .choices
@@ -246,13 +273,99 @@ impl LoopState {
                 },
             ));
 
+            if matches!(choice.finish_reason, Some(FinishReason::Length))
+                && self.handle_max_tokens_recovery(&mut recovery)
+            {
+                continue;
+            }
+
+            recovery.continuation_attempts = 0;
+
             // 判断是否需要继续调用工具
             if !matches!(choice.finish_reason, Some(FinishReason::ToolCalls)) {
                 return Ok(());
             }
 
             self.execute_tool_call(&msg.tool_calls).await?;
+            self.maybe_auto_compact().await?;
         }
+    }
+
+    async fn handle_request_error_recovery(
+        &mut self,
+        error: OpenAIError,
+        recovery: &mut RecoveryState,
+    ) -> anyhow::Result<LoopControl> {
+        let error_txt = error.to_string();
+        if is_prompt_too_long_error(&error_txt) {
+            if recovery.compact_attempts > MAX_RECOVERY_ATTEMPTS {
+                error!(
+                    "[Error] compact recovery exhausted after {} attempts: {}",
+                    MAX_RECOVERY_ATTEMPTS, error
+                );
+                return Ok(LoopControl::Stop);
+            }
+
+            recovery.compact_attempts += 1;
+            info!(
+                "[Recovery] compact ({}/{}): context too large",
+                recovery.compact_attempts, MAX_RECOVERY_ATTEMPTS
+            );
+
+            if let Err(compact_error) = self.compact_history(None).await {
+                info!("[Error] compact recovery failed: {}", compact_error);
+                return Ok(LoopControl::Stop);
+            }
+            return Ok(LoopControl::Continue);
+        }
+        if is_transient_transport_error(&error_txt) {
+            if recovery.transport_attempts >= MAX_RECOVERY_ATTEMPTS {
+                info!(
+                    "[Error] transport recovery exhausted after {} attempts: {}",
+                    MAX_RECOVERY_ATTEMPTS, error
+                );
+                return Ok(LoopControl::Stop);
+            }
+
+            let delay = backoff_delay(recovery.transport_attempts);
+            recovery.transport_attempts += 1;
+            info!(
+                "[Recovery] backoff ({}/{}): transient transport failure. Retrying in {:.1}s",
+                recovery.transport_attempts,
+                MAX_RECOVERY_ATTEMPTS,
+                delay.as_secs_f64()
+            );
+            thread::sleep(delay);
+            return Ok(LoopControl::Continue);
+        }
+
+        error!("[Error] API call failed: {}", error);
+        Ok(LoopControl::Stop)
+    }
+
+    fn handle_max_tokens_recovery(&mut self, recovery: &mut RecoveryState) -> bool {
+        if recovery.continuation_attempts >= MAX_RECOVERY_ATTEMPTS {
+            println!(
+                "[Error] continuation recovery exhausted after {} attempts",
+                MAX_RECOVERY_ATTEMPTS
+            );
+            return false;
+        }
+
+        recovery.continuation_attempts += 1;
+        println!(
+            "[Recovery] continue ({}/{}): output truncated",
+            recovery.continuation_attempts, MAX_RECOVERY_ATTEMPTS
+        );
+        self.context.push(ChatCompletionRequestMessage::User(
+            ChatCompletionRequestUserMessage {
+                content: ChatCompletionRequestUserMessageContent::Text(
+                    CONTINUATION_MESSAGE.to_string(),
+                ),
+                name: None,
+            },
+        ));
+        true
     }
 
     pub async fn execute_tool_call(
@@ -359,6 +472,17 @@ impl LoopState {
                 .context("manual compact failed")?;
         }
         Ok(())
+    }
+
+    async fn maybe_auto_compact(&mut self) -> anyhow::Result<()> {
+         if estimate_context_size(&self.context) <= CONTEXT_THRESHOLD_CHARS {
+            return Ok(());
+        }
+
+        println!("[Recovery] compact: context estimate exceeded threshold");
+        self.compact_history(None)
+            .await
+            .context("proactive compact failed")
     }
 
     pub fn handle_mode_command(&mut self, query: &str) -> anyhow::Result<()> {
@@ -498,3 +622,37 @@ pub fn extract_text(message: &ChatCompletionRequestMessage) -> String {
         _ => String::new(),
     }
 }
+
+fn is_prompt_too_long_error(error_text: &str) -> bool {
+    (error_text.contains("prompt") && error_text.contains("long"))
+        || error_text.contains("overlong_prompt")
+        || error_text.contains("too many tokens")
+        || error_text.contains("context length")
+}
+
+fn is_transient_transport_error(error_text: &str) -> bool {
+    [
+        "timeout",
+        "timed out",
+        "rate limit",
+        "too many requests",
+        "unavailable",
+        "connection",
+        "overloaded",
+        "temporarily",
+        "econnreset",
+        "broken pipe",
+    ]
+    .iter()
+    .any(|needle| error_text.contains(needle))
+}
+
+fn backoff_delay(attempt: u32) -> Duration {
+    let base = (BACKOFF_BASE_DELAY_SECS * 2f64.powi(attempt as i32)).min(BACKOFF_MAX_DELAY_SECS);
+    let jitter = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|duration| (duration.subsec_millis() % 1000) as f64 / 1000.0)
+        .unwrap_or(0.0);
+    Duration::from_secs_f64(base + jitter)
+}
+
