@@ -62,7 +62,7 @@ impl From<ToolSpec> for FunctionObject {
 }
 
 
-pub fn toolset_compact(memory_manager: Arc<Mutex<Manager>>) -> HashMap<String, Box<dyn Tool>> {
+pub fn toolset_compact(registry: Arc<SkillRegistry>, memory_manager: Arc<Mutex<Manager>>) -> HashMap<String, Box<dyn Tool>> {
     HashMap::from([
         ("bash".to_string(), bash_tool()),
         ("read_file".to_string(), read_file_tool()),
@@ -70,6 +70,7 @@ pub fn toolset_compact(memory_manager: Arc<Mutex<Manager>>) -> HashMap<String, B
         ("edit_file".to_string(), edit_file_tool()),
         ("compact".to_string(), compact_tool()),
         ("save_memory".to_string(), save_memory_tool(memory_manager)),
+        ("load_skill".to_string(), load_skills_tool(registry)),
     ])
 }
 

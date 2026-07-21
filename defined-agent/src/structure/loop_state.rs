@@ -8,7 +8,11 @@ use crate::memory::{MEMORY_GUIDANCE, Manager};
 use crate::permission::{
     PermissionBehavior, PermissionDecision, PermissionManager, PermissionMode,
 };
+use crate::skills::SkillRegistry;
+use crate::system::SystemPrompt;
 use crate::tools::Tool;
+
+use chrono::Utc;
 use anyhow::Context;
 use async_openai::types::chat::{
     ChatCompletionMessageToolCalls, ChatCompletionRequestAssistantMessage,
@@ -23,6 +27,7 @@ use async_openai::types::chat::{
 use async_openai::{Client, config::OpenAIConfig};
 use inquire::Select;
 use std::collections::HashMap;
+use std::path::Path;
 use std::sync::{Arc, Mutex};
 use tracing::{error, info};
 
@@ -60,6 +65,7 @@ pub struct LoopState {
     pub client: Client<OpenAIConfig>,
     pub context: Vec<ChatCompletionRequestMessage>,
     tools: HashMap<String, Box<dyn Tool>>,
+    pub skill_registry: Arc<SkillRegistry>,
     pub compact_state: CompactState,
     pub manager: PermissionManager,
     pub hooks: Vec<Hook>,
@@ -70,6 +76,7 @@ impl LoopState {
     pub fn new(
         client: Client<OpenAIConfig>,
         tools: HashMap<String, Box<dyn Tool>>,
+        skill_registry: Arc<SkillRegistry>,
         manager: PermissionManager,
         memory_manager: Arc<Mutex<Manager>>,
     ) -> Self {
@@ -77,6 +84,7 @@ impl LoopState {
             client,
             context: Vec::new(),
             tools,
+            skill_registry,
             compact_state: CompactState::default(),
             manager,
             hooks: Vec::new(),
@@ -85,33 +93,109 @@ impl LoopState {
     }
 
     fn build_system_prompt(&self) -> anyhow::Result<String> {
-        let cwd = std::env::current_dir()
+        let workdir = std::env::current_dir()
             .unwrap_or_else(|_| std::path::PathBuf::from("."));
-        let mut parts = vec![format!(
-            "You are a coding agent at {}. Use tools to solve tasks.",
-            cwd.display(),
-        )];
+        let prompt = SystemPrompt::builder()
+            .role(format!( "You are a coding agent operating in {}.",
+                workdir.display()))
+            .guidelines([ "Try to understand how to complete the task well before completing it.",])
+            .constraints([
+                "Think step by step",
+                "Think before you act; respond with your thoughts before calling tools",
+                "Do not make up any assumptions, use tools to get the information you need",
+                "Use the provided tools to interact with the system and accomplish the task",
+                "If you are stuck, or otherwise cannot complete the task, respond with your thoughts and stop",
+                "If the task is completed, or otherwise cannot continue, like requiring user feedback, stop.",
+            ])
+            .skills_available(self.skill_registry.describe_available())
+            .memory(self.load_memory_prompt()?)
+            .claude_md(self.load_claude_md_prompt(&workdir))
+            .dynamic_context(self.load_dynamic_context(&workdir))
+            .memory_guidance(MEMORY_GUIDANCE.trim())
+            .build()?;
 
-        let memory_prompt = self
-            .memory_manager
-            .lock()
-            .map_err(|_| anyhow::anyhow!("memory manager lock poisoned"))?
-            .load_memory_prompt();
 
-        if !memory_prompt.is_empty() {
-            parts.push(memory_prompt);
-        }
-        parts.push(MEMORY_GUIDANCE.trim().to_string());
-
-        Ok(parts.join("\n\n"))
+        prompt
+            .to_prompt()
+            .render()
+            .context("failed to render system prompt")
 
     }
 
+    fn load_memory_prompt(&self) -> anyhow::Result<String> {
+        self.memory_manager
+            .lock()
+            .map_err(|_| anyhow::anyhow!("memory manager lock poisoned"))
+            .map(|manager|manager.load_memory_prompt())
+    }
+
+    fn load_claude_md_prompt(&self, workdir: &Path) -> String {
+        let mut sources = Vec::new();
+
+        let user_claude = std::env::var_os("HOME")
+            .map(std::path::PathBuf::from)
+            .map(|home| home.join(".claude").join("CLAUDE.md"));
+        if let Some(path) = user_claude
+            && let Ok(content) = std::fs::read_to_string(&path)
+        {
+            sources.push((
+                "user global (~/.claude/CLAUDE.md)".to_string(),
+                content.trim().to_string(),
+            ));
+        }
+
+        let project_claude = workdir.join("CLAUDE.md");
+        if let Ok(content) = std::fs::read_to_string(&project_claude) {
+            sources.push((
+                "project root (CLAUDE.md)".to_string(),
+                content.trim().to_string(),
+            ));
+        }
+
+        if let Ok(cwd) = std::env::current_dir()
+            && cwd != workdir
+        {
+            let subdir_claude = cwd.join("CLAUDE.md");
+            if let Ok(content) = std::fs::read_to_string(&subdir_claude) {
+                sources.push((
+                    format!("subdir ({}/CLAUDE.md)", cwd.display()),
+                    content.trim().to_string(),
+                ));
+            }
+        }
+
+        if sources.is_empty() {
+            return String::new();
+        }
+
+        let mut lines = vec!["# CLAUDE.md instructions".to_string(), String::new()];
+        for (label, content) in sources {
+            lines.push(format!("## From {}", label));
+            lines.push(String::new());
+            lines.push(content);
+            lines.push(String::new());
+        }
+        lines.join("\n").trim().to_string()
+    }
+
+    fn load_dynamic_context(&self, workdir: &Path) -> String {
+        let lines = [
+            "# Dynamic context".to_string(),
+            format!("Current date: {}", Utc::now().date_naive()),
+            format!("Working directory: {}", workdir.display()),
+            format!(
+                "Model: {}",
+                get_model().unwrap_or_else(|_| "unknown".to_string())
+            ),
+            format!("Platform: {}", std::env::consts::OS),
+        ];
+        lines.join("\n")
+    }
+
     pub async fn agent_loop(&mut self) -> anyhow::Result<()> {
-        
+        let system = self.build_system_prompt()?;
 
         loop {
-            let system = self.build_system_prompt()?;
             micro_compact(&mut self.context);
 
             if estimate_context_size(&self.context) > CONTEXT_LIMIT {
