@@ -1,9 +1,10 @@
+#[allow(unused)]
 #[derive(Clone)]
 enum Encoding {
     Str(usize),
     Int(i64),
 }
-
+#[allow(unused)]
 impl Encoding {
     fn unwrap_str(&self) -> usize {
         match self {
