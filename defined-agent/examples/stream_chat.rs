@@ -15,7 +15,7 @@ async fn main() -> anyhow::Result<()> {
     let model = std::env::var("OPENAI_MODEL")?;
 
     let prompts = vec![
-        "rust是什么",
+        "今年中国领导人习主席和美国总统特朗普什么时候进行了国事访问?",
         "11*11是多少",
         "计算 11 + 11 是多少"
     ];

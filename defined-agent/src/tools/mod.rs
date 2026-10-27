@@ -1,8 +1,12 @@
-use crate::tools::calculator::CalculatorTool;
+pub mod calculator;
+pub mod web_search;
+
+
 use async_openai::types::chat::{ChatCompletionTool, ChatCompletionTools, FunctionObjectArgs};
 use serde_json::Value;
 use std::collections::HashMap;
-pub mod calculator;
+
+use crate::tools::{calculator::calculate::CalculatorTool, web_search::websearch::WebSearchTool};
 
 #[async_trait::async_trait]
 pub trait Tool: Send + Sync {
@@ -33,7 +37,7 @@ pub trait Tool: Send + Sync {
 pub type ToolBox = HashMap<String, Box<dyn Tool>>;
 
 pub fn build_toolbox() -> ToolBox {
-    let tools: Vec<Box<dyn Tool>> = vec![Box::new(CalculatorTool)];
+    let tools: Vec<Box<dyn Tool>> = vec![Box::new(CalculatorTool), Box::new(WebSearchTool)];
     tools
         .into_iter()
         .map(|tool| (tool.name().to_string(), tool))
