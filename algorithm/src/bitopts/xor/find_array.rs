@@ -6,7 +6,7 @@ impl Solution {
         let n = pref.len();
         let mut ans = vec![pref[0]; n];
         for x in 1..n {
-            let cur = pref[x] ^ pref[x-1];
+            let cur = pref[x] ^ pref[x - 1];
             ans[x] = cur;
         }
         ans
@@ -24,8 +24,8 @@ mod tests {
     use super::Solution;
     #[test]
     pub fn test_normal_case() {
-        let pref = vec![5,2,0,3,1];
-        let expected = vec![5,7,2,3,2];
+        let pref = vec![5, 2, 0, 3, 1];
+        let expected = vec![5, 7, 2, 3, 2];
         assert_eq!(Solution::find_array(pref), expected);
 
         let pref = vec![13];
@@ -35,8 +35,8 @@ mod tests {
 
     #[test]
     pub fn test_case_1() {
-        let pref = vec![5,2,0,3,1];
-        let expected = vec![5,7,2,3,2];
+        let pref = vec![5, 2, 0, 3, 1];
+        let expected = vec![5, 7, 2, 3, 2];
         assert_eq!(Solution::find_array_v1(pref), expected);
 
         let pref = vec![13];

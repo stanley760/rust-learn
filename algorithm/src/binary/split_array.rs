@@ -21,8 +21,7 @@ impl Solution {
             }
             true
         };
-        
-       
+
         while left < right {
             let mid = (left + right) >> 1;
             if check(mid) {

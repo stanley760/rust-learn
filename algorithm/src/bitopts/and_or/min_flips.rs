@@ -13,7 +13,7 @@ impl Solution {
             a >>= 1;
             b >>= 1;
             c >>= 1;
-            
+
             ans += ((x | y) ^ z) + (x & y & !z);
         }
         ans

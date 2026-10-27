@@ -4,14 +4,13 @@ struct Solution;
 impl Solution {
     pub fn search(nums: Vec<i32>, target: i32) -> bool {
         let check = |mid: usize, right: usize| -> bool {
-           
-           if nums[mid] > nums[right] {
+            if nums[mid] > nums[right] {
                 // mid 在左半部分 单调递减
                 target > nums[right] && target <= nums[mid]
-           } else {
+            } else {
                 // mid 在右半部分 单调递增
                 target > nums[right] || target <= nums[mid]
-           }
+            }
         };
 
         let (mut left, mut right) = (0, nums.len() - 1);

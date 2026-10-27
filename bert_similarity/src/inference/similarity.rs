@@ -44,11 +44,9 @@ impl SimilarityCalculator {
         let opposition_score = OppositionDetector::detect_opposition(text1, text2, vec1, vec2)?;
 
         // Check for semantic equivalence (bonus for low-overlap but similar meaning)
-        let semantic_bonus = SemanticEquivalenceDetector::detect_semantic_bonus(
-            text1,
-            text2,
-            base_similarity,
-        ).unwrap_or(0.0);
+        let semantic_bonus =
+            SemanticEquivalenceDetector::detect_semantic_bonus(text1, text2, base_similarity)
+                .unwrap_or(0.0);
 
         // Apply stronger penalty for high opposition scores
         // Use a graduated curve that increases more sharply at higher opposition levels

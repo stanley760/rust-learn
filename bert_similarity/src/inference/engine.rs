@@ -214,7 +214,9 @@ impl ModelEngine {
         let input_ids_data: &[u32] = &input_ids_vec;
         let input_ids = Tensor::new(input_ids_data, &self.device)
             .and_then(|t| t.reshape((batch_size, max_len)))
-            .map_err(|e| AppError::ModelError(format!("Failed to create input_ids tensor: {}", e)))?;
+            .map_err(|e| {
+                AppError::ModelError(format!("Failed to create input_ids tensor: {}", e))
+            })?;
 
         tracing::debug!(
             "Created input_ids tensor with dtype: {:?}, shape: {:?}",
@@ -237,7 +239,9 @@ impl ModelEngine {
                 AppError::ModelError(format!("Failed to create attention_mask tensor: {}", e))
             })?
             .reshape((batch_size, max_len))
-            .map_err(|e| AppError::ModelError(format!("Failed to reshape attention_mask: {}", e)))?;
+            .map_err(|e| {
+                AppError::ModelError(format!("Failed to reshape attention_mask: {}", e))
+            })?;
 
         tracing::debug!(
             "Created attention_mask tensor with dtype: {:?}, shape: {:?}",
@@ -402,11 +406,11 @@ impl ModelEngine {
             let sim =
                 SimilarityCalculator::cosine_similarity_with_opposition(emb1, emb2, text1, text2)
                     .map_err(|e| {
-                        AppError::InvalidInput(format!(
-                            "Error computing similarity for pair {}: {}",
-                            i, e
-                        ))
-                    })?;
+                    AppError::InvalidInput(format!(
+                        "Error computing similarity for pair {}: {}",
+                        i, e
+                    ))
+                })?;
             similarities.push(sim);
         }
 
@@ -443,7 +447,8 @@ mod tests {
             initializer_range: 0.02,
             layer_norm_eps: 1e-12,
             pad_token_id: 0,
-            position_embedding_type: candle_transformers::models::bert::PositionEmbeddingType::Absolute,
+            position_embedding_type:
+                candle_transformers::models::bert::PositionEmbeddingType::Absolute,
             use_cache: false,
             classifier_dropout: None,
             model_type: None,

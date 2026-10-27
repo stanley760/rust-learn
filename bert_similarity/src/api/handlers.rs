@@ -1,18 +1,12 @@
 // API endpoint handlers
 
-use axum::{
-    extract::State,
-    extract::Path,
-    http::StatusCode,
-    Json,
-};
+use axum::{extract::Path, extract::State, http::StatusCode, Json};
 use std::sync::Arc;
 
 use crate::api::models::{
-    SimilarityRequest, SimilarityResponse,
-    BulkSimilarityRequest, BulkSimilarityResponse,
-    HealthResponse, FinetuneRequest, FinetuneResponse,
-    FinetuneStatusResponse, LoadModelRequest,
+    BulkSimilarityRequest, BulkSimilarityResponse, FinetuneRequest, FinetuneResponse,
+    FinetuneStatusResponse, HealthResponse, LoadModelRequest, SimilarityRequest,
+    SimilarityResponse,
 };
 use crate::api::service::FinetuneService;
 use crate::model::ModelEngine;
@@ -26,16 +20,16 @@ pub struct AppState {
 }
 
 /// Handler for POST /similarity endpoint
-/// 
+///
 /// Computes semantic similarity between two sentences
-/// 
+///
 /// # Arguments
 /// * `State(state)` - Shared application state containing the model engine
 /// * `Json(request)` - JSON request body with sentence1 and sentence2
-/// 
+///
 /// # Returns
 /// * `Result<Json<SimilarityResponse>>` - JSON response with similarity score
-/// 
+///
 /// # Errors
 /// * Returns 400 Bad Request if input is invalid (empty strings)
 /// * Returns 500 Internal Server Error if model inference fails
@@ -48,21 +42,22 @@ pub async fn similarity_handler(
         request.sentence1.len(),
         request.sentence2.len()
     );
-    
+
     // Validate input
     if request.sentence1.is_empty() || request.sentence2.is_empty() {
         tracing::warn!("Invalid input: empty string(s) provided");
         return Err(AppError::InvalidInput(
-            "Both sentences must be non-empty strings".to_string()
+            "Both sentences must be non-empty strings".to_string(),
         ));
     }
-    
+
     // Compute similarity using ModelEngine
-    let similarity = state.model_engine
+    let similarity = state
+        .model_engine
         .compute_similarity(&request.sentence1, &request.sentence2)?;
-    
+
     tracing::info!("Similarity computed successfully: {}", similarity);
-    
+
     // Return formatted response
     Ok(Json(SimilarityResponse {
         sentence1: request.sentence1,
@@ -72,16 +67,16 @@ pub async fn similarity_handler(
 }
 
 /// Handler for POST /bulk_similarity endpoint
-/// 
+///
 /// Computes semantic similarity for multiple sentence pairs in batch
-/// 
+///
 /// # Arguments
 /// * `State(state)` - Shared application state containing the model engine
 /// * `Json(request)` - JSON request body with array of sentence pairs
-/// 
+///
 /// # Returns
 /// * `Result<Json<BulkSimilarityResponse>>` - JSON response with array of similarity scores
-/// 
+///
 /// # Errors
 /// * Returns 400 Bad Request if input is invalid (empty list, empty strings)
 /// * Returns 500 Internal Server Error if model inference fails
@@ -93,7 +88,7 @@ pub async fn bulk_similarity_handler(
         "Bulk similarity request received - {} pairs",
         request.sentence_pairs.len()
     );
-    
+
     // Handle empty list - return empty results
     if request.sentence_pairs.is_empty() {
         tracing::info!("Empty sentence pairs list, returning empty results");
@@ -101,7 +96,7 @@ pub async fn bulk_similarity_handler(
             results: Vec::new(),
         }));
     }
-    
+
     // Validate input - check for empty strings in any pair
     for (idx, (sentence1, sentence2)) in request.sentence_pairs.iter().enumerate() {
         if sentence1.is_empty() || sentence2.is_empty() {
@@ -112,13 +107,15 @@ pub async fn bulk_similarity_handler(
             )));
         }
     }
-    
+
     // Compute similarities in batch
-    let similarities = state.model_engine
+    let similarities = state
+        .model_engine
         .compute_similarity_batch(&request.sentence_pairs)?;
-    
+
     // Build response with individual results
-    let results: Vec<SimilarityResponse> = request.sentence_pairs
+    let results: Vec<SimilarityResponse> = request
+        .sentence_pairs
         .into_iter()
         .zip(similarities.into_iter())
         .map(|((sentence1, sentence2), similarity)| SimilarityResponse {
@@ -127,30 +124,31 @@ pub async fn bulk_similarity_handler(
             similarity,
         })
         .collect();
-    
-    tracing::info!("Bulk similarity computed successfully - {} results", results.len());
-    
+
+    tracing::info!(
+        "Bulk similarity computed successfully - {} results",
+        results.len()
+    );
+
     Ok(Json(BulkSimilarityResponse { results }))
 }
 
 /// Handler for GET /health endpoint
-/// 
+///
 /// Returns health status of the service
-/// 
+///
 /// # Arguments
 /// * `State(state)` - Shared application state containing the model engine
-/// 
+///
 /// # Returns
 /// * `Json<HealthResponse>` - JSON response with health status
-pub async fn health_handler(
-    State(state): State<AppState>,
-) -> Json<HealthResponse> {
+pub async fn health_handler(State(state): State<AppState>) -> Json<HealthResponse> {
     tracing::debug!("Health check request received");
-    
+
     // Check if model is loaded by checking device
     let model_loaded = true; // If we have a ModelEngine, the model is loaded
     let device = format!("{:?}", state.model_engine.device());
-    
+
     Json(HealthResponse {
         status: "healthy".to_string(),
         model_loaded,
@@ -159,14 +157,14 @@ pub async fn health_handler(
 }
 
 /// Handler for GET / endpoint
-/// 
+///
 /// Returns service information
-/// 
+///
 /// # Returns
 /// * `(StatusCode, Json<serde_json::Value>)` - JSON response with service info
 pub async fn root_handler() -> (StatusCode, Json<serde_json::Value>) {
     tracing::debug!("Root endpoint request received");
-    
+
     let info = serde_json::json!({
         "service": "Rust Semantic Similarity Service",
         "version": env!("CARGO_PKG_VERSION"),
@@ -178,7 +176,7 @@ pub async fn root_handler() -> (StatusCode, Json<serde_json::Value>) {
             "GET /": "Service information"
         }
     });
-    
+
     (StatusCode::OK, Json(info))
 }
 
@@ -238,7 +236,9 @@ pub async fn finetune_handler(
             params,
             &job_manager,
             &job_id_clone,
-        ).await {
+        )
+        .await
+        {
             Ok(_) => {
                 job_manager.set_job_completed(&job_id_clone);
                 tracing::info!("Fine-tuning job {} completed successfully", job_id_clone);
@@ -256,24 +256,27 @@ pub async fn finetune_handler(
     Ok(Json(FinetuneResponse {
         job_id: job_id.clone(),
         status: "pending".to_string(),
-        message: format!("Fine-tuning job {} created successfully. Use /finetune/status/{} to check progress.", job_id, job_id),
+        message: format!(
+            "Fine-tuning job {} created successfully. Use /finetune/status/{} to check progress.",
+            job_id, job_id
+        ),
     }))
 }
 
 /// Handler for GET /finetune/status/:job_id endpoint
-/// 
+///
 /// Queries the status of a fine-tuning job
-/// 
+///
 /// # Arguments
 /// * `State(state)` - Shared application state
 /// * `Path(job_id)` - The job ID from the URL path
-/// 
+///
 /// # Returns
 /// * `Result<Json<FinetuneStatusResponse>>` - JSON response with job status and progress
-/// 
+///
 /// # Errors
 /// * Returns 404 Not Found if job does not exist
-/// 
+///
 /// Requirements: 6.4
 pub async fn finetune_status_handler(
     State(state): State<AppState>,
@@ -282,7 +285,9 @@ pub async fn finetune_status_handler(
     tracing::debug!("Status query for job: {}", job_id);
 
     // Get job from manager
-    let job = state.job_manager.get_job(&job_id)
+    let job = state
+        .job_manager
+        .get_job(&job_id)
         .ok_or_else(|| AppError::InvalidInput(format!("Job not found: {}", job_id)))?;
 
     tracing::debug!(
@@ -305,20 +310,20 @@ pub async fn finetune_status_handler(
 }
 
 /// Handler for POST /model/load endpoint
-/// 
+///
 /// Loads a custom fine-tuned model
-/// 
+///
 /// # Arguments
 /// * `State(_state)` - Shared application state
 /// * `Json(request)` - JSON request body with model path
-/// 
+///
 /// # Returns
 /// * `Result<(StatusCode, Json<serde_json::Value>)>` - JSON response with success message
-/// 
+///
 /// # Errors
 /// * Returns 400 Bad Request if model path is invalid
 /// * Returns 500 Internal Server Error if model loading fails
-/// 
+///
 /// Requirements: 6.5, 3.4
 pub async fn load_model_handler(
     State(_state): State<AppState>,
@@ -345,8 +350,9 @@ pub async fn load_model_handler(
     // Validate model files using ModelPersistence
     use crate::model::ModelPersistence;
     let persistence = ModelPersistence::new(model_path.parent().unwrap_or(model_path));
-    
-    let metadata = persistence.load_and_validate_model(model_path)
+
+    let metadata = persistence
+        .load_and_validate_model(model_path)
         .map_err(|e| AppError::ModelError(format!("Model validation failed: {}", e)))?;
 
     tracing::info!(
@@ -411,7 +417,11 @@ async fn execute_finetune_job(
     // The service layer is now integrated, but the actual training execution
     // requires ModelEngine to support model extraction, which is a future enhancement.
 
-    tracing::info!("Training with {} samples for {} epochs", dataset.len(), params.num_epochs);
+    tracing::info!(
+        "Training with {} samples for {} epochs",
+        dataset.len(),
+        params.num_epochs
+    );
 
     // Simulate training progress updates
     // In a real implementation, the service.execute_training() would handle this
@@ -422,7 +432,12 @@ async fn execute_finetune_job(
         let simulated_loss = 1.0 / (epoch as f32 + 1.0);
         job_manager.update_job_progress(job_id, epoch, Some(simulated_loss));
 
-        tracing::debug!("Job {} - Epoch {}/{} completed", job_id, epoch, params.num_epochs);
+        tracing::debug!(
+            "Job {} - Epoch {}/{} completed",
+            job_id,
+            epoch,
+            params.num_epochs
+        );
     }
 
     tracing::info!("Fine-tuning job {} training completed", job_id);
@@ -434,10 +449,10 @@ async fn execute_finetune_job(
 mod tests {
     use super::*;
     use crate::model::{BertModel, TokenizerWrapper};
-    use candle_core::{Device, DType};
+    use candle_core::{DType, Device};
     use candle_nn::VarBuilder;
     use candle_transformers::models::bert::Config as BertConfig;
-    
+
     fn create_test_config() -> BertConfig {
         BertConfig {
             vocab_size: 1000,
@@ -452,13 +467,14 @@ mod tests {
             initializer_range: 0.02,
             layer_norm_eps: 1e-12,
             pad_token_id: 0,
-            position_embedding_type: candle_transformers::models::bert::PositionEmbeddingType::Absolute,
+            position_embedding_type:
+                candle_transformers::models::bert::PositionEmbeddingType::Absolute,
             use_cache: false,
             classifier_dropout: None,
             model_type: None,
         }
     }
-    
+
     fn create_test_tokenizer() -> TokenizerWrapper {
         let tokenizer_json = r#"{
             "version": "1.0",
@@ -488,108 +504,110 @@ mod tests {
                 "unk_token": "[PAD]"
             }
         }"#;
-        
+
         use std::sync::atomic::{AtomicUsize, Ordering};
         static COUNTER: AtomicUsize = AtomicUsize::new(0);
         let id = COUNTER.fetch_add(1, Ordering::SeqCst);
-        
+
         let temp_dir = std::env::temp_dir();
         let tokenizer_path = temp_dir.join(format!("test_handlers_tokenizer_{}.json", id));
         std::fs::write(&tokenizer_path, tokenizer_json).unwrap();
-        
+
         TokenizerWrapper::from_file(tokenizer_path.to_str().unwrap()).unwrap()
     }
-    
+
     fn create_test_app_state() -> AppState {
         let config = create_test_config();
         let device = Device::Cpu;
         let vb = VarBuilder::zeros(DType::F32, &device);
-        
+
         let model = BertModel::load(vb, &config, device.clone()).unwrap();
         let tokenizer = create_test_tokenizer();
         let model_engine = ModelEngine::new(model, tokenizer, 128);
-        
+
         AppState {
             model_engine: Arc::new(model_engine),
             job_manager: Arc::new(crate::api::FinetuneJobManager::new()),
         }
     }
-    
+
     #[tokio::test]
     async fn test_similarity_handler_empty_first_sentence() {
         let state = create_test_app_state();
-        
+
         let request = SimilarityRequest {
             sentence1: "".to_string(),
             sentence2: "test".to_string(),
         };
-        
+
         let result = similarity_handler(State(state), Json(request)).await;
-        
+
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), AppError::InvalidInput(_)));
     }
-    
+
     #[tokio::test]
     async fn test_similarity_handler_empty_second_sentence() {
         let state = create_test_app_state();
-        
+
         let request = SimilarityRequest {
             sentence1: "test".to_string(),
             sentence2: "".to_string(),
         };
-        
+
         let result = similarity_handler(State(state), Json(request)).await;
-        
+
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), AppError::InvalidInput(_)));
     }
-    
+
     #[tokio::test]
     async fn test_bulk_similarity_handler_empty_list() {
         let state = create_test_app_state();
-        
+
         let request = BulkSimilarityRequest {
             sentence_pairs: vec![],
         };
-        
-        let result = bulk_similarity_handler(State(state), Json(request)).await.unwrap();
-        
+
+        let result = bulk_similarity_handler(State(state), Json(request))
+            .await
+            .unwrap();
+
         assert!(result.results.is_empty());
     }
-    
+
     #[tokio::test]
     async fn test_bulk_similarity_handler_with_empty_string() {
         let state = create_test_app_state();
-        
+
         let request = BulkSimilarityRequest {
             sentence_pairs: vec![
                 ("hello".to_string(), "world".to_string()),
                 ("".to_string(), "test".to_string()),
             ],
         };
-        
+
         let result = bulk_similarity_handler(State(state), Json(request)).await;
-        
+
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), AppError::InvalidInput(_)));
     }
-    
+
     #[tokio::test]
     async fn test_health_handler_returns_healthy() {
         let state = create_test_app_state();
-        
+
         let response = health_handler(State(state)).await;
-        
+
         assert_eq!(response.status, "healthy");
         assert!(response.model_loaded);
         assert!(!response.device.is_empty());
     }
-    
+
     #[tokio::test]
     async fn test_root_handler_returns_service_info() {
         let (status, response) = root_handler().await;
-        
+
         assert_eq!(status, StatusCode::OK);
         assert!(response.get("service").is_some());
         assert!(response.get("version").is_some());

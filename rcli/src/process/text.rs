@@ -32,7 +32,6 @@ struct Ed25519Verifier {
     key: VerifyingKey,
 }
 
-
 impl TextSign for Blake3 {
     fn sign(&self, reader: &mut dyn Read) -> Result<Vec<u8>> {
         let mut buf = Vec::new();
@@ -137,7 +136,7 @@ impl Blake3 {
 }
 
 impl Ed25519Signer {
-     pub fn new(key: SigningKey) -> Self {
+    pub fn new(key: SigningKey) -> Self {
         Self { key }
     }
 

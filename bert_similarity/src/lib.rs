@@ -11,9 +11,11 @@ pub mod utils;
 
 // Re-exports for backward compatibility
 // The new architecture exports through these paths to maintain API compatibility
-pub use core::{BertModel, TokenizerWrapper, get_device};
-pub use inference::{ModelEngine, SimilarityCalculator, OppositionDetector};
-pub use model_management::{HuggingFaceModelLoader, ModelRegistry, ModelPersistence, ModelMetadata, ModelVersion};
+pub use core::{get_device, BertModel, TokenizerWrapper};
+pub use inference::{ModelEngine, OppositionDetector, SimilarityCalculator};
+pub use model_management::{
+    HuggingFaceModelLoader, ModelMetadata, ModelPersistence, ModelRegistry, ModelVersion,
+};
 
 // Legacy re-exports (will be deprecated in future)
 pub use model::{BertModel as LegacyBertModel, ModelEngine as LegacyModelEngine};

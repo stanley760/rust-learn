@@ -21,7 +21,7 @@ impl Solution {
             return;
         }
 
-        // Coloring 
+        // Coloring
         image[i][j] = new_color;
 
         let rows = image.len();

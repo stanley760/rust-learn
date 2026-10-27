@@ -3,9 +3,9 @@
 // This module provides business logic separation from HTTP handling,
 // making the code more testable and maintainable.
 
-use crate::model::ModelEngine;
-use crate::training::{TrainingDataset, FinetuneTrainer, FinetuneResult, validate_training_data};
 use crate::api::models::{FinetuneParams, TrainingPair};
+use crate::model::ModelEngine;
+use crate::training::{validate_training_data, FinetuneResult, FinetuneTrainer, TrainingDataset};
 use crate::utils::AppError;
 use std::sync::Arc;
 
@@ -42,7 +42,10 @@ impl FinetuneService {
     pub fn validate_training_data(&self, data: &[TrainingPair]) -> Result<(), AppError> {
         match validate_training_data(data) {
             Ok(_) => Ok(()),
-            Err(e) => Err(AppError::InvalidInput(format!("Training data validation failed: {}", e))),
+            Err(e) => Err(AppError::InvalidInput(format!(
+                "Training data validation failed: {}",
+                e
+            ))),
         }
     }
 

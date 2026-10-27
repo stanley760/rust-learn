@@ -1,4 +1,3 @@
-
 pub struct Solution;
 
 impl Solution {
@@ -7,7 +6,7 @@ impl Solution {
         for x in nums {
             n -= x % 2;
         }
-        n >=2
+        n >= 2
     }
 }
 #[cfg(test)]
@@ -16,11 +15,11 @@ mod tests {
 
     #[test]
     pub fn test_normal_case() {
-        let nums = vec![1,2,3,4,5];
+        let nums = vec![1, 2, 3, 4, 5];
         assert_eq!(Solution::has_trailing_zeros(nums), true);
-        let nums = vec![2,4,8,16];
+        let nums = vec![2, 4, 8, 16];
         assert_eq!(Solution::has_trailing_zeros(nums), true);
-        let nums = vec![1,3,5,7,9];
+        let nums = vec![1, 3, 5, 7, 9];
         assert_eq!(Solution::has_trailing_zeros(nums), false);
     }
 }

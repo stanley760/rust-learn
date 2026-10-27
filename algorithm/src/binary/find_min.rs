@@ -21,10 +21,10 @@ impl Solution {
 
     fn find_min_api(nums: Vec<i32>) -> i32 {
         let n = nums.len();
-        let pos =  (0..n - 1)
-         .collect::<Vec<_>>()
-         .partition_point(|&i| nums[i] >= nums[nums.len() - 1]);
-         nums[pos]
+        let pos = (0..n - 1)
+            .collect::<Vec<_>>()
+            .partition_point(|&i| nums[i] >= nums[nums.len() - 1]);
+        nums[pos]
     }
 }
 

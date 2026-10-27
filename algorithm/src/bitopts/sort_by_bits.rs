@@ -12,7 +12,6 @@ impl Solution {
 mod tests {
     use super::Solution;
 
-
     #[test]
     fn test_normal_case() {
         let arr = vec![0, 1, 2, 3, 4, 5, 6, 7, 8];

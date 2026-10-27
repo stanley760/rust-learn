@@ -62,7 +62,7 @@ impl FinetuneJob {
 }
 
 /// Manager for fine-tuning jobs
-/// 
+///
 /// Uses Arc<Mutex<HashMap>> to store job states in a thread-safe manner
 /// Requirements: 6.3, 6.4
 #[derive(Clone)]
@@ -79,20 +79,20 @@ impl FinetuneJobManager {
     }
 
     /// Generate a new unique job ID using UUID
-    /// 
+    ///
     /// Requirements: 6.3
     pub fn generate_job_id() -> String {
         Uuid::new_v4().to_string()
     }
 
     /// Create a new fine-tuning job
-    /// 
+    ///
     /// # Arguments
     /// * `total_epochs` - Total number of training epochs
-    /// 
+    ///
     /// # Returns
     /// * `String` - The generated job ID
-    /// 
+    ///
     /// Requirements: 6.3
     pub fn create_job(&self, total_epochs: usize) -> String {
         let job_id = Self::generate_job_id();
@@ -107,13 +107,13 @@ impl FinetuneJobManager {
     }
 
     /// Get the status of a fine-tuning job
-    /// 
+    ///
     /// # Arguments
     /// * `job_id` - The job ID to query
-    /// 
+    ///
     /// # Returns
     /// * `Option<FinetuneJob>` - The job information if it exists
-    /// 
+    ///
     /// Requirements: 6.4
     pub fn get_job(&self, job_id: &str) -> Option<FinetuneJob> {
         let jobs = self.jobs.lock().unwrap();
@@ -121,7 +121,7 @@ impl FinetuneJobManager {
     }
 
     /// Update a job's status to running
-    /// 
+    ///
     /// # Arguments
     /// * `job_id` - The job ID to update
     pub fn set_job_running(&self, job_id: &str) {
@@ -133,7 +133,7 @@ impl FinetuneJobManager {
     }
 
     /// Update a job's progress
-    /// 
+    ///
     /// # Arguments
     /// * `job_id` - The job ID to update
     /// * `current_epoch` - Current epoch number
@@ -153,7 +153,7 @@ impl FinetuneJobManager {
     }
 
     /// Mark a job as completed
-    /// 
+    ///
     /// # Arguments
     /// * `job_id` - The job ID to update
     pub fn set_job_completed(&self, job_id: &str) {
@@ -165,7 +165,7 @@ impl FinetuneJobManager {
     }
 
     /// Mark a job as failed
-    /// 
+    ///
     /// # Arguments
     /// * `job_id` - The job ID to update
     /// * `error_message` - Error message describing the failure
@@ -178,7 +178,7 @@ impl FinetuneJobManager {
     }
 
     /// Remove a job from the manager
-    /// 
+    ///
     /// # Arguments
     /// * `job_id` - The job ID to remove
     pub fn remove_job(&self, job_id: &str) {
@@ -188,7 +188,7 @@ impl FinetuneJobManager {
     }
 
     /// Get all jobs
-    /// 
+    ///
     /// # Returns
     /// * `Vec<FinetuneJob>` - List of all jobs
     pub fn list_jobs(&self) -> Vec<FinetuneJob> {

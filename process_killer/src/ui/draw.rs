@@ -1,6 +1,6 @@
 use crate::action::process::Process;
 use dioxus::prelude::*;
-static CSS : Asset = asset!("/assets/style.css");
+static CSS: Asset = asset!("/assets/style.css");
 pub fn app() -> Element {
     let header_txt: [&str; 5] = ["协议", "本地地址", "远程地址", "状态", "PID"];
     let init_datas: Vec<Vec<String>> = Process::run()

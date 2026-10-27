@@ -1,13 +1,13 @@
 // Model persistence and version management module
 // Requirements: 4.4, 10.1, 10.2, 10.3, 10.4, 10.5
 
+use crate::api::models::FinetuneParams;
 use crate::core::BertModel;
 use crate::utils::AppError;
-use crate::api::models::FinetuneParams;
 use serde::{Deserialize, Serialize};
-use std::path::{Path, PathBuf};
 use std::fs;
 use std::io::Write;
+use std::path::{Path, PathBuf};
 
 /// Metadata for a saved model
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -112,8 +112,9 @@ impl ModelPersistence {
         tracing::info!("Saving model to {:?}", model_dir);
 
         // Create model directory
-        fs::create_dir_all(&model_dir)
-            .map_err(|e| AppError::TrainingError(format!("Failed to create model directory: {}", e)))?;
+        fs::create_dir_all(&model_dir).map_err(|e| {
+            AppError::TrainingError(format!("Failed to create model directory: {}", e))
+        })?;
 
         // Save model configuration (config.json)
         self.save_config(&model_dir)?;
@@ -201,14 +202,17 @@ impl ModelPersistence {
             "model_type": "bert",
         });
 
-        let tokenizer_json = serde_json::to_string_pretty(&tokenizer_config)
-            .map_err(|e| AppError::TrainingError(format!("Failed to serialize tokenizer config: {}", e)))?;
+        let tokenizer_json = serde_json::to_string_pretty(&tokenizer_config).map_err(|e| {
+            AppError::TrainingError(format!("Failed to serialize tokenizer config: {}", e))
+        })?;
 
-        let mut file = fs::File::create(&tokenizer_path)
-            .map_err(|e| AppError::TrainingError(format!("Failed to create tokenizer file: {}", e)))?;
+        let mut file = fs::File::create(&tokenizer_path).map_err(|e| {
+            AppError::TrainingError(format!("Failed to create tokenizer file: {}", e))
+        })?;
 
-        file.write_all(tokenizer_json.as_bytes())
-            .map_err(|e| AppError::TrainingError(format!("Failed to write tokenizer config: {}", e)))?;
+        file.write_all(tokenizer_json.as_bytes()).map_err(|e| {
+            AppError::TrainingError(format!("Failed to write tokenizer config: {}", e))
+        })?;
 
         tracing::debug!("Tokenizer config saved to {:?}", tokenizer_path);
 
@@ -229,8 +233,9 @@ impl ModelPersistence {
         // In a full implementation with Candle's safetensors support, this would save actual weights
         let placeholder_data = b"SAFETENSORS_PLACEHOLDER";
 
-        let mut file = fs::File::create(&weights_path)
-            .map_err(|e| AppError::TrainingError(format!("Failed to create weights file: {}", e)))?;
+        let mut file = fs::File::create(&weights_path).map_err(|e| {
+            AppError::TrainingError(format!("Failed to create weights file: {}", e))
+        })?;
 
         file.write_all(placeholder_data)
             .map_err(|e| AppError::TrainingError(format!("Failed to write weights: {}", e)))?;
@@ -250,14 +255,19 @@ impl ModelPersistence {
     /// * `Result<()>` - Success or error
     ///
     /// Requirements: 10.2
-    pub fn save_metadata(&self, model_dir: &Path, metadata: &ModelMetadata) -> Result<(), AppError> {
+    pub fn save_metadata(
+        &self,
+        model_dir: &Path,
+        metadata: &ModelMetadata,
+    ) -> Result<(), AppError> {
         let metadata_path = model_dir.join("metadata.json");
 
         let metadata_json = serde_json::to_string_pretty(metadata)
             .map_err(|e| AppError::TrainingError(format!("Failed to serialize metadata: {}", e)))?;
 
-        let mut file = fs::File::create(&metadata_path)
-            .map_err(|e| AppError::TrainingError(format!("Failed to create metadata file: {}", e)))?;
+        let mut file = fs::File::create(&metadata_path).map_err(|e| {
+            AppError::TrainingError(format!("Failed to create metadata file: {}", e))
+        })?;
 
         file.write_all(metadata_json.as_bytes())
             .map_err(|e| AppError::TrainingError(format!("Failed to write metadata: {}", e)))?;
@@ -281,7 +291,10 @@ impl ModelPersistence {
     /// * `Result<ModelMetadata>` - The model metadata if valid
     ///
     /// Requirements: 10.3
-    pub fn load_and_validate_model<P: AsRef<Path>>(&self, model_path: P) -> Result<ModelMetadata, AppError> {
+    pub fn load_and_validate_model<P: AsRef<Path>>(
+        &self,
+        model_path: P,
+    ) -> Result<ModelMetadata, AppError> {
         let model_path = model_path.as_ref();
 
         tracing::info!("Loading and validating model from {:?}", model_path);
@@ -319,8 +332,12 @@ impl ModelPersistence {
             }
 
             // Check if file is readable and not empty
-            let metadata = fs::metadata(&file_path)
-                .map_err(|e| AppError::ModelError(format!("Failed to read file metadata for {}: {}", file_name, e)))?;
+            let metadata = fs::metadata(&file_path).map_err(|e| {
+                AppError::ModelError(format!(
+                    "Failed to read file metadata for {}: {}",
+                    file_name, e
+                ))
+            })?;
 
             if metadata.len() == 0 {
                 return Err(AppError::ModelError(format!(
@@ -335,8 +352,12 @@ impl ModelPersistence {
         let metadata_content = fs::read_to_string(&metadata_path)
             .map_err(|e| AppError::ModelError(format!("Failed to read metadata file: {}", e)))?;
 
-        let metadata: ModelMetadata = serde_json::from_str(&metadata_content)
-            .map_err(|e| AppError::ModelError(format!("Failed to parse metadata: {}. Model may be corrupted.", e)))?;
+        let metadata: ModelMetadata = serde_json::from_str(&metadata_content).map_err(|e| {
+            AppError::ModelError(format!(
+                "Failed to parse metadata: {}. Model may be corrupted.",
+                e
+            ))
+        })?;
 
         tracing::info!("Model validated successfully: {}", metadata.base_model);
 
@@ -370,8 +391,9 @@ impl ModelPersistence {
             .map_err(|e| AppError::ModelError(format!("Failed to read model directory: {}", e)))?;
 
         for entry in entries {
-            let entry = entry
-                .map_err(|e| AppError::ModelError(format!("Failed to read directory entry: {}", e)))?;
+            let entry = entry.map_err(|e| {
+                AppError::ModelError(format!("Failed to read directory entry: {}", e))
+            })?;
 
             let path = entry.path();
 
@@ -409,7 +431,7 @@ impl ModelPersistence {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use candle_core::{Device, DType};
+    use candle_core::{DType, Device};
     use candle_nn::VarBuilder;
     use candle_transformers::models::bert::Config as BertConfig;
 
@@ -427,7 +449,8 @@ mod tests {
             initializer_range: 0.02,
             layer_norm_eps: 1e-12,
             pad_token_id: 0,
-            position_embedding_type: candle_transformers::models::bert::PositionEmbeddingType::Absolute,
+            position_embedding_type:
+                candle_transformers::models::bert::PositionEmbeddingType::Absolute,
             use_cache: false,
             classifier_dropout: None,
             model_type: None,
@@ -446,14 +469,7 @@ mod tests {
 
         let params = FinetuneParams::default();
 
-        let result = persistence.save_model(
-            &model,
-            "test-model",
-            &params,
-            100,
-            0.5,
-            3,
-        );
+        let result = persistence.save_model(&model, "test-model", &params, 100, 0.5, 3);
 
         assert!(result.is_ok());
 
@@ -477,14 +493,9 @@ mod tests {
 
         let params = FinetuneParams::default();
 
-        let model_path = persistence.save_model(
-            &model,
-            "test-model",
-            &params,
-            100,
-            0.5,
-            3,
-        ).unwrap();
+        let model_path = persistence
+            .save_model(&model, "test-model", &params, 100, 0.5, 3)
+            .unwrap();
 
         // Check required files exist
         assert!(model_path.join("model.safetensors").exists());
@@ -508,14 +519,9 @@ mod tests {
 
         let params = FinetuneParams::default();
 
-        let model_path = persistence.save_model(
-            &model,
-            "test-model",
-            &params,
-            100,
-            0.5,
-            3,
-        ).unwrap();
+        let model_path = persistence
+            .save_model(&model, "test-model", &params, 100, 0.5, 3)
+            .unwrap();
 
         // Load and validate
         let result = persistence.load_and_validate_model(&model_path);

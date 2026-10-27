@@ -3,8 +3,8 @@
 // This module defines the Optimizer trait and provides implementations
 // for different optimization algorithms (Adam, SGD, etc.).
 
-use candle_core::{Tensor, Var};
 use crate::utils::AppError;
+use candle_core::{Tensor, Var};
 
 /// Optimizer trait defining the interface for parameter optimization
 ///
@@ -69,4 +69,4 @@ pub trait Optimizer {
 
 pub mod adam;
 
-pub use adam::{AdamOptimizer, AdamConfig};
+pub use adam::{AdamConfig, AdamOptimizer};

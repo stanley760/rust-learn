@@ -1,14 +1,14 @@
 // defined mostly used data-struct
 mod int_set;
-mod list;
 mod linked_list;
+mod list;
 mod zip_list;
 pub use linked_list::*;
 
 use std::{cell::RefCell, rc::Rc, time::SystemTime};
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum ObjectType {
-    String, 
+    String,
     List,
     Set,
     Zset,
@@ -46,9 +46,7 @@ pub trait ObjectData {
     // fn set_wrapper_mut(&mut self) -> &mut dyn SetWrapper { panic!("This is not as SetWrapper") }
     // fn zset_ref(&self) -> &Zset { panic!("This is not a Zset") }
     fn encoding(&self) -> ObjectEncoding;
-
 }
-
 
 type Pointer = Box<dyn ObjectData>;
 pub type RedisobjPtr = Rc<RefCell<RedisObject>>;

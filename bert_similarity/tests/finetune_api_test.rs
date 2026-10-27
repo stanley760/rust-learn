@@ -1,13 +1,13 @@
 // Integration test for fine-tuning API endpoints
 
-use bert_similarity::api::{ApiServer, FinetuneJobManager};
-use bert_similarity::model::{BertModel, TokenizerWrapper, ModelEngine};
-use bert_similarity::utils::Config;
-use candle_core::{Device, DType};
-use candle_nn::VarBuilder;
-use candle_transformers::models::bert::Config as BertConfig;
 use axum::body::Body;
 use axum::http::{Request, StatusCode};
+use bert_similarity::api::{ApiServer, FinetuneJobManager};
+use bert_similarity::model::{BertModel, ModelEngine, TokenizerWrapper};
+use bert_similarity::utils::Config;
+use candle_core::{DType, Device};
+use candle_nn::VarBuilder;
+use candle_transformers::models::bert::Config as BertConfig;
 use tower::util::ServiceExt;
 
 fn create_test_config() -> BertConfig {
@@ -98,14 +98,15 @@ async fn test_finetune_endpoint_exists() {
         ]
     }"#;
 
-    let response = server.router
+    let response = server
+        .router
         .oneshot(
             Request::builder()
                 .method("POST")
                 .uri("/finetune")
                 .header("content-type", "application/json")
                 .body(Body::from(request_body))
-                .unwrap()
+                .unwrap(),
         )
         .await
         .unwrap();
@@ -118,13 +119,14 @@ async fn test_finetune_endpoint_exists() {
 async fn test_finetune_status_endpoint_exists() {
     let server = create_test_server();
 
-    let response = server.router
+    let response = server
+        .router
         .oneshot(
             Request::builder()
                 .method("GET")
                 .uri("/finetune/status/test-job-id")
                 .body(Body::empty())
-                .unwrap()
+                .unwrap(),
         )
         .await
         .unwrap();
@@ -142,14 +144,15 @@ async fn test_model_load_endpoint_exists() {
         "model_path": "/nonexistent/path"
     }"#;
 
-    let response = server.router
+    let response = server
+        .router
         .oneshot(
             Request::builder()
                 .method("POST")
                 .uri("/model/load")
                 .header("content-type", "application/json")
                 .body(Body::from(request_body))
-                .unwrap()
+                .unwrap(),
         )
         .await
         .unwrap();
@@ -167,14 +170,15 @@ async fn test_finetune_with_invalid_data() {
         "training_data": []
     }"#;
 
-    let response = server.router
+    let response = server
+        .router
         .oneshot(
             Request::builder()
                 .method("POST")
                 .uri("/finetune")
                 .header("content-type", "application/json")
                 .body(Body::from(request_body))
-                .unwrap()
+                .unwrap(),
         )
         .await
         .unwrap();
@@ -187,13 +191,14 @@ async fn test_finetune_with_invalid_data() {
 async fn test_finetune_status_nonexistent_job() {
     let server = create_test_server();
 
-    let response = server.router
+    let response = server
+        .router
         .oneshot(
             Request::builder()
                 .method("GET")
                 .uri("/finetune/status/nonexistent-job-id")
                 .body(Body::empty())
-                .unwrap()
+                .unwrap(),
         )
         .await
         .unwrap();
@@ -210,14 +215,15 @@ async fn test_model_load_invalid_path() {
         "model_path": "/nonexistent/path/to/model"
     }"#;
 
-    let response = server.router
+    let response = server
+        .router
         .oneshot(
             Request::builder()
                 .method("POST")
                 .uri("/model/load")
                 .header("content-type", "application/json")
                 .body(Body::from(request_body))
-                .unwrap()
+                .unwrap(),
         )
         .await
         .unwrap();

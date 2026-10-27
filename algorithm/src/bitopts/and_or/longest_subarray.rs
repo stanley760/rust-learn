@@ -5,7 +5,6 @@ impl Solution {
     pub fn longest_subarray(nums: Vec<i32>) -> i32 {
         let (mut ans, mut mx, mut cnt) = (0, 0, 0);
         for x in nums {
-            
             if x > mx {
                 // get the maximum's index. and count is 1.
                 mx = x;
@@ -16,8 +15,8 @@ impl Solution {
                 cnt += 1;
                 ans = ans.max(cnt);
             } else {
-                // clear the count because its out of the bound which the condition is 
-                // calculating the subarray only contains the max value. 
+                // clear the count because its out of the bound which the condition is
+                // calculating the subarray only contains the max value.
                 cnt = 0;
             }
         }

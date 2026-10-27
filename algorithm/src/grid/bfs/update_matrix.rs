@@ -2,7 +2,7 @@ use std::collections::VecDeque;
 
 #[allow(dead_code)]
 struct Solution;
-const DIRS :[(i32, i32); 4] = [(0, 1), (0, -1), (1, 0), (-1, 0)];
+const DIRS: [(i32, i32); 4] = [(0, 1), (0, -1), (1, 0), (-1, 0)];
 #[allow(dead_code)]
 impl Solution {
     pub fn update_matrix(mat: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
@@ -44,12 +44,11 @@ impl Solution {
 mod tests {
     use super::Solution;
 
-
     #[test]
     pub fn test_case_1() {
         let mat = vec![vec![0, 0, 0], vec![0, 1, 0], vec![0, 0, 0]];
 
-        let expected = vec![vec![0,0,0],vec![0,1,0],vec![0,0,0]];
+        let expected = vec![vec![0, 0, 0], vec![0, 1, 0], vec![0, 0, 0]];
 
         assert_eq!(Solution::update_matrix(mat), expected);
     }
@@ -58,7 +57,7 @@ mod tests {
     pub fn test_case_2() {
         let mat = vec![vec![0, 0, 0], vec![0, 1, 0], vec![1, 1, 1]];
 
-        let expected = vec![vec![0,0,0],vec![0,1,0],vec![1,2,1]];
+        let expected = vec![vec![0, 0, 0], vec![0, 1, 0], vec![1, 2, 1]];
 
         assert_eq!(Solution::update_matrix(mat), expected);
     }

@@ -1,7 +1,7 @@
 use std::vec;
 #[allow(dead_code)]
 pub struct Solution;
-const DIRS : [(i32, i32); 4] = [(-1, 0), (1, 0), (0, 1), (0, -1)];
+const DIRS: [(i32, i32); 4] = [(-1, 0), (1, 0), (0, 1), (0, -1)];
 #[allow(dead_code)]
 impl Solution {
     pub fn oranges_rotting(grid: Vec<Vec<i32>>) -> i32 {

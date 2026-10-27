@@ -7,25 +7,25 @@ use thiserror::Error;
 pub enum ConfigError {
     #[error("Invalid port number: {0}")]
     InvalidPort(u16),
-    
+
     #[error("Invalid max_connections: must be greater than 0")]
     InvalidMaxConnections,
-    
+
     #[error("Invalid device: {0}. Must be one of: auto, cuda, metal, cpu")]
     InvalidDevice(String),
-    
+
     #[error("Invalid max_sequence_length: must be greater than 0")]
     InvalidMaxSequenceLength,
-    
+
     #[error("Invalid log level: {0}. Must be one of: debug, info, warn, error")]
     InvalidLogLevel(String),
-    
+
     #[error("Invalid learning rate: must be greater than 0")]
     InvalidLearningRate,
-    
+
     #[error("Invalid batch size: must be greater than 0")]
     InvalidBatchSize,
-    
+
     #[error("Invalid epochs: must be greater than 0")]
     InvalidEpochs,
 }
@@ -143,7 +143,7 @@ impl Config {
             }
         }
     }
-    
+
     /// Validate configuration values
     pub fn validate(&self) -> Result<(), ConfigError> {
         self.server.validate()?;
@@ -187,7 +187,7 @@ impl Default for Config {
 mod tests {
     use super::*;
     use std::io::Write;
-    
+
     #[test]
     fn test_load_valid_config() {
         let config_content = r#"
@@ -210,13 +210,13 @@ default_batch_size = 32
 default_epochs = 5
 checkpoint_dir = "test_checkpoints"
 "#;
-        
+
         let temp_file = std::env::temp_dir().join("test_config.toml");
         let mut file = std::fs::File::create(&temp_file).unwrap();
         file.write_all(config_content.as_bytes()).unwrap();
-        
+
         let config = Config::from_file(&temp_file).unwrap();
-        
+
         assert_eq!(config.server.host, "127.0.0.1");
         assert_eq!(config.server.port, 9000);
         assert_eq!(config.server.max_connections, 50);
@@ -227,38 +227,38 @@ checkpoint_dir = "test_checkpoints"
         assert_eq!(config.finetune.default_learning_rate, 1e-5);
         assert_eq!(config.finetune.default_batch_size, 32);
         assert_eq!(config.finetune.default_epochs, 5);
-        
+
         std::fs::remove_file(temp_file).ok();
     }
-    
+
     #[test]
     fn test_load_nonexistent_config_uses_default() {
         let config = Config::load_or_default("nonexistent_config.toml");
-        
+
         // Should use default values
         assert_eq!(config.server.host, "0.0.0.0");
         assert_eq!(config.server.port, 8000);
         assert_eq!(config.model.device, "auto");
         assert_eq!(config.logging.level, "info");
     }
-    
+
     #[test]
     fn test_load_malformed_config_uses_default() {
         let malformed_content = "this is not valid toml [[[";
-        
+
         let temp_file = std::env::temp_dir().join("malformed_config.toml");
         let mut file = std::fs::File::create(&temp_file).unwrap();
         file.write_all(malformed_content.as_bytes()).unwrap();
-        
+
         let config = Config::load_or_default(&temp_file);
-        
+
         // Should use default values
         assert_eq!(config.server.host, "0.0.0.0");
         assert_eq!(config.server.port, 8000);
-        
+
         std::fs::remove_file(temp_file).ok();
     }
-    
+
     #[test]
     fn test_validate_invalid_port() {
         let config = ServerConfig {
@@ -266,12 +266,12 @@ checkpoint_dir = "test_checkpoints"
             port: 0,
             max_connections: 100,
         };
-        
+
         let result = config.validate();
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), ConfigError::InvalidPort(0)));
     }
-    
+
     #[test]
     fn test_validate_invalid_max_connections() {
         let config = ServerConfig {
@@ -279,12 +279,15 @@ checkpoint_dir = "test_checkpoints"
             port: 8000,
             max_connections: 0,
         };
-        
+
         let result = config.validate();
         assert!(result.is_err());
-        assert!(matches!(result.unwrap_err(), ConfigError::InvalidMaxConnections));
+        assert!(matches!(
+            result.unwrap_err(),
+            ConfigError::InvalidMaxConnections
+        ));
     }
-    
+
     #[test]
     fn test_validate_invalid_device() {
         let config = ModelConfig {
@@ -293,24 +296,27 @@ checkpoint_dir = "test_checkpoints"
             device: "invalid_device".to_string(),
             max_sequence_length: 128,
         };
-        
+
         let result = config.validate();
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), ConfigError::InvalidDevice(_)));
     }
-    
+
     #[test]
     fn test_validate_invalid_log_level() {
         let config = LoggingConfig {
             level: "invalid_level".to_string(),
             file: None,
         };
-        
+
         let result = config.validate();
         assert!(result.is_err());
-        assert!(matches!(result.unwrap_err(), ConfigError::InvalidLogLevel(_)));
+        assert!(matches!(
+            result.unwrap_err(),
+            ConfigError::InvalidLogLevel(_)
+        ));
     }
-    
+
     #[test]
     fn test_validate_invalid_learning_rate() {
         let config = FinetuneConfig {
@@ -319,12 +325,15 @@ checkpoint_dir = "test_checkpoints"
             default_epochs: 3,
             checkpoint_dir: "checkpoints".to_string(),
         };
-        
+
         let result = config.validate();
         assert!(result.is_err());
-        assert!(matches!(result.unwrap_err(), ConfigError::InvalidLearningRate));
+        assert!(matches!(
+            result.unwrap_err(),
+            ConfigError::InvalidLearningRate
+        ));
     }
-    
+
     #[test]
     fn test_validate_invalid_batch_size() {
         let config = FinetuneConfig {
@@ -333,12 +342,12 @@ checkpoint_dir = "test_checkpoints"
             default_epochs: 3,
             checkpoint_dir: "checkpoints".to_string(),
         };
-        
+
         let result = config.validate();
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), ConfigError::InvalidBatchSize));
     }
-    
+
     #[test]
     fn test_validate_invalid_epochs() {
         let config = FinetuneConfig {
@@ -347,7 +356,7 @@ checkpoint_dir = "test_checkpoints"
             default_epochs: 0,
             checkpoint_dir: "checkpoints".to_string(),
         };
-        
+
         let result = config.validate();
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), ConfigError::InvalidEpochs));

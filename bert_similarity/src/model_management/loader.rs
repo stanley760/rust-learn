@@ -201,7 +201,10 @@ impl HuggingFaceModelLoader {
 
         // Download the first file to determine the model directory
         let first_file = repo.get(required_files[0]).map_err(|e| {
-            AppError::ModelError(format!("Failed to download file '{}': {}", required_files[0], e))
+            AppError::ModelError(format!(
+                "Failed to download file '{}': {}",
+                required_files[0], e
+            ))
         })?;
 
         let model_dir = first_file
@@ -292,11 +295,9 @@ mod tests {
         // Create a test F32 tensor view
         let values: Vec<f32> = vec![1.0, 2.0, 3.0, 4.0];
         let data: Vec<u8> = bytemuck::cast_slice(&values).to_vec();
-        let tensor_view = safetensors::tensor::TensorView::new(
-            safetensors::Dtype::F32,
-            vec![2, 2],
-            &data,
-        ).unwrap();
+        let tensor_view =
+            safetensors::tensor::TensorView::new(safetensors::Dtype::F32, vec![2, 2], &data)
+                .unwrap();
 
         let result = HuggingFaceModelLoader::tensor_view_to_tensor(&tensor_view, &device);
         assert!(result.is_ok(), "F32 tensor conversion should succeed");
@@ -310,11 +311,9 @@ mod tests {
         // Create a test I64 tensor view
         let values: Vec<i64> = vec![1, 2, 3, 4];
         let data: Vec<u8> = bytemuck::cast_slice(&values).to_vec();
-        let tensor_view = safetensors::tensor::TensorView::new(
-            safetensors::Dtype::I64,
-            vec![2, 2],
-            &data,
-        ).unwrap();
+        let tensor_view =
+            safetensors::tensor::TensorView::new(safetensors::Dtype::I64, vec![2, 2], &data)
+                .unwrap();
 
         let result = HuggingFaceModelLoader::tensor_view_to_tensor(&tensor_view, &device);
         assert!(result.is_ok(), "I64 tensor conversion should succeed");
@@ -328,11 +327,9 @@ mod tests {
         // Create a test with unsupported dtype (I16)
         let values: Vec<i16> = vec![1, 2, 3, 4];
         let data: Vec<u8> = bytemuck::cast_slice(&values).to_vec();
-        let tensor_view = safetensors::tensor::TensorView::new(
-            safetensors::Dtype::I16,
-            vec![2, 2],
-            &data,
-        ).unwrap();
+        let tensor_view =
+            safetensors::tensor::TensorView::new(safetensors::Dtype::I16, vec![2, 2], &data)
+                .unwrap();
 
         let result = HuggingFaceModelLoader::tensor_view_to_tensor(&tensor_view, &device);
         assert!(result.is_err(), "I16 tensor conversion should fail");
@@ -387,7 +384,10 @@ mod tests {
         std::fs::write(&config_path, config_json).unwrap();
 
         let result = HuggingFaceModelLoader::load_config(&config_path);
-        assert!(result.is_err(), "Config loading should fail with missing fields");
+        assert!(
+            result.is_err(),
+            "Config loading should fail with missing fields"
+        );
 
         // Clean up
         std::fs::remove_file(&config_path).ok();
@@ -420,13 +420,20 @@ mod tests {
         assert!(model_dir.exists(), "Model directory should exist");
 
         // Verify required files exist
-        assert!(model_dir.join("config.json").exists(), "config.json should exist");
         assert!(
-            model_dir.join("model.safetensors").exists() || model_dir.join("pytorch_model.bin").exists(),
+            model_dir.join("config.json").exists(),
+            "config.json should exist"
+        );
+        assert!(
+            model_dir.join("model.safetensors").exists()
+                || model_dir.join("pytorch_model.bin").exists(),
             "Model weights should exist"
         );
-        assert!(model_dir.join("tokenizer.json").exists() || model_dir.join("tokenizer_config.json").exists(),
-                "Tokenizer files should exist");
+        assert!(
+            model_dir.join("tokenizer.json").exists()
+                || model_dir.join("tokenizer_config.json").exists(),
+            "Tokenizer files should exist"
+        );
     }
 
     /// Integration test - model version support
@@ -440,7 +447,10 @@ mod tests {
         let revision = "main";
 
         let result = HuggingFaceModelLoader::download_model(model_id, Some(revision));
-        assert!(result.is_ok(), "Model download with revision should succeed");
+        assert!(
+            result.is_ok(),
+            "Model download with revision should succeed"
+        );
     }
 
     /// Integration test - backward compatibility (no revision parameter)
@@ -455,6 +465,9 @@ mod tests {
 
         // Calling with None for revision should work (backward compatible)
         let result = HuggingFaceModelLoader::download_model(model_id, None);
-        assert!(result.is_ok(), "Model download without revision should succeed");
+        assert!(
+            result.is_ok(),
+            "Model download without revision should succeed"
+        );
     }
 }

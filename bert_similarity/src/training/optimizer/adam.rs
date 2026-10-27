@@ -1,8 +1,8 @@
 // Adam optimizer implementation
 
+use super::Optimizer;
 use candle_core::{Tensor, Var};
 use std::collections::HashMap;
-use super::Optimizer;
 
 /// Adam optimizer configuration
 ///
@@ -123,14 +123,29 @@ impl Optimizer for AdamOptimizer {
             // Update first moment (momentum)
             // m = beta1 * m + (1 - beta1) * grad
             let m_new = if let Some(prev_m) = self.m.get(&idx) {
-                let beta1_tensor = Tensor::new(self.config.beta1, grad.device())
-                    .map_err(|e| crate::utils::AppError::TrainingError(format!("Failed to create beta1 tensor: {}", e)))?;
-                let one_minus_beta1 = Tensor::new(1.0 - self.config.beta1, grad.device())
-                    .map_err(|e| crate::utils::AppError::TrainingError(format!("Failed to create 1-beta1 tensor: {}", e)))?;
+                let beta1_tensor = Tensor::new(self.config.beta1, grad.device()).map_err(|e| {
+                    crate::utils::AppError::TrainingError(format!(
+                        "Failed to create beta1 tensor: {}",
+                        e
+                    ))
+                })?;
+                let one_minus_beta1 =
+                    Tensor::new(1.0 - self.config.beta1, grad.device()).map_err(|e| {
+                        crate::utils::AppError::TrainingError(format!(
+                            "Failed to create 1-beta1 tensor: {}",
+                            e
+                        ))
+                    })?;
 
-                prev_m.mul(&beta1_tensor)
+                prev_m
+                    .mul(&beta1_tensor)
                     .and_then(|m1| m1.add(&grad.mul(&one_minus_beta1)?))
-                    .map_err(|e| crate::utils::AppError::TrainingError(format!("Failed to update first moment: {}", e)))?
+                    .map_err(|e| {
+                        crate::utils::AppError::TrainingError(format!(
+                            "Failed to update first moment: {}",
+                            e
+                        ))
+                    })?
             } else {
                 // Initialize with gradient
                 grad.clone()
@@ -139,20 +154,43 @@ impl Optimizer for AdamOptimizer {
             // Update second moment (RMSprop)
             // v = beta2 * v + (1 - beta2) * grad^2
             let v_new = if let Some(prev_v) = self.v.get(&idx) {
-                let beta2_tensor = Tensor::new(self.config.beta2, grad.device())
-                    .map_err(|e| crate::utils::AppError::TrainingError(format!("Failed to create beta2 tensor: {}", e)))?;
-                let one_minus_beta2 = Tensor::new(1.0 - self.config.beta2, grad.device())
-                    .map_err(|e| crate::utils::AppError::TrainingError(format!("Failed to create 1-beta2 tensor: {}", e)))?;
-                let grad_squared = grad.sqr()
-                    .map_err(|e| crate::utils::AppError::TrainingError(format!("Failed to square gradient: {}", e)))?;
+                let beta2_tensor = Tensor::new(self.config.beta2, grad.device()).map_err(|e| {
+                    crate::utils::AppError::TrainingError(format!(
+                        "Failed to create beta2 tensor: {}",
+                        e
+                    ))
+                })?;
+                let one_minus_beta2 =
+                    Tensor::new(1.0 - self.config.beta2, grad.device()).map_err(|e| {
+                        crate::utils::AppError::TrainingError(format!(
+                            "Failed to create 1-beta2 tensor: {}",
+                            e
+                        ))
+                    })?;
+                let grad_squared = grad.sqr().map_err(|e| {
+                    crate::utils::AppError::TrainingError(format!(
+                        "Failed to square gradient: {}",
+                        e
+                    ))
+                })?;
 
-                prev_v.mul(&beta2_tensor)
+                prev_v
+                    .mul(&beta2_tensor)
                     .and_then(|v1| v1.add(&grad_squared.mul(&one_minus_beta2)?))
-                    .map_err(|e| crate::utils::AppError::TrainingError(format!("Failed to update second moment: {}", e)))?
+                    .map_err(|e| {
+                        crate::utils::AppError::TrainingError(format!(
+                            "Failed to update second moment: {}",
+                            e
+                        ))
+                    })?
             } else {
                 // Initialize with squared gradient
-                grad.sqr()
-                    .map_err(|e| crate::utils::AppError::TrainingError(format!("Failed to square gradient: {}", e)))?
+                grad.sqr().map_err(|e| {
+                    crate::utils::AppError::TrainingError(format!(
+                        "Failed to square gradient: {}",
+                        e
+                    ))
+                })?
             };
 
             // Store updated moments
@@ -202,7 +240,7 @@ impl Optimizer for AdamOptimizer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use candle_core::{Device, DType, Tensor};
+    use candle_core::{DType, Device, Tensor};
 
     #[test]
     fn test_adam_config_default() {
@@ -256,13 +294,15 @@ mod tests {
 
         // Create empty var list (simplified test)
         let mut params: Vec<Var> = vec![];
-        let grads = vec![
-            Tensor::ones((2, 3), DType::F32, &Device::Cpu).expect("Failed to create tensor"),
-        ]; // Only 1 gradient
+        let grads =
+            vec![Tensor::ones((2, 3), DType::F32, &Device::Cpu).expect("Failed to create tensor")]; // Only 1 gradient
 
         let result = optimizer.step(&mut params, &grads);
         assert!(result.is_err());
-        assert!(matches!(result.unwrap_err(), crate::utils::AppError::TrainingError(_)));
+        assert!(matches!(
+            result.unwrap_err(),
+            crate::utils::AppError::TrainingError(_)
+        ));
     }
 
     #[test]

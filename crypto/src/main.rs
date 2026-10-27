@@ -12,8 +12,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let verifier = Secp256k1Verifier::from_signer(&signer);
 
     println!("   私钥: {}", hex::encode(&signer.to_bytes()));
-    println!("   公钥 (压缩): {}", hex::encode(&signer.public_key_compressed()));
-    println!("   公钥 (未压缩): {}", hex::encode(&signer.public_key_uncompressed()));
+    println!(
+        "   公钥 (压缩): {}",
+        hex::encode(&signer.public_key_compressed())
+    );
+    println!(
+        "   公钥 (未压缩): {}",
+        hex::encode(&signer.public_key_uncompressed())
+    );
     println!();
 
     // 2. 签名消息
@@ -27,14 +33,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 3. 验证签名
     println!("3. 验证签名...");
     let is_valid = verifier.verify(message.as_bytes(), &signature)?;
-    println!("   签名验证结果: {}", if is_valid { "有效 ✓" } else { "无效 ✗" });
+    println!(
+        "   签名验证结果: {}",
+        if is_valid { "有效 ✓" } else { "无效 ✗" }
+    );
     println!();
 
     // 4. 验证错误消息
     println!("4. 验证错误消息...");
     let wrong_message = "Wrong message";
     let is_valid = verifier.verify(wrong_message.as_bytes(), &signature)?;
-    println!("   错误消息验证结果: {}", if is_valid { "有效 ✗ (意外!)" } else { "无效 ✓ (预期)" });
+    println!(
+        "   错误消息验证结果: {}",
+        if is_valid {
+            "有效 ✗ (意外!)"
+        } else {
+            "无效 ✓ (预期)"
+        }
+    );
     println!();
 
     // 5. 密钥序列化演示
@@ -46,7 +62,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 从字节重建
     let restored_verifier = Secp256k1Verifier::from_bytes(&keypair.public_key)?;
     let is_valid = restored_verifier.verify(message.as_bytes(), &signature)?;
-    println!("   重建后验证结果: {}", if is_valid { "有效 ✓" } else { "无效 ✗" });
+    println!(
+        "   重建后验证结果: {}",
+        if is_valid { "有效 ✓" } else { "无效 ✗" }
+    );
     println!();
 
     // 6. 带恢复 ID 的签名
@@ -56,8 +75,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let recovered_key =
         Secp256k1Verifier::recover_from_signature(message.as_bytes(), &sig, recovery_id)?;
-    println!("   恢复的公钥: {}", hex::encode(recovered_key.to_sec1_bytes()));
-    println!("   原始公钥:   {}", hex::encode(signer.verifying_key().to_sec1_bytes()));
+    println!(
+        "   恢复的公钥: {}",
+        hex::encode(recovered_key.to_sec1_bytes())
+    );
+    println!(
+        "   原始公钥:   {}",
+        hex::encode(signer.verifying_key().to_sec1_bytes())
+    );
     println!("   公钥匹配: {}", recovered_key == signer.verifying_key());
     println!();
 
@@ -73,7 +98,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let user_verifier = Secp256k1Verifier::from_signer(&user_signer);
 
         println!("\n您的私钥: {}", hex::encode(&user_signer.to_bytes()));
-        println!("您的公钥: {}", hex::encode(&user_signer.public_key_compressed()));
+        println!(
+            "您的公钥: {}",
+            hex::encode(&user_signer.public_key_compressed())
+        );
 
         let user_sig = user_signer.sign(user_input.trim().as_bytes());
         println!("签名: {}", hex::encode(&user_sig.to_bytes()));

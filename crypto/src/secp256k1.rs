@@ -2,9 +2,8 @@
 //! 使用 k256 crate 实现 ECDSA 签名、验证和密钥管理
 
 use k256::ecdsa::{
-    signature::Signer as K256Signer,
-    signature::Verifier as K256Verifier,
-    RecoveryId, Signature, SigningKey, VerifyingKey,
+    signature::Signer as K256Signer, signature::Verifier as K256Verifier, RecoveryId, Signature,
+    SigningKey, VerifyingKey,
 };
 use k256::sha2::{Digest, Sha256};
 use rand::rngs::OsRng;
@@ -32,8 +31,8 @@ pub struct KeyPair {
 impl Secp256k1Signer {
     /// 从私钥字节创建签名器
     pub fn from_bytes(private_key: &[u8]) -> Result<Self, Secp256k1Error> {
-        let signing_key = SigningKey::from_slice(private_key)
-            .map_err(|_| Secp256k1Error::InvalidPrivateKey)?;
+        let signing_key =
+            SigningKey::from_slice(private_key).map_err(|_| Secp256k1Error::InvalidPrivateKey)?;
         Ok(Self { signing_key })
     }
 
@@ -132,7 +131,11 @@ impl Secp256k1Verifier {
     }
 
     /// 验证预计算哈希的签名
-    pub fn verify_hash(&self, hash: [u8; 32], signature: &Signature) -> Result<bool, Secp256k1Error> {
+    pub fn verify_hash(
+        &self,
+        hash: [u8; 32],
+        signature: &Signature,
+    ) -> Result<bool, Secp256k1Error> {
         Ok(self.verifying_key.verify(&hash, signature).is_ok())
     }
 
@@ -199,13 +202,10 @@ pub struct KeyDerivation;
 impl KeyDerivation {
     /// 从父私钥派生子私钥（简化实现）
     /// 注意：实际应用应使用 BIP-32 标准
-    pub fn derive_child(
-        parent_key: &SigningKey,
-        index: u32,
-    ) -> Result<SigningKey, Secp256k1Error> {
+    pub fn derive_child(parent_key: &SigningKey, index: u32) -> Result<SigningKey, Secp256k1Error> {
         // 简化实现：使用 HMAC-SHA256 派生
-        use hmac::Mac;
         use hmac::Hmac;
+        use hmac::Mac;
 
         let parent_bytes = parent_key.to_bytes();
         let chain_code = [0u8; 32]; // 实际应用中应有真实的链码
@@ -216,8 +216,8 @@ impl KeyDerivation {
         let result = hmac.finalize();
         let bytes = result.into_bytes();
 
-        let child_key = SigningKey::from_slice(&bytes[..32])
-            .map_err(|_| Secp256k1Error::InvalidKeyLength)?;
+        let child_key =
+            SigningKey::from_slice(&bytes[..32]).map_err(|_| Secp256k1Error::InvalidKeyLength)?;
         Ok(child_key)
     }
 }

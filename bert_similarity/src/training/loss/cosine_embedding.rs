@@ -1,8 +1,8 @@
 // Cosine embedding loss implementation
 
-use candle_core::{Device, Tensor};
-use crate::utils::AppError;
 use super::Loss;
+use crate::utils::AppError;
+use candle_core::{Device, Tensor};
 
 /// Configuration for cosine embedding loss
 #[derive(Debug, Clone)]
@@ -41,7 +41,10 @@ impl CosineEmbeddingLoss {
     /// * `config` - Loss configuration
     /// * `device` - Device for tensor operations
     pub fn new(config: CosineEmbeddingLossConfig, device: Device) -> Self {
-        Self { _config: config, device }
+        Self {
+            _config: config,
+            device,
+        }
     }
 
     /// Create with default configuration
@@ -168,13 +171,13 @@ impl Loss for CosineEmbeddingLoss {
             )));
         }
 
-        let embeddings1 = predictions.narrow(0, 0, batch_size).map_err(|e| {
-            AppError::TrainingError(format!("Failed to narrow embeddings1: {}", e))
-        })?;
+        let embeddings1 = predictions
+            .narrow(0, 0, batch_size)
+            .map_err(|e| AppError::TrainingError(format!("Failed to narrow embeddings1: {}", e)))?;
 
-        let embeddings2 = predictions.narrow(0, batch_size, batch_size).map_err(|e| {
-            AppError::TrainingError(format!("Failed to narrow embeddings2: {}", e))
-        })?;
+        let embeddings2 = predictions
+            .narrow(0, batch_size, batch_size)
+            .map_err(|e| AppError::TrainingError(format!("Failed to narrow embeddings2: {}", e)))?;
 
         // Compute cosine similarity
         let cosine_sim = self.cosine_similarity(&embeddings1, &embeddings2)?;

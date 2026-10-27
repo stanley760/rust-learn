@@ -13,11 +13,11 @@ impl Solution {
         }
 
         fn dfs(grid: &mut Vec<Vec<i32>>, ans: &mut usize, i: usize, j: usize) {
-            // it always move by the step of one column, the result is moved by the 
+            // it always move by the step of one column, the result is moved by the
             if j > *ans {
                 *ans = j;
             }
-            // 
+            //
             if *ans == grid[0].len() - 1 {
                 return;
             }

@@ -28,11 +28,7 @@ mod tests {
 
     #[test]
     fn test_search_matrix() {
-        let matrix = vec![
-            vec![1, 3, 5, 7],
-            vec![10, 11, 16, 20],
-            vec![23, 30, 34, 60],
-        ];
+        let matrix = vec![vec![1, 3, 5, 7], vec![10, 11, 16, 20], vec![23, 30, 34, 60]];
         assert_eq!(Solution::search_matrix(matrix.clone(), 3), true);
         assert_eq!(Solution::search_matrix(matrix.clone(), 13), false);
     }

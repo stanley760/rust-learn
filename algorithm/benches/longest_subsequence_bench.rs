@@ -1,7 +1,7 @@
 use std::hint::black_box;
 
-use criterion::{ criterion_group, criterion_main, Criterion};
 use algorithm::bitopts::xor::longest_subsequence::Solution;
+use criterion::{criterion_group, criterion_main, Criterion};
 
 fn bench_longest_subsequence(c: &mut Criterion) {
     let mut group = c.benchmark_group("longest_subsequence");

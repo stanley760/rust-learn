@@ -35,16 +35,19 @@ impl Solution {
         while left < right {
             let mid = (left + right) >> 1;
             let max_j = mat[mid]
-            .iter().position(|&x| x == *mat[mid].iter().max().unwrap()).unwrap();
+                .iter()
+                .position(|&x| x == *mat[mid].iter().max().unwrap())
+                .unwrap();
             if mat[mid][max_j] > mat[mid + 1][max_j] {
                 right = mid;
             } else {
                 left = mid + 1;
             }
         }
-       let j = mat[left]
+        let j = mat[left]
             .iter()
-            .position(|&x| x == *mat[left].iter().max().unwrap()).unwrap();
+            .position(|&x| x == *mat[left].iter().max().unwrap())
+            .unwrap();
 
         vec![left as _, j as _]
     }

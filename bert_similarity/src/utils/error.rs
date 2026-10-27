@@ -52,21 +52,9 @@ pub struct ErrorResponse {
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let (status, error_type, message) = match &self {
-            AppError::InvalidInput(_) => (
-                StatusCode::BAD_REQUEST,
-                "BadRequest",
-                self.to_string(),
-            ),
-            AppError::ModelNotFound(_) => (
-                StatusCode::NOT_FOUND,
-                "NotFound",
-                self.to_string(),
-            ),
-            AppError::JobNotFound(_) => (
-                StatusCode::NOT_FOUND,
-                "NotFound",
-                self.to_string(),
-            ),
+            AppError::InvalidInput(_) => (StatusCode::BAD_REQUEST, "BadRequest", self.to_string()),
+            AppError::ModelNotFound(_) => (StatusCode::NOT_FOUND, "NotFound", self.to_string()),
+            AppError::JobNotFound(_) => (StatusCode::NOT_FOUND, "NotFound", self.to_string()),
             AppError::ModelError(_) => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "ModelError",
@@ -176,8 +164,7 @@ mod tests {
 
     #[test]
     fn test_serde_json_error_conversion() {
-        let json_error = serde_json::from_str::<serde_json::Value>("invalid json")
-            .unwrap_err();
+        let json_error = serde_json::from_str::<serde_json::Value>("invalid json").unwrap_err();
         let app_error: AppError = json_error.into();
         assert!(matches!(app_error, AppError::SerializationError(_)));
     }

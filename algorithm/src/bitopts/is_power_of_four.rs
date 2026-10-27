@@ -13,7 +13,7 @@ mod tests {
 
     #[test]
     pub fn test_normal_case() {
-        assert_eq!(Solution::is_power_of_four(16),true);
+        assert_eq!(Solution::is_power_of_four(16), true);
         assert_eq!(Solution::is_power_of_four(5), false);
         assert_eq!(Solution::is_power_of_four(1), true);
         assert_eq!(Solution::is_power_of_four(8), false);

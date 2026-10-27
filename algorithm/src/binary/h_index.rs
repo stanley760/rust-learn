@@ -27,7 +27,7 @@ mod tests {
         let citations = vec![0, 1, 3, 5, 6];
         assert_eq!(Solution::h_index(citations), 3);
 
-        let citations = vec![1,2, 100];
+        let citations = vec![1, 2, 100];
         assert_eq!(Solution::h_index(citations), 2);
     }
 }

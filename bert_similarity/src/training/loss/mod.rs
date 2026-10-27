@@ -3,8 +3,8 @@
 // This module defines the Loss trait and provides implementations
 // for different loss functions (CosineEmbedding, etc.).
 
-use candle_core::Tensor;
 use crate::utils::AppError;
+use candle_core::Tensor;
 
 /// Loss function trait for training
 ///

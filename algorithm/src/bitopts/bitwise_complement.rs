@@ -21,6 +21,5 @@ mod tests {
         assert_eq!(Solution::bitwise_complement(5), 2);
         assert_eq!(Solution::bitwise_complement(7), 0);
         assert_eq!(Solution::bitwise_complement(10), 5);
-
     }
 }

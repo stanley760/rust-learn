@@ -53,9 +53,10 @@ impl ModelRegistry {
     pub fn activate(&mut self, id: &str) -> Result<(), AppError> {
         tracing::info!("Activating model with ID: {}", id);
 
-        let model = self.models.get(id).ok_or_else(|| {
-            AppError::ModelError(format!("Model not found: {}", id))
-        })?;
+        let model = self
+            .models
+            .get(id)
+            .ok_or_else(|| AppError::ModelError(format!("Model not found: {}", id)))?;
 
         self.active_model = Some(Arc::clone(model));
         tracing::info!("Model '{}' is now the active model", id);
@@ -79,7 +80,8 @@ impl ModelRegistry {
     /// # Returns
     /// * `Result<Arc<RwLock<BertModel>>>` - The model, or error if not found
     pub fn get(&self, id: &str) -> Result<Arc<RwLock<BertModel>>, AppError> {
-        self.models.get(id)
+        self.models
+            .get(id)
             .cloned()
             .ok_or_else(|| AppError::ModelError(format!("Model not found: {}", id)))
     }
@@ -132,9 +134,10 @@ impl ModelRegistry {
     pub fn unregister(&mut self, id: &str) -> Result<(), AppError> {
         tracing::info!("Unregistering model with ID: {}", id);
 
-        let removed = self.models.remove(id).ok_or_else(|| {
-            AppError::ModelError(format!("Model not found: {}", id))
-        })?;
+        let removed = self
+            .models
+            .remove(id)
+            .ok_or_else(|| AppError::ModelError(format!("Model not found: {}", id)))?;
 
         // If the removed model was active, clear the active model
         if let Some(active) = &self.active_model {
@@ -164,7 +167,7 @@ impl Default for ModelRegistry {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use candle_core::{Device, DType};
+    use candle_core::{DType, Device};
     use candle_nn::VarBuilder;
     use candle_transformers::models::bert::Config as BertConfig;
 
@@ -182,7 +185,8 @@ mod tests {
             initializer_range: 0.02,
             layer_norm_eps: 1e-12,
             pad_token_id: 0,
-            position_embedding_type: candle_transformers::models::bert::PositionEmbeddingType::Absolute,
+            position_embedding_type:
+                candle_transformers::models::bert::PositionEmbeddingType::Absolute,
             use_cache: false,
             classifier_dropout: None,
             model_type: None,

@@ -60,6 +60,4 @@ mod tests {
         let nums = vec![0, 0, 0];
         assert_eq!(Solution::longest_subsequence(nums), 0);
     }
-
-    
 }

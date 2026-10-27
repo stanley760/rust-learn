@@ -4,13 +4,12 @@ struct Solution;
 impl Solution {
     pub fn smallest_number(n: i32) -> i32 {
         let bit_length = 32 - n.leading_zeros();
-        return (1<< bit_length) - 1;
+        return (1 << bit_length) - 1;
     }
 }
 #[cfg(test)]
 mod tests {
     use super::Solution;
-
 
     #[test]
     pub fn test_normal_case() {

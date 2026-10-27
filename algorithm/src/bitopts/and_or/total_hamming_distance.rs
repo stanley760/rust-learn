@@ -1,9 +1,7 @@
 #[allow(dead_code)]
-struct Solution; 
+struct Solution;
 #[allow(dead_code)]
 impl Solution {
-   
-
     pub fn total_hamming_distance(nums: Vec<i32>) -> i32 {
         let mut ans = 0;
         let n = nums.len();
@@ -22,7 +20,6 @@ impl Solution {
 #[cfg(test)]
 mod tests {
 
-    
     use super::*;
 
     #[test]

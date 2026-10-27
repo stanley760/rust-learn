@@ -1,16 +1,14 @@
-
 struct Solution;
 #[allow(dead_code)]
 impl Solution {
     pub fn has_alternating_bits(n: i32) -> bool {
         let num = n ^ (n >> 1);
-        num & (num + 1) == 0 
+        num & (num + 1) == 0
     }
 }
 #[cfg(test)]
 mod tests {
     use crate::has_alternating_bits::Solution;
-
 
     #[test]
     pub fn test_normal_case() {

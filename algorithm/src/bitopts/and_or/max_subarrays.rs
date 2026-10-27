@@ -13,7 +13,7 @@ impl Solution {
                 a = -1;
             }
         }
-        // if answer is zero, it indicates that all nums is larger than zero, so answer is one. 
+        // if answer is zero, it indicates that all nums is larger than zero, so answer is one.
         ans.max(1)
     }
 }
@@ -25,10 +25,10 @@ mod tests {
 
     #[test]
     pub fn test_normal_case() {
-        let nums = vec![1,0,2,0,1,2];
+        let nums = vec![1, 0, 2, 0, 1, 2];
         assert_eq!(Solution::max_subarrays(nums), 3);
 
-        let nums = vec![5,7,1,3];
+        let nums = vec![5, 7, 1, 3];
         assert_eq!(Solution::max_subarrays(nums), 1);
     }
 }

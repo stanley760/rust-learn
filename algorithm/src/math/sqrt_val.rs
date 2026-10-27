@@ -1,9 +1,8 @@
-
 pub struct Solution;
 
 impl Solution {
     pub fn my_sqrt(x: i32) -> i32 {
-        let mut l = 0; 
+        let mut l = 0;
         let mut r = x;
         let mut ans = -1;
         while l <= r {
@@ -24,7 +23,7 @@ impl Solution {
         let c: f32 = x as f32;
         let mut x0: f32 = x as f32;
         loop {
-            let x1 = 0.5*(x0 + c/x0);
+            let x1 = 0.5 * (x0 + c / x0);
             if (x0 - x1).abs() < 1e-7 {
                 break;
             }
@@ -34,11 +33,9 @@ impl Solution {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use crate::math::sqrt_val::Solution;
-
 
     #[test]
     fn test_common() {

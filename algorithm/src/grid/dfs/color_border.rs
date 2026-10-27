@@ -16,31 +16,47 @@ impl Solution {
         grid
     }
 
-    fn dfs(visited: &mut Vec<Vec<bool>>,grid: &mut Vec<Vec<i32>>, x: usize, y: usize, original_color: i32, color: i32) {
-            
-            visited[x][y] = true;
+    fn dfs(
+        visited: &mut Vec<Vec<bool>>,
+        grid: &mut Vec<Vec<i32>>,
+        x: usize,
+        y: usize,
+        original_color: i32,
+        color: i32,
+    ) {
+        visited[x][y] = true;
 
-            for i in 0..4 {
-                let dx = x as isize + DX[i];
-                let dy = y as isize + DY[i];
-                let len_row = grid.len() as isize;
-                let len_col = grid[0].len() as isize;
+        for i in 0..4 {
+            let dx = x as isize + DX[i];
+            let dy = y as isize + DY[i];
+            let len_row = grid.len() as isize;
+            let len_col = grid[0].len() as isize;
 
-                if dx < 0 || dx >= len_row || dy < 0 || dy >= len_col || grid[dx as usize][dy as usize] != original_color {
-                    if dx >= 0 && dx < len_row && dy >= 0 && dy < len_col && visited[dx as usize][dy as usize] {
-                        continue;
-                    }
-                    grid[x][y] = color;
+            if dx < 0
+                || dx >= len_row
+                || dy < 0
+                || dy >= len_col
+                || grid[dx as usize][dy as usize] != original_color
+            {
+                if dx >= 0
+                    && dx < len_row
+                    && dy >= 0
+                    && dy < len_col
+                    && visited[dx as usize][dy as usize]
+                {
                     continue;
                 }
-                let dx = dx as usize;
-                let dy = dy as usize;
+                grid[x][y] = color;
+                continue;
+            }
+            let dx = dx as usize;
+            let dy = dy as usize;
 
-                if grid[dx][dy] == original_color && !visited[dx][dy] {
-                    Self::dfs(visited, grid, dx, dy, original_color, color);
-                }
+            if grid[dx][dy] == original_color && !visited[dx][dy] {
+                Self::dfs(visited, grid, dx, dy, original_color, color);
             }
         }
+    }
 }
 
 #[cfg(test)]

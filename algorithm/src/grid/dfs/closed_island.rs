@@ -29,10 +29,15 @@ impl Solution {
                     dfs(&mut grid, i as isize, j as isize);
                 }
             }
-        } 
+        }
 
         fn dfs(grid: &mut Vec<Vec<i32>>, i: isize, j: isize) {
-            if i < 0 || i as usize >= grid.len() || j < 0 || j as usize >= grid[0].len() || grid[i as usize][j as usize] != 0 {
+            if i < 0
+                || i as usize >= grid.len()
+                || j < 0
+                || j as usize >= grid[0].len()
+                || grid[i as usize][j as usize] != 0
+            {
                 return;
             }
             grid[i as usize][j as usize] = 1;
@@ -41,7 +46,7 @@ impl Solution {
             dfs(grid, i, j - 1);
             dfs(grid, i, j + 1);
         }
-        ans 
+        ans
     }
 }
 

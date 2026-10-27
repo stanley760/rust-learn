@@ -74,9 +74,9 @@ mod tests {
             } else {
                 println!("Request-{} denied", i);
             }
-            if i % 5 == 0  && i != 0 {
+            if i % 5 == 0 && i != 0 {
                 thread::sleep(Duration::from_secs(1));
             }
-         }
+        }
     }
 }

@@ -1,4 +1,3 @@
-
 #[allow(dead_code)]
 struct Solution;
 #[allow(dead_code)]
@@ -9,8 +8,7 @@ impl Solution {
         (0..n).into_iter().for_each(|x| {
             let cur = start + 2 * x;
             if x > 0 {
-
-                ans ^=cur;
+                ans ^= cur;
             }
         });
         ans

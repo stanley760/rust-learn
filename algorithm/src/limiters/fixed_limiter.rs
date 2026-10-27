@@ -50,14 +50,15 @@ impl FixedLimiter {
 
 #[allow(unused)]
 mod tests {
-    use std::{thread, time::{Duration, SystemTime}};
     use crate::limiters::fixed_limiter::FixedLimiter;
-
-    
+    use std::{
+        thread,
+        time::{Duration, SystemTime},
+    };
 
     #[test]
     fn test_fixed_limiter() {
-        let limiter = FixedLimiter::new(Duration::from_secs(1),  3);
+        let limiter = FixedLimiter::new(Duration::from_secs(1), 3);
 
         for _ in 0..20 {
             let allowed = limiter.allow();

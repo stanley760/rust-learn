@@ -4,7 +4,6 @@ use std::collections::HashSet;
 struct Solution;
 #[allow(dead_code)]
 impl Solution {
-
     ///$$
     /// Time's Complexity:  O(n)
     /// Space's Complexity: O(1)
@@ -21,7 +20,7 @@ impl Solution {
         }
         println!("mask:{:b}", mask);
         mask = !mask;
-        original *(mask & -mask)
+        original * (mask & -mask)
     }
 
     ///$$
@@ -30,10 +29,11 @@ impl Solution {
     ///$$
     pub fn find_final_value_v1(nums: Vec<i32>, original: i32) -> i32 {
         let mut original = original;
-        let st = nums.into_iter()
-        .filter(|x| x % original == 0 && ((x /original) & (x / original - 1)) == 0)
-        .collect::<HashSet<_>>();
-        
+        let st = nums
+            .into_iter()
+            .filter(|x| x % original == 0 && ((x / original) & (x / original - 1)) == 0)
+            .collect::<HashSet<_>>();
+
         while st.contains(&original) {
             original *= 2;
         }
@@ -47,7 +47,7 @@ mod tests {
 
     #[test]
     pub fn test_normal_case() {
-        let nums = vec![5,3,6,1,12];
+        let nums = vec![5, 3, 6, 1, 12];
         let original = 3;
         assert_eq!(Solution::find_final_value(nums, original), 24);
 
@@ -58,11 +58,11 @@ mod tests {
 
     #[test]
     pub fn test_normal_case_v1() {
-let nums = vec![5,3,6,1,12];
+        let nums = vec![5, 3, 6, 1, 12];
         let original = 3;
         assert_eq!(Solution::find_final_value_v1(nums, original), 24);
 
-        let nums = vec![2,7,9];
+        let nums = vec![2, 7, 9];
         let original = 4;
         assert_eq!(Solution::find_final_value_v1(nums, original), 4);
     }

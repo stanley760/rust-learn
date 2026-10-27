@@ -1,4 +1,3 @@
-
 #[allow(dead_code)]
 struct Solution;
 #[allow(dead_code)]
@@ -27,7 +26,6 @@ impl Solution {
                 }
             }
         }
-
 
         fn dfs(board: &mut Vec<Vec<char>>, i: isize, j: isize) {
             if i < 0
@@ -71,5 +69,4 @@ mod tests {
         Solution::solve(&mut board);
         assert_eq!(board, expected);
     }
-
 }

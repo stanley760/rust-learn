@@ -1,3 +1,3 @@
-mod maximum_difference;
-mod max_distance;
 pub mod lru;
+mod max_distance;
+mod maximum_difference;

@@ -1,7 +1,7 @@
 // Tokenizer wrapper for BERT model text processing
 
 use crate::utils::AppError;
-use tokenizers::{Tokenizer, Encoding};
+use tokenizers::{Encoding, Tokenizer};
 
 /// Wrapper around the tokenizers::Tokenizer for easier integration
 #[derive(Debug, Clone)]
@@ -73,7 +73,9 @@ impl TokenizerWrapper {
     /// * `Result<Encoding>` - The encoding containing token IDs, attention mask, etc.
     pub fn encode(&self, text: &str, add_special_tokens: bool) -> Result<Encoding, AppError> {
         if text.is_empty() {
-            return Err(AppError::InvalidInput("Cannot encode empty string".to_string()));
+            return Err(AppError::InvalidInput(
+                "Cannot encode empty string".to_string(),
+            ));
         }
 
         self.tokenizer
@@ -261,6 +263,9 @@ mod tests {
     fn test_from_file_nonexistent_returns_error() {
         let result = TokenizerWrapper::from_file("/nonexistent/path/tokenizer.json");
         assert!(result.is_err());
-        assert!(matches!(result.unwrap_err(), AppError::TokenizationError(_)));
+        assert!(matches!(
+            result.unwrap_err(),
+            AppError::TokenizationError(_)
+        ));
     }
 }

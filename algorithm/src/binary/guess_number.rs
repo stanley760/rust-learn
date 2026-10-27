@@ -23,14 +23,13 @@ const PICK: i32 = 6;
 
 fn guess(num: i32) -> i32 {
     if num < PICK {
-        1   // 猜小了，应该更大
+        1 // 猜小了，应该更大
     } else if num > PICK {
-        -1  // 猜大了，应该更小
+        -1 // 猜大了，应该更小
     } else {
-        0   // 猜对了！
+        0 // 猜对了！
     }
 }
-
 
 #[cfg(test)]
 mod tests {

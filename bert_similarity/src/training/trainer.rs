@@ -3,8 +3,8 @@
 
 use crate::api::models::FinetuneParams;
 use crate::model::BertModel;
-use crate::training::optimizer::{Optimizer, AdamOptimizer, AdamConfig};
-use crate::training::loss::{Loss, CosineEmbeddingLoss};
+use crate::training::loss::{CosineEmbeddingLoss, Loss};
+use crate::training::optimizer::{AdamConfig, AdamOptimizer, Optimizer};
 use crate::utils::AppError;
 use candle_core::{Device, Tensor};
 use std::path::PathBuf;
@@ -34,7 +34,7 @@ pub struct FinetuneTrainer {
     model: Arc<Mutex<BertModel>>,
     params: FinetuneParams,
     device: Device,
-    _optimizer: Option<Box<dyn Optimizer>>,  // Reserved for future autograd integration
+    _optimizer: Option<Box<dyn Optimizer>>, // Reserved for future autograd integration
     loss_fn: Box<dyn Loss>,
 }
 
@@ -201,8 +201,9 @@ impl FinetuneTrainer {
                 let embeddings2 = model.get_pooled_output(&hidden_states2, &attention_mask2)?;
 
                 // Concatenate embeddings for loss computation
-                let predictions = Tensor::cat(&[&embeddings1, &embeddings2], 0)
-                    .map_err(|e| AppError::TrainingError(format!("Failed to concatenate embeddings: {}", e)))?;
+                let predictions = Tensor::cat(&[&embeddings1, &embeddings2], 0).map_err(|e| {
+                    AppError::TrainingError(format!("Failed to concatenate embeddings: {}", e))
+                })?;
 
                 // Compute loss using loss function trait
                 let loss = self.loss_fn.compute(&predictions, &labels_tensor)?;

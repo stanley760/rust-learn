@@ -12,7 +12,7 @@ impl Solution {
             if grid[0][j] == 1 {
                 dfs(&mut grid, 0, j);
             }
-            if grid[m-1][j] == 1 {
+            if grid[m - 1][j] == 1 {
                 dfs(&mut grid, m - 1, j);
             }
         }
@@ -34,7 +34,6 @@ impl Solution {
                 }
             }
         }
-        
 
         fn dfs(grid: &mut Vec<Vec<i32>>, i: usize, j: usize) {
             let (m, n) = (grid.len(), grid[0].len());

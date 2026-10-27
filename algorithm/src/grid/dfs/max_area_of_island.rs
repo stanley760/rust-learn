@@ -33,7 +33,7 @@ impl Solution {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     pub fn test_normal_case() {
         let grid = [
@@ -50,7 +50,7 @@ mod tests {
 
         assert_eq!(Solution::max_area_of_island(grid), 6);
 
-        let grid = [[0,0,0,0,0,0,0,0]];
+        let grid = [[0, 0, 0, 0, 0, 0, 0, 0]];
         let grid = grid.iter().map(|g| g.to_vec()).collect::<Vec<_>>();
 
         assert_eq!(Solution::max_area_of_island(grid), 0);

@@ -145,16 +145,23 @@ impl OppositionDetector {
         let char_sim = Self::calculate_char_similarity(&norm1, &norm2);
 
         // Detect if text contains Chinese characters (CJK Unified Ideographs block)
-        let has_chinese = norm1.chars().any(|c| is_chinese_char(c)) || norm2.chars().any(|c| is_chinese_char(c));
+        let has_chinese =
+            norm1.chars().any(|c| is_chinese_char(c)) || norm2.chars().any(|c| is_chinese_char(c));
 
         // For Chinese text, use character-level comparison instead of word-level
         // since Chinese doesn't use spaces between words
         let (word_overlap, diff_ratio) = if has_chinese {
             // For Chinese, compare character n-grams (bigrams)
-            let bigrams1: Vec<String> = norm1.chars().collect::<Vec<_>>().windows(2)
+            let bigrams1: Vec<String> = norm1
+                .chars()
+                .collect::<Vec<_>>()
+                .windows(2)
                 .map(|w| w.iter().collect())
                 .collect();
-            let bigrams2: Vec<String> = norm2.chars().collect::<Vec<_>>().windows(2)
+            let bigrams2: Vec<String> = norm2
+                .chars()
+                .collect::<Vec<_>>()
+                .windows(2)
                 .map(|w| w.iter().collect())
                 .collect();
 
@@ -525,7 +532,10 @@ mod tests {
         } else {
             0.0
         };
-        println!("common_words: {}, total_unique: {}, word_overlap: {}", common_words, total_unique_words, word_overlap);
+        println!(
+            "common_words: {}, total_unique: {}, word_overlap: {}",
+            common_words, total_unique_words, word_overlap
+        );
 
         let structural = OppositionDetector::detect_from_structure(text1, text2).unwrap();
         println!("structural_opposition: {}", structural);
@@ -537,10 +547,18 @@ mod tests {
         println!("total_opposition: {}", opposition);
 
         // Should detect significant opposition due to high structural similarity
-        assert!(opposition > 0.3, "Expected opposition > 0.3, got {}", opposition);
+        assert!(
+            opposition > 0.3,
+            "Expected opposition > 0.3, got {}",
+            opposition
+        );
 
         // Test structural detection specifically
-        assert!(structural > 0.5, "Expected structural opposition > 0.5, got {}", structural);
+        assert!(
+            structural > 0.5,
+            "Expected structural opposition > 0.5, got {}",
+            structural
+        );
     }
 
     #[test]
@@ -548,9 +566,15 @@ mod tests {
         // Test various Chinese antonym-like patterns
         // For shorter sentences, detection is harder, so we use longer sentences
         let test_cases = vec![
-            ("这项措施能够有效促进经济发展", "这项措施能够有效阻碍经济发展"),
+            (
+                "这项措施能够有效促进经济发展",
+                "这项措施能够有效阻碍经济发展",
+            ),
             ("这项政策可以增加居民收入", "这项政策可以减少居民收入"),
-            ("这个方法能够显著提高工作效率", "这个方法能够显著降低工作效率"),
+            (
+                "这个方法能够显著提高工作效率",
+                "这个方法能够显著降低工作效率",
+            ),
             ("我们完全支持这个观点和建议", "我们完全反对这个观点和建议"),
             ("很多用户非常喜欢这个产品", "很多用户非常讨厌这个产品"),
         ];
@@ -559,14 +583,17 @@ mod tests {
             let emb1 = vec![0.5, 0.3, 0.8, 0.2];
             let emb2 = vec![0.5, 0.3, 0.8, 0.2]; // Same structure, different meaning
 
-            let _opposition = OppositionDetector::detect_opposition(text1, text2, &emb1, &emb2).unwrap();
+            let _opposition =
+                OppositionDetector::detect_opposition(text1, text2, &emb1, &emb2).unwrap();
 
             // At minimum, structural detection should trigger for longer sentences
             let structural = OppositionDetector::detect_from_structure(text1, text2).unwrap();
             assert!(
                 structural > 0.35,
                 "Structural opposition too low for '{}' vs '{}': {}",
-                text1, text2, structural
+                text1,
+                text2,
+                structural
             );
         }
     }

@@ -25,10 +25,10 @@ impl Solution {
         }
 
         let mut ans = 0;
-    
+
         for i in 0..grid.len() {
             for j in 0..grid[0].len() {
-                // the condition that 
+                // the condition that
                 if grid[i][j] > 0 {
                     ans = ans.max(dfs(&mut grid, i, j));
                 }
@@ -42,15 +42,19 @@ impl Solution {
 mod tests {
     use super::*;
 
-
     #[test]
     pub fn test_normal_case() {
-        let grid: [[i32; 4]; 4] = [[0,2,1,0],[4,0,0,3],[1,0,0,4],[0,3,2,0]];
+        let grid: [[i32; 4]; 4] = [[0, 2, 1, 0], [4, 0, 0, 3], [1, 0, 0, 4], [0, 3, 2, 0]];
         let grid: Vec<Vec<i32>> = grid.iter().map(|g| g.to_vec()).collect::<Vec<_>>();
 
         assert_eq!(Solution::find_max_fish(grid), 7);
-        
-        let grid = vec![vec![1,0,0,0],vec![0,0,0,0],vec![0,0,0,0],vec![0,0,0,1]];
+
+        let grid = vec![
+            vec![1, 0, 0, 0],
+            vec![0, 0, 0, 0],
+            vec![0, 0, 0, 0],
+            vec![0, 0, 0, 1],
+        ];
         assert_eq!(Solution::find_max_fish(grid), 1);
     }
 }

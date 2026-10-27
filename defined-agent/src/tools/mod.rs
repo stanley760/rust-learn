@@ -1,147 +1,41 @@
-﻿use std::sync::Mutex;
-use std::{borrow::Cow, sync::Arc};
-use std::collections::HashMap;
-
-use async_openai::types::chat::{
-    ChatCompletionTool, ChatCompletionTools, FunctionObject, FunctionObjectArgs,
-};
-use async_trait::async_trait;
+use crate::tools::calculator::CalculatorTool;
+use async_openai::types::chat::{ChatCompletionTool, ChatCompletionTools, FunctionObjectArgs};
 use serde_json::Value;
+use std::collections::HashMap;
+pub mod calculator;
 
-use crate::memory::Manager;
-use crate::tools::compact::compact_tool;
-use crate::tools::memory::save_memory_tool;
-use crate::{skills::SkillRegistry, tools::{
-    bash::bash_tool, 
-    edit_file::edit_file_tool, 
-    read_file::read_file_tool, 
-    sub_agent::sub_agent_tool, 
-    write_file::write_file_tool
-}};
-
-use crate::skills::load_skills_tool;
-
-mod bash;
-mod write_file;
-mod edit_file;
-mod read_file;
-mod todo;
-mod sub_agent;
-mod compact;
-mod memory;
-/// Provider-agnostic tool specification.
-///
-/// Mirrors Anthropic's `ToolSpec` (name, description, input_schema)
-/// and can be converted into any provider's native type.
-pub struct ToolSpec {
-    pub name: String,
-    pub description: Option<String>,
-    /// JSON Schema describing the tool's input parameters.
-    pub input_schema: serde_json::Value,
-}
-
-impl ToolSpec {
-    /// Convert into an OpenAI-compatible `ChatCompletionTools`.
-    pub fn into_openai_tool(self) -> ChatCompletionTools {
-        ChatCompletionTools::Function(ChatCompletionTool {
-            function: self.into(),
-        })
-    }
-}
-
-impl From<ToolSpec> for FunctionObject {
-    fn from(spec: ToolSpec) -> Self {
-        let mut args = FunctionObjectArgs::default();
-        args.name(spec.name);
-        if let Some(desc) = spec.description {
-            args.description(desc);
-        }
-        args.parameters(spec.input_schema);
-        args.build().expect("Failed to build FunctionObject from ToolSpec")
-    }
-}
-
-
-pub fn toolset_compact(registry: Arc<SkillRegistry>, memory_manager: Arc<Mutex<Manager>>) -> HashMap<String, Box<dyn Tool>> {
-    HashMap::from([
-        ("bash".to_string(), bash_tool()),
-        ("read_file".to_string(), read_file_tool()),
-        ("write_file".to_string(), write_file_tool()),
-        ("edit_file".to_string(), edit_file_tool()),
-        ("compact".to_string(), compact_tool()),
-        ("save_memory".to_string(), save_memory_tool(memory_manager)),
-        ("load_skill".to_string(), load_skills_tool(registry)),
-    ])
-}
-
-pub fn toolset(registry: Arc<SkillRegistry>) -> HashMap<String, Box<dyn Tool>> {
-    HashMap::from([
-        ("bash".to_string(), bash_tool()),
-        ("read_file".to_string(), read_file_tool()),
-        ("write_file".to_string(), write_file_tool()),
-        ("edit_file".to_string(), edit_file_tool()),
-        ("load_skill".to_string(), load_skills_tool(registry)),
-    ])
-}
-
-pub fn agent_tools() -> HashMap<String, Box<dyn Tool>> {
-    HashMap::from([
-        ("bash".to_string(), bash_tool()),
-        ("read_file".to_string(), read_file_tool()),
-        ("write_file".to_string(), write_file_tool()),
-        ("edit_file".to_string(), edit_file_tool()),
-        ("task".to_string(), sub_agent_tool()),
-    ])
-}
-
-pub fn subagent_tools() -> HashMap<String, Box<dyn Tool>> {
-    HashMap::from([
-        ("bash".to_string(), bash_tool()),
-        ("read_file".to_string(), read_file_tool()),
-        ("write_file".to_string(), write_file_tool()),
-        ("edit_file".to_string(), edit_file_tool()),
-    ])
-}
-
-#[async_trait]
+#[async_trait::async_trait]
 pub trait Tool: Send + Sync {
-    async fn invoke(&mut self, input: &Value) -> anyhow::Result<String>;
-    fn name(&self) -> Cow<'_, str>;
-    fn tool_spec(&self) -> ToolSpec;
+    fn name(&self) -> &str;
+
+    fn description(&self) -> &str;
+
+    fn parameters(&self) -> Value;
+
+    async fn execute(&self, arg_json: &str) -> anyhow::Result<String>;
+
+    fn definition(&self) -> anyhow::Result<ChatCompletionTools> {
+        let function = FunctionObjectArgs::default()
+            .name(self.name())
+            .description(self.description())
+            .parameters(self.parameters())
+            .build()
+            .map_err(|e| {
+                anyhow::anyhow!("Failed to build tool definition for {}: {e}", self.name())
+            })?;
+
+        Ok(ChatCompletionTools::Function(ChatCompletionTool {
+            function,
+        }))
+    }
 }
 
+pub type ToolBox = HashMap<String, Box<dyn Tool>>;
 
-/// Validate and resolve a path, ensuring it stays within the workspace.
-///
-/// If `must_exist` is true (e.g. for read operations), the path is canonicalized
-/// which requires the file/directory to already exist.
-/// If `must_exist` is false (e.g. for write operations), the parent directory
-/// is canonicalized instead, and the filename is appended — this allows writing
-/// to files that don't yet exist while still preventing path traversal.
-fn safe_path(path: &str, must_exist: bool) -> anyhow::Result<std::path::PathBuf> {
-    let cwd = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
-    let full = cwd.join(path);
-
-    if must_exist {
-        let canonical = full.canonicalize()?;
-        if !canonical.starts_with(&cwd) {
-            return Err(anyhow::anyhow!("Path escapes workspace"));
-        }
-        Ok(canonical)
-    } else {
-        // For write operations: canonicalize the parent (which must exist),
-        // then append the filename. This allows writing to new files while
-        // still preventing path traversal attacks.
-        let parent = full.parent().ok_or_else(|| anyhow::anyhow!("Path has no parent directory"))?;
-        let canonical_parent = if parent.as_os_str().is_empty() {
-            cwd.clone()
-        } else {
-            parent.canonicalize()?
-        };
-        if !canonical_parent.starts_with(&cwd) {
-            return Err(anyhow::anyhow!("Path escapes workspace"));
-        }
-        let file_name = full.file_name().ok_or_else(|| anyhow::anyhow!("Path has no filename"))?;
-        Ok(canonical_parent.join(file_name))
-    }
+pub fn build_toolbox() -> ToolBox {
+    let tools: Vec<Box<dyn Tool>> = vec![Box::new(CalculatorTool)];
+    tools
+        .into_iter()
+        .map(|tool| (tool.name().to_string(), tool))
+        .collect()
 }

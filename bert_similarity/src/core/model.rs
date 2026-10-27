@@ -88,7 +88,9 @@ impl BertModel {
             .zeros_like()
             .map_err(|e| AppError::ModelError(format!("Failed to create token_type_ids: {}", e)))?
             .to_dtype(candle_core::DType::U32)
-            .map_err(|e| AppError::ModelError(format!("Failed to convert token_type_ids to U32: {}", e)))?;
+            .map_err(|e| {
+                AppError::ModelError(format!("Failed to convert token_type_ids to U32: {}", e))
+            })?;
 
         let hidden_states = self
             .model
@@ -225,7 +227,8 @@ mod tests {
             initializer_range: 0.02,
             layer_norm_eps: 1e-12,
             pad_token_id: 0,
-            position_embedding_type: candle_transformers::models::bert::PositionEmbeddingType::Absolute,
+            position_embedding_type:
+                candle_transformers::models::bert::PositionEmbeddingType::Absolute,
             use_cache: false,
             classifier_dropout: None,
             model_type: None,

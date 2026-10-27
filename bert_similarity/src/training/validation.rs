@@ -121,7 +121,9 @@ pub fn validate_training_pair(pair: &TrainingPair, index: usize) -> Vec<Validati
 /// Requirements: 5.1, 5.2, 5.3, 5.5
 ///
 /// Returns a ValidationResult with all validation errors found
-pub fn validate_training_data(training_data: &[TrainingPair]) -> Result<ValidationResult, AppError> {
+pub fn validate_training_data(
+    training_data: &[TrainingPair],
+) -> Result<ValidationResult, AppError> {
     // Check if training data is empty
     if training_data.is_empty() {
         return Err(AppError::InvalidInput(

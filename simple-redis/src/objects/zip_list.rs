@@ -9,7 +9,7 @@ impl Encoding {
     fn unwrap_str(&self) -> usize {
         match self {
             Self::Str(s) => *s,
-            _ => panic!("this is not in encoding with the string")
+            _ => panic!("this is not in encoding with the string"),
         }
     }
 
@@ -30,7 +30,4 @@ impl Encoding {
     fn is_int(&self) -> bool {
         !self.is_str()
     }
-
-    
-
 }

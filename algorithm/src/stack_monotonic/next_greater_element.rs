@@ -4,13 +4,15 @@ use std::collections::HashMap;
 struct Solution;
 #[allow(dead_code)]
 impl Solution {
-
-    pub fn  next_greater_element(nums1: Vec<i32>, nums2: Vec<i32>) -> Vec<i32> {
-        
-        let index = nums1.iter().enumerate().map(|(i, &x)| (x, i)).collect::<HashMap<_, _>>();
+    pub fn next_greater_element(nums1: Vec<i32>, nums2: Vec<i32>) -> Vec<i32> {
+        let index = nums1
+            .iter()
+            .enumerate()
+            .map(|(i, &x)| (x, i))
+            .collect::<HashMap<_, _>>();
         let n = nums1.len();
         let mut res = vec![-1; n];
-        let mut stack= Vec::new();
+        let mut stack = Vec::new();
         for x in nums2 {
             while let Some(top) = stack.last() {
                 if x <= *top {
@@ -18,13 +20,13 @@ impl Solution {
                 } else {
                     res[index[top]] = x;
                     stack.pop();
-                } 
+                }
             }
             if index.contains_key(&x) {
                 stack.push(x);
             }
         }
-        
+
         res
     }
 }
@@ -37,7 +39,10 @@ mod tests {
     fn test_next_greater_element() {
         let nums1 = vec![4, 1, 2];
         let nums2 = vec![1, 3, 4, 2];
-        assert_eq!(Solution::next_greater_element(nums1, nums2), vec![-1, 3, -1]);
+        assert_eq!(
+            Solution::next_greater_element(nums1, nums2),
+            vec![-1, 3, -1]
+        );
     }
 
     #[test]

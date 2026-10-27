@@ -10,7 +10,8 @@ impl Solution {
         let mut pos = 0;
 
         while n > 0 {
-            if n & 1 == 1 { // 检查最低位是否为1
+            if n & 1 == 1 {
+                // 检查最低位是否为1
                 if last_one != -1 {
                     max_gap = max_gap.max(pos - last_one);
                 }
@@ -42,8 +43,6 @@ impl Solution {
 
         max_gap
     }
-
-    
 }
 
 #[cfg(test)]
@@ -52,11 +51,11 @@ mod tests {
 
     #[test]
     fn test_binary_gap() {
-        assert_eq!(Solution::binary_gap(22), 2);  // 10110
-        assert_eq!(Solution::binary_gap(8), 0);   // 1000
-        assert_eq!(Solution::binary_gap(5), 2);   // 101
-        assert_eq!(Solution::binary_gap(6), 1);   // 110
-        assert_eq!(Solution::binary_gap(1), 0);   // 1
+        assert_eq!(Solution::binary_gap(22), 2); // 10110
+        assert_eq!(Solution::binary_gap(8), 0); // 1000
+        assert_eq!(Solution::binary_gap(5), 2); // 101
+        assert_eq!(Solution::binary_gap(6), 1); // 110
+        assert_eq!(Solution::binary_gap(1), 0); // 1
     }
 
     #[test]

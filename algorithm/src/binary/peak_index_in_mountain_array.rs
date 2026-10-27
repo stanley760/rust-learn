@@ -20,7 +20,6 @@ impl Solution {
 mod tests {
     use super::*;
 
-
     #[test]
     fn test_peak_index_in_mountain_array() {
         let arr = vec![0, 1, 0];

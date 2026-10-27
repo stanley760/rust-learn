@@ -75,7 +75,7 @@ impl Solution {
         let mut m = mask;
 
         while src != 0 && m != 0 {
-            let lowest_bit = m & -m; 
+            let lowest_bit = m & -m;
             dbg!(lowest_bit);
             // 找到最低位的 1 0011
             if (src & 1) != 0 {

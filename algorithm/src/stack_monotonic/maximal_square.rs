@@ -17,7 +17,7 @@ impl Solution {
             }
             ans = ans.max(Self::largest_area(&heights));
         }
-        ans *ans
+        ans * ans
     }
 
     fn largest_area(heights: &[i32]) -> i32 {
@@ -26,9 +26,9 @@ impl Solution {
         for (r, &h) in heights.iter().enumerate() {
             let right = r as i32;
             while st.len() > 1 && heights[*st.last().unwrap() as usize] >= h {
-                let i = st.pop().unwrap()  as usize;
+                let i = st.pop().unwrap() as usize;
                 let left = *st.last().unwrap();
-                ans = ans.max(heights[i].min(right - left  - 1));
+                ans = ans.max(heights[i].min(right - left - 1));
             }
             st.push(right);
         }

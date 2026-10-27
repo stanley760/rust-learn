@@ -20,7 +20,7 @@ impl Solution {
         let mut ans = 0;
         while !queue.is_empty() {
             let level_size = queue.len();
-            
+
             for _ in 0..level_size {
                 let (cx, cy) = queue.pop_front().unwrap();
                 for d in DIRS {
@@ -29,20 +29,18 @@ impl Solution {
                     let m_i32 = m as i32;
                     let n_i32 = n as i32;
 
-                    if x_i32 >= 0 && x_i32 < m_i32  && 0 <= y_i32 && y_i32 < n_i32 {
+                    if x_i32 >= 0 && x_i32 < m_i32 && 0 <= y_i32 && y_i32 < n_i32 {
                         let x = x_i32 as usize;
                         let y = y_i32 as usize;
                         if maze[x][y] == '.' && !visited[x][y] {
                             // Check if it's an exit
                             if x == 0 || y == 0 || x == m - 1 || y == n - 1 {
-                                
                                 return ans + 1;
-                            } 
-                        
+                            }
+
                             visited[x][y] = true;
                             queue.push_back((x_i32, y_i32));
                         }
-                        
                     }
                 }
             }
