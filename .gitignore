@@ -23,3 +23,5 @@ rust-project.json
 
 
 .vscode/settings.json
+
+**/.env

@@ -15,8 +15,8 @@ async fn main() -> anyhow::Result<()> {
     let model = std::env::var("OPENAI_MODEL")?;
 
     let prompts = vec![
-        "2026年中网公开赛冠军是谁，决赛是哪两位运动员角逐冠军?",
         "11*11是多少",
+        "2026年中网公开赛冠军是谁，决赛是哪两位运动员角逐冠军?",
     ];
 
     // 顺序执行：多路并发时输出会在终端交错，无法逐 token 跟随
