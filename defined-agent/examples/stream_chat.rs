@@ -15,9 +15,8 @@ async fn main() -> anyhow::Result<()> {
     let model = std::env::var("OPENAI_MODEL")?;
 
     let prompts = vec![
-        "今年中国领导人习主席和美国总统特朗普什么时候进行了国事访问?",
+        "2026年中网公开赛冠军是谁，决赛是哪两位运动员角逐冠军?",
         "11*11是多少",
-        "计算 11 + 11 是多少"
     ];
 
     // 顺序执行：多路并发时输出会在终端交错，无法逐 token 跟随

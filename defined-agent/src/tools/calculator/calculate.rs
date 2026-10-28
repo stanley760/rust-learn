@@ -3,32 +3,17 @@ use serde::Deserialize;
 use serde_json::Value;
 
 use crate::tools::{
-    Tool,
-    calculator::execute::calculator,
+    Tool, ToolError,
+    calculator::execute::{Operator, calculator},
 };
 
 #[derive(Deserialize, Debug, JsonSchema)]
 struct CalculatorArgs {
     operator: String,
-    first_number: CalculatorNumber,
-    second_number: CalculatorNumber,
+    first_number: f64,
+    second_number: f64,
 }
 
-#[derive(serde::Deserialize, schemars::JsonSchema, Debug)]
-#[serde(untagged)]
-enum CalculatorNumber {
-    Integer(i64),
-    Float(f64),
-}
-
-impl CalculatorNumber {
-    fn as_f64(&self) -> f64 {
-        match self {
-            Self::Integer(value) => *value as f64,
-            Self::Float(value) => *value,
-        }
-    }
-}
 pub struct CalculatorTool;
 
 #[async_trait::async_trait]
@@ -38,7 +23,7 @@ impl Tool for CalculatorTool {
     }
 
     fn description(&self) -> &str {
-        "Perform baic arithmetric for calculator"
+        "Perform basic arithmetic: add, subtract, multiply, divide"
     }
 
     fn parameters(&self) -> Value {
@@ -46,15 +31,13 @@ impl Tool for CalculatorTool {
             .expect("Failed to serialize CalculatorArgs schema")
     }
 
-    async fn execute(&self, arg_json: &str) -> anyhow::Result<String> {
-        let args: CalculatorArgs = serde_json::from_str(arg_json)?;
-        let first_number = args.first_number.as_f64();
-        let second_number = args.second_number.as_f64();
-        let result = calculator(&args.operator, first_number, second_number);
-        match result {
-            Ok(value) => Ok(value.to_string()),
-            Err(err) => Ok(format!("Error: {err}")),
-        }
+    async fn execute(&self, arg_json: &str) -> Result<String, ToolError> {
+        let args: CalculatorArgs = serde_json::from_str(arg_json).map_err(|e| {
+            ToolError::Permanent(format!("invalid calculator arguments: {e}"))
+        })?;
+
+        let operator = Operator::parse(&args.operator)?;
+        let result = calculator(operator, args.first_number, args.second_number)?;
+        Ok(result.to_string())
     }
 }
-

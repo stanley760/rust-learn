@@ -1788,6 +1788,7 @@ dependencies = [
  "strum",
  "strum_macros",
  "tera",
+ "thiserror 2.0.18",
  "tokio",
  "tracing",
  "tracing-subscriber",
