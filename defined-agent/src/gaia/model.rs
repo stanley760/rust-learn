@@ -12,7 +12,7 @@ pub struct HfRow {
     pub row: GaiaRow
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct GaiaRow {
     pub task_id: String,
 
@@ -35,7 +35,7 @@ pub struct GaiaRow {
     pub annotator_metadata: AnnotatorMetadata,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct AnnotatorMetadata {
     #[serde(rename = "Steps")]
     pub steps: String,
