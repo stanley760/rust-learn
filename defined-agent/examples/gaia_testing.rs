@@ -36,20 +36,13 @@ fn models() -> Vec<String> {
                 .collect();
             if list.is_empty() {
                 tracing::warn!("GAIA_MODELS 为空，回退到默认模型列表");
-                default_models()
+                vec!["no models in settings".to_string()]
             } else {
                 list
             }
         }
-        Err(_) => default_models(),
+        Err(_) => vec!["no models in settings".to_string()],
     }
-}
-
-fn default_models() -> Vec<String> {
-    vec![
-        "Qwen/Qwen3.5-35B-A3B".to_string(),
-        "Qwen/Qwen3.8-27B".to_string(),
-    ]
 }
 
 pub async fn gaia_level1_experiment() -> anyhow::Result<()> {

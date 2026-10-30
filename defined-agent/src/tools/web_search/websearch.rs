@@ -3,7 +3,7 @@ use schemars::{JsonSchema, schema_for};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::tools::{Tool, ToolError, web_search::execute::web_search};
+use crate::{llm::ExecutionContext, tools::{Tool, ToolError, web_search::execute::web_search}};
 
 /// 检索结果条数的默认值。
 ///
@@ -98,7 +98,7 @@ impl Tool for WebSearchTool {
         true
     }
 
-    async fn execute(&self, arg_json: &str) -> Result<String, ToolError> {
+    async fn execute(&self, arg_json: &str, _content: &ExecutionContext) -> Result<String, ToolError> {
         let args: WebSearchArgs = serde_json::from_str(arg_json).map_err(|e| {
             ToolError::Permanent(format!("invalid web search arguments: {e}"))
         })?;

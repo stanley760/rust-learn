@@ -2,10 +2,10 @@ use schemars::{JsonSchema, schema_for};
 use serde::Deserialize;
 use serde_json::Value;
 
-use crate::tools::{
+use crate::{llm::ExecutionContext, tools::{
     Tool, ToolError,
     calculator::execute::{Operator, calculator},
-};
+}};
 
 #[derive(Deserialize, Debug, JsonSchema)]
 struct CalculatorArgs {
@@ -31,7 +31,7 @@ impl Tool for CalculatorTool {
             .expect("Failed to serialize CalculatorArgs schema")
     }
 
-    async fn execute(&self, arg_json: &str) -> Result<String, ToolError> {
+    async fn execute(&self, arg_json: &str, _content: &ExecutionContext) -> Result<String, ToolError> {
         let args: CalculatorArgs = serde_json::from_str(arg_json).map_err(|e| {
             ToolError::Permanent(format!("invalid calculator arguments: {e}"))
         })?;
